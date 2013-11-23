@@ -1,0 +1,8 @@
+build
+data
+\#*
+*.h~
+*.cpp~
+*.cuh~
+*.cu~
+
