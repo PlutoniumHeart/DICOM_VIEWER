@@ -15,6 +15,7 @@
 #include <itkImageSeriesReader.h>
 #include <itkImageSeriesWriter.h>
 #include <itkNumericSeriesFileNames.h>
+#include <itkGDCMSeriesFileNames.h>
 
 
 const unsigned char D2 = 2;
@@ -31,13 +32,16 @@ typedef itk::GDCMImageIO                                                       D
 typedef itk::ImageFileReader<UnsignedCharImageType>                            UnsignedCharImageReadType;
 typedef itk::ImageSeriesReader<UnsignedCharSeriesType>                         UnsignedCharSeriesReadType;
 typedef itk::ImageFileReader<ShortImageType>                                   ShortImageReadType;
+typedef itk::ImageSeriesReader<ShortSeriesType>                                ShortSeriesReadType;
 typedef itk::ImageFileWriter<UnsignedCharImageType>                            UnsignedCharImageWriteType;
 typedef itk::ImageSeriesWriter<UnsignedCharSeriesType,
                                UnsignedCharImageType>                          UnsignedCharSeriesWriteType;
+typedef itk::ImageSeriesWriter<ShortSeriesType, ShortImageType>                ShortSeriesWriteType;
 typedef itk::ImageFileWriter<ShortImageType>                                   ShortImageWriteType;
 typedef itk::ImageRegionConstIterator<UnsignedCharImageType>                   UnsignedCharConstIteratorType;
 typedef itk::ImageRegionConstIterator<ShortImageType>                          ShortImageConstIteratorType;
 typedef itk::ImageRegionIterator<UnsignedCharImageType>                        UnsignedCharIteratorType;
+typedef itk::GDCMSeriesFileNames                                               DICOMSeriesNameGeneratorType;
 typedef itk::NumericSeriesFileNames                                            SeriesNameGeneratorType;
 
 
@@ -65,6 +69,12 @@ public:
 
     static bool ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
     static bool WriteDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
+
+    static void SetDICOMFolder(std::string folderName, std::string** pSeriesName);
+    static bool ReadDICOMSeries(std::string folderName, std::string seriesName,
+                                ShortSeriesType::Pointer& imageObj);
+    static bool WriteDICOMSeries(std::string folderNmae, ShortSeriesType::Pointer& imageObj,
+                                 std::string seriesFormat, int begin, int end);
 private:
     static PNGIOType::Pointer m_pPNGIO;
     static JPEGIOType::Pointer m_pJPEGIO;

@@ -249,3 +249,77 @@ bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& i
     }
     return true;
 }
+
+
+void ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
+{
+    short i = 0;
+    short sNumberOfSeries = 0;
+    
+    DICOMSeriesNameGeneratorType::Pointer nameGenerator = DICOMSeriesNameGeneratorType::New();
+    nameGenerator->AddSeriesRestriction("0020|0012");
+    nameGenerator->SetDirectory(folderName);
+
+    const std::vector<std::string> seriesUID = nameGenerator->GetSeriesUIDs();
+    std::vector<std::string>::const_iterator seriesItr;
+    sNumberOfSeries = seriesUID.size();
+    *pSeriesName = new std::string[sNumberOfSeries];
+    for(seriesItr=seriesUID.begin();seriesItr!=seriesUID.end();seriesItr++)
+    {
+        *pSeriesName[i++] = *seriesItr;
+    }
+}
+
+
+bool ImageIO::ReadDICOMSeries(std::string folderName, std::string seriesName,
+                              ShortSeriesType::Pointer& imageObj)
+{
+    DICOMSeriesNameGeneratorType::Pointer nameGenerator = DICOMSeriesNameGeneratorType::New();
+    ShortSeriesReadType::Pointer seriesReader = ShortSeriesReadType::New();
+    seriesReader->SetImageIO(m_pDICOMIO);
+    nameGenerator->AddSeriesRestriction("0020|0012");
+    nameGenerator->SetDirectory(folderName);
+    std::vector<std::string> fileNameContainer = nameGenerator->GetFileNames(seriesName);
+    seriesReader->SetFileNames(fileNameContainer);
+
+    try
+    {
+        seriesReader->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exceptions caught in reading file series: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+
+    imageObj = seriesReader->GetOutput();
+    return true;
+}
+
+
+bool ImageIO::WriteDICOMSeries(std::string folderName, ShortSeriesType::Pointer& imageObj,
+                               std::string seriesFormat, int begin, int end)
+{
+    ShortSeriesWriteType::Pointer seriesWriter = ShortSeriesWriteType::New();
+    seriesWriter->SetInput(imageObj);
+    seriesWriter->SetImageIO(m_pDICOMIO);
+    SeriesNameGeneratorType::Pointer nameGenerator = SeriesNameGeneratorType::New();
+    nameGenerator->SetSeriesFormat(folderName+seriesFormat);
+    nameGenerator->SetStartIndex(begin);
+    nameGenerator->SetEndIndex(end);
+    nameGenerator->SetIncrementIndex(1);
+    seriesWriter->SetFileNames(nameGenerator->GetFileNames());
+
+    try
+    {
+        seriesWriter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in writing image series: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    return true;
+}
