@@ -41,12 +41,24 @@ int main()
     ImageFilter::Cast<UnsignedCharImageType, ShortImageType,
                       UnsignedCharImageType::Pointer, ShortImageType::Pointer>(imageObj, s_imageObj);
     ImageIO::WriteDICOMImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/output/211.IMA", s_imageObj);
-    */
     
     ImageIO::ReadDICOMImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/input/LI.MR.RESEARCH_PHANTOM.0007.0047.2013.08.06.19.22.15.906250.27825948.IMA", s_imageObj);
     ImageFilter::RescaleIntensityFilter<ShortImageType, UnsignedCharImageType,
                       ShortImageType::Pointer, UnsignedCharImageType::Pointer>(s_imageObj, imageObj);
     ImageIO::WritePNGImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/output/liver.png", imageObj);
+    */
+
+    ImageIO::SetDICOMFolder("/home/zhitaoli/workspace/Git/DICOM_Tool/data/input/DICOM_Series/", &pSeriesName);
+    std::cout<<"There is (are) "<<sizeof(pSeriesName)/sizeof(std::string)<<" DICOM series in the folder"<<std::endl;
+    for(int i=0;i<sizeof(pSeriesName)/sizeof(std::string);i++)
+    {
+        std::cout<<"Reading "<<pSeriesName[i]<<std::endl;
+        ImageIO::ReadDICOMSeries("/home/zhitaoli/workspace/Git/DICOM_Tool/data/input/DICOM_Series/", pSeriesName[i], s_imageObj_3d);
+        std::cout<<"Writing "<<pSeriesName[i]<<std::endl;
+        ImageFilter::RescaleIntensityFilter<ShortSeriesType, UnsignedCharSeriesType,
+                                            ShortSeriesType::Pointer, UnsignedCharSeriesType::Pointer>(s_imageObj_3d, imageObj_3d);
+        ImageIO::WritePNGSeries("/home/zhitaoli/workspace/Git/DICOM_Tool/data/output/PNG_liver/", imageObj_3d, "%03d.png", 1, 96);
+    }
     
     return 0;
 }
