@@ -38,12 +38,14 @@ int main()
     */
 
     /*ImageIO::ReadPNGImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/input/211.png", imageObj);
-    ImageFilter::CastUnsignedCharToShortImage(imageObj, s_imageObj);
+    ImageFilter::Cast<UnsignedCharImageType, ShortImageType,
+                      UnsignedCharImageType::Pointer, ShortImageType::Pointer>(imageObj, s_imageObj);
     ImageIO::WriteDICOMImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/output/211.IMA", s_imageObj);
     */
     
     ImageIO::ReadDICOMImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/input/LI.MR.RESEARCH_PHANTOM.0007.0047.2013.08.06.19.22.15.906250.27825948.IMA", s_imageObj);
-    ImageFilter::CastShortToUnsignedCharImage(s_imageObj, imageObj);
+    ImageFilter::RescaleIntensityFilter<ShortImageType, UnsignedCharImageType,
+                      ShortImageType::Pointer, UnsignedCharImageType::Pointer>(s_imageObj, imageObj);
     ImageIO::WritePNGImage("/home/zhitaoli/workspace/Git/DICOM_Tool/data/output/liver.png", imageObj);
     
     return 0;
