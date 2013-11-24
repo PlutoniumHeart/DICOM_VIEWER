@@ -2,47 +2,7 @@
 #define IMAGEIO_H
 
 
-#include <itkImage.h>
-#include <itkImageFileReader.h>
-#include <itkImageFileWriter.h>
-#include <itkImageRegionIterator.h>
-#include <itkImageRegionConstIterator.h>
-#include <itkPNGImageIO.h>
-#include <itkJPEGImageIO.h>
-#include <itkGDCMImageIO.h>
-#include <itkMetaDataDictionary.h>
-#include <itkMetaDataObject.h>
-#include <itkImageSeriesReader.h>
-#include <itkImageSeriesWriter.h>
-#include <itkNumericSeriesFileNames.h>
-#include <itkGDCMSeriesFileNames.h>
-
-
-const unsigned char D2 = 2;
-const unsigned char D3 = 3;
-
-typedef itk::Image<unsigned char, D2>                                          UnsignedCharImageType;
-typedef itk::Image<unsigned char, D3>                                          UnsignedCharSeriesType;
-typedef itk::Image<short, D2>                                                  ShortImageType;
-typedef itk::Image<short, D3>                                                  ShortSeriesType;
-typedef itk::ImageRegion<D2>                                                   UnsignedCharImageRegion2D;
-typedef itk::PNGImageIO                                                        PNGIOType;
-typedef itk::JPEGImageIO                                                       JPEGIOType;
-typedef itk::GDCMImageIO                                                       DICOMIOType;
-typedef itk::ImageFileReader<UnsignedCharImageType>                            UnsignedCharImageReadType;
-typedef itk::ImageSeriesReader<UnsignedCharSeriesType>                         UnsignedCharSeriesReadType;
-typedef itk::ImageFileReader<ShortImageType>                                   ShortImageReadType;
-typedef itk::ImageSeriesReader<ShortSeriesType>                                ShortSeriesReadType;
-typedef itk::ImageFileWriter<UnsignedCharImageType>                            UnsignedCharImageWriteType;
-typedef itk::ImageSeriesWriter<UnsignedCharSeriesType,
-                               UnsignedCharImageType>                          UnsignedCharSeriesWriteType;
-typedef itk::ImageSeriesWriter<ShortSeriesType, ShortImageType>                ShortSeriesWriteType;
-typedef itk::ImageFileWriter<ShortImageType>                                   ShortImageWriteType;
-typedef itk::ImageRegionConstIterator<UnsignedCharImageType>                   UnsignedCharConstIteratorType;
-typedef itk::ImageRegionConstIterator<ShortImageType>                          ShortImageConstIteratorType;
-typedef itk::ImageRegionIterator<UnsignedCharImageType>                        UnsignedCharIteratorType;
-typedef itk::GDCMSeriesFileNames                                               DICOMSeriesNameGeneratorType;
-typedef itk::NumericSeriesFileNames                                            SeriesNameGeneratorType;
+#include "ImageCommon.h"
 
 
 class ImageIO
@@ -75,11 +35,56 @@ public:
                                 ShortSeriesType::Pointer& imageObj);
     static bool WriteDICOMSeries(std::string folderNmae, ShortSeriesType::Pointer& imageObj,
                                  std::string seriesFormat, int begin, int end);
+
+    template<class T1, class T2>
+    static bool CreateBlankImage(T1 imageObj, int x, int y);
+    template<class T1, class T2>
+    static bool CreateBlankSeries(T1 imageObj, int x, int y, int z);
+    
 private:
     static PNGIOType::Pointer m_pPNGIO;
     static JPEGIOType::Pointer m_pJPEGIO;
     static DICOMIOType::Pointer m_pDICOMIO;
 };
+
+
+template<class T1, class T2>
+bool ImageIO::CreateBlankImage(T1 imageObj, int x, int y)
+{
+    itk::Index<D2> start;
+    itk::Size<D2> size;
+
+    start.Fill(0);
+    size[0] = x;
+    size[1] = y;
+    T2 region(start, size);
+
+    imageObj->SetRegions(region);
+    imageObj->Allocate();
+    imageObj->FillBuffer(0);
+    
+    return true;
+}
+
+
+template<class T1, class T2>
+bool ImageIO::CreateBlankSeries(T1 imageObj, int x, int y, int z)
+{
+    itk::Index<D3> start;
+    itk::Size<D3> size;
+
+    start.Fill(0);
+    size[0] = x;
+    size[1] = y;
+    size[2] = z;
+    T2 region(start, size);
+
+    imageObj->SetRegions(region);
+    imageObj->Allocate();
+    imageObj->FillBuffer(0);
+    
+    return true;
+}
 
 
 #endif // IMAGEIO_H

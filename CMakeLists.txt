@@ -12,7 +12,9 @@ endif(ITK_FOUND)
 include_directories(src/include)
 
 set(SOURCES src/main.cpp 
+            src/include/ImageCommon.h
             src/include/ImageIO.h src/ImageIO.cpp
+            src/include/ImageFilter.h src/ImageFilter.cpp
 )
 
 set(ALL_LIBS ${ITK_LIBRARIES})
