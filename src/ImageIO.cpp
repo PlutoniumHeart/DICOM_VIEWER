@@ -57,6 +57,62 @@ bool ImageIO::WritePNGImage(std::string outputFile, UnsignedCharImageType::Point
 }
 
 
+bool ImageIO::ReadPNGSeries(std::string folderName, UnsignedCharSeriesType::Pointer& imageObj,
+                            std::string seriesFormat, int begin, int end)
+{
+    UnsignedCharSeriesReadType::Pointer reader = UnsignedCharSeriesReadType::New();
+    SeriesNameGeneratorType::Pointer nameGenerator = SeriesNameGeneratorType::New();
+
+    nameGenerator->SetSeriesFormat(folderName+seriesFormat);
+    nameGenerator->SetStartIndex(begin);
+    nameGenerator->SetEndIndex(end);
+    nameGenerator->SetIncrementIndex(1);
+
+    reader->SetImageIO(m_pPNGIO);
+    reader->SetFileNames(nameGenerator->GetFileNames());
+    try
+    {
+        reader->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exception caught in reading file series: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    imageObj = reader->GetOutput();
+    return true;
+}
+
+
+bool ImageIO::WritePNGSeries(std::string folderName, UnsignedCharSeriesType::Pointer& imageObj,
+                              std::string seriesFormat, int begin, int end)
+{
+    UnsignedCharSeriesWriteType::Pointer writer = UnsignedCharSeriesWriteType::New();
+    SeriesNameGeneratorType::Pointer nameGenerator = SeriesNameGeneratorType::New();
+
+    nameGenerator->SetSeriesFormat(folderName+seriesFormat);
+    nameGenerator->SetStartIndex(begin);
+    nameGenerator->SetEndIndex(end);
+    nameGenerator->SetIncrementIndex(1);
+
+    writer->SetImageIO(m_pPNGIO);
+    writer->SetInput(imageObj);
+    writer->SetFileNames(nameGenerator->GetFileNames());
+    try
+    {
+        writer->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Execption caught in writing files: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    return true;
+}
+
+
 bool ImageIO::ReadJPEGImage(std::string inputFile, UnsignedCharImageType::Pointer& imageObj)
 {
     UnsignedCharImageReadType::Pointer reader = UnsignedCharImageReadType::New();
@@ -91,6 +147,62 @@ bool ImageIO::WriteJPEGImage(std::string outputFile, UnsignedCharImageType::Poin
     catch(itk::ExceptionObject &e)
     {
         std::cerr<<"Exception in file writing: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    return true;
+}
+
+
+bool ImageIO::ReadJPEGSeries(std::string folderName, UnsignedCharSeriesType::Pointer& imageObj,
+                            std::string seriesFormat, int begin, int end)
+{
+    UnsignedCharSeriesReadType::Pointer reader = UnsignedCharSeriesReadType::New();
+    SeriesNameGeneratorType::Pointer nameGenerator = SeriesNameGeneratorType::New();
+
+    nameGenerator->SetSeriesFormat(folderName+seriesFormat);
+    nameGenerator->SetStartIndex(begin);
+    nameGenerator->SetEndIndex(end);
+    nameGenerator->SetIncrementIndex(1);
+
+    reader->SetImageIO(m_pJPEGIO);
+    reader->SetFileNames(nameGenerator->GetFileNames());
+    try
+    {
+        reader->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exception caught in reading file series: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    imageObj = reader->GetOutput();
+    return true;
+}
+
+
+bool ImageIO::WriteJPEGSeries(std::string folderName, UnsignedCharSeriesType::Pointer& imageObj,
+                              std::string seriesFormat, int begin, int end)
+{
+    UnsignedCharSeriesWriteType::Pointer writer = UnsignedCharSeriesWriteType::New();
+    SeriesNameGeneratorType::Pointer nameGenerator = SeriesNameGeneratorType::New();
+
+    nameGenerator->SetSeriesFormat(folderName+seriesFormat);
+    nameGenerator->SetStartIndex(begin);
+    nameGenerator->SetEndIndex(end);
+    nameGenerator->SetIncrementIndex(1);
+
+    writer->SetImageIO(m_pJPEGIO);
+    writer->SetInput(imageObj);
+    writer->SetFileNames(nameGenerator->GetFileNames());
+    try
+    {
+        writer->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Execption caught in writing files: "<<std::endl;
         std::cerr<<e<<std::endl;
         return false;
     }
