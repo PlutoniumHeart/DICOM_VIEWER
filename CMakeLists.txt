@@ -9,16 +9,28 @@ else(ITK_FOUND)
   message(FATAL_ERROR "ITK not found. Please set ITK_DIR. ")
 endif(ITK_FOUND)
 
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
+find_package(Qt5Declarative REQUIRED)
+
+set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+
 include_directories(src/include)
 
 set(SOURCES src/main.cpp 
             src/include/ImageCommon.h
             src/include/ImageIO.h src/ImageIO.cpp
             src/include/ImageFilter.h src/ImageFilter.cpp
+            src/include/ImageViewer.h src/ImageViewer.cpp
 )
 
-set(ALL_LIBS ${ITK_LIBRARIES})
+set(ALL_LIBS ${ITK_LIBRARIES}
+             ${Qt5Widgets_LIBRARIES}
+)
 
 add_executable(DICOM_Tool ${SOURCES})
+
+qt5_use_modules(DICOM_Tool Widgets Core Declarative PrintSupport)
 
 target_link_libraries(DICOM_Tool ${ALL_LIBS})

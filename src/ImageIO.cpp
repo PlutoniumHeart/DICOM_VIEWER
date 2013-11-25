@@ -323,3 +323,41 @@ bool ImageIO::WriteDICOMSeries(std::string folderName, ShortSeriesType::Pointer&
     }
     return true;
 }
+
+
+int ImageIO::PixelToArray(ShortImageType::Pointer& imageObj, short** array)
+{
+    itk::ImageRegion<D2>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
+    int w = tmp.GetElement(0);
+    int h = tmp.GetElement(1);
+    std::cout<<w<<" "<<h<<std::endl;
+    *array = new short[w*h];
+    int i = 0;
+    ShortImageConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
+    in.GoToBegin();
+    while(!in.IsAtEnd())
+    {
+        (*array)[i++] = in.Get();
+        ++in;
+    }
+    return 0;
+}
+
+
+int ImageIO::PixelToArray(ShortSeriesType::Pointer imageObj, short** array)
+{
+    itk::ImageRegion<D3>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
+    int w = tmp.GetElement(0);
+    int h = tmp.GetElement(1);
+    int d = tmp.GetElement(2);
+    *array = new short[w*h*d];
+    int i = 0;
+    ShortSeriesConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
+    in.GoToBegin();
+    while(!in.IsAtEnd())
+    {
+        *array[i++] = in.Get();
+        ++in;
+    }
+    return 0;
+}

@@ -5,4 +5,4 @@ data
 *.cpp~
 *.cuh~
 *.cu~
-
+*.backup

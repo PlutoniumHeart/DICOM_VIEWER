@@ -40,6 +40,9 @@ public:
     static bool CreateBlankImage(T1 imageObj, int x, int y);
     template<class T1, class T2>
     static bool CreateBlankSeries(T1 imageObj, int x, int y, int z);
+
+    static int PixelToArray(ShortImageType::Pointer& imageObj, short** array);
+    static int PixelToArray(ShortSeriesType::Pointer imageObj, short** array);
     
 private:
     static PNGIOType::Pointer m_pPNGIO;
