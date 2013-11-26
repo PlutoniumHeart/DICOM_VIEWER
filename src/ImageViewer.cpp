@@ -7,12 +7,15 @@ ImageViewer::ImageViewer(QMainWindow *parent)
 {
     ui.setupUi(this);
 
+    std::cout<<"width: "<<this->width()<<std::endl;
     ui.imageLabel->setBackgroundRole(QPalette::Base);
-    ui.imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    //ui.imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui.imageLabel->setMinimumSize(64, 64);
     ui.imageLabel->setScaledContents(true);
 
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.imageLabel);
+
     //setCentralWidget(ui.scrollArea);
     
     createActions();
@@ -170,4 +173,9 @@ void ImageViewer::updateActions()
     ui.actionZoom_in_25->setEnabled(!ui.actionFitToWindow->isChecked());
     ui.actionZoom_out_25->setEnabled(!ui.actionFitToWindow->isChecked());
     ui.actionNormalSize->setEnabled(!ui.actionFitToWindow->isChecked());
+}
+
+
+void ImageViewer::resizeEvent(QResizeEvent * /* event */)
+{
 }

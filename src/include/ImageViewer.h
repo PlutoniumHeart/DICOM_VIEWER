@@ -27,6 +27,9 @@ public:
     ImageViewer(QMainWindow *parent = 0);
     ~ImageViewer();
 
+protected:
+    void resizeEvent(QResizeEvent *event);
+
 private slots:
     void open();
     void print();

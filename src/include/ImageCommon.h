@@ -18,11 +18,16 @@
 #include <itkGDCMSeriesFileNames.h>
 #include <itkCastImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkBinaryErodeImageFilter.h>
+#include <itkBinaryDilateImageFilter.h>
+#include <itkBinaryBallStructuringElement.h>
 
 
 const unsigned char D2 = 2;
 const unsigned char D3 = 3;
 
+// IO
 typedef itk::Image<unsigned char, D2>                                       UnsignedCharImageType;
 typedef itk::Image<unsigned char, D3>                                       UnsignedCharSeriesType;
 typedef itk::Image<short, D2>                                               ShortImageType;

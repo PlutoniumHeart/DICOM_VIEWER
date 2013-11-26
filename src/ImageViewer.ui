@@ -17,8 +17,8 @@
    <widget class="QLabel" name="imageLabel">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
+      <x>144</x>
+      <y>44</y>
       <width>512</width>
       <height>512</height>
      </rect>
@@ -30,14 +30,17 @@
    <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
+      <x>144</x>
+      <y>44</y>
       <width>512</width>
       <height>512</height>
      </rect>
     </property>
     <property name="widgetResizable">
      <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
     <widget class="QWidget" name="scrollAreaWidgetContents_3">
      <property name="geometry">

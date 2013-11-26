@@ -266,7 +266,7 @@ void ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
     *pSeriesName = new std::string[sNumberOfSeries];
     for(seriesItr=seriesUID.begin();seriesItr!=seriesUID.end();seriesItr++)
     {
-        *pSeriesName[i++] = *seriesItr;
+        (*pSeriesName)[i++] = *seriesItr;
     }
 }
 
