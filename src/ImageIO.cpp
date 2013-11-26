@@ -330,7 +330,6 @@ int ImageIO::PixelToArray(ShortImageType::Pointer& imageObj, short** array)
     itk::ImageRegion<D2>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
     int w = tmp.GetElement(0);
     int h = tmp.GetElement(1);
-    std::cout<<w<<" "<<h<<std::endl;
     *array = new short[w*h];
     int i = 0;
     ShortImageConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());

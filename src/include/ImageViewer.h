@@ -7,8 +7,8 @@
 #include <QImage>
 #include <QPrinter>
 #include <QPrintDialog>
-
 #include "ImageIO.h"
+#include "ui_ImageViewer.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -24,41 +24,30 @@ class ImageViewer : public QMainWindow
 {
     Q_OBJECT
 public:
-    ImageViewer();
-    
+    ImageViewer(QMainWindow *parent = 0);
+    ~ImageViewer();
+
 private slots:
     void open();
     void print();
+    void fitToWindow();
+    void normalSize();
     void zoomIn();
     void zoomOut();
-    void normalSize();
-    void fitToWindow();
-    void about();
+    void scaleImage(double factor);
+    void adjustScrollBar(QScrollBar* scrollBar, double factor);
 
 private:
     void createActions();
-    void createMenus();
     void updateActions();
-    void scaleImage(double factor);
-    void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
-    QLabel *imageLabel;
-    QScrollArea *scrollArea;
     double scaleFactor;
     QPrinter printer;
-    QAction *openAct;
     QAction *printAct;
-    QAction *exitAct;
-    QAction *zoomInAct;
-    QAction *zoomOutAct;
-    QAction *normalSizeAct;
-    QAction *fitToWindowAct;
-    QAction *aboutAct;
-    QAction *aboutQtAct;
 
-    QMenu *fileMenu;
-    QMenu *viewMenu;
-    QMenu *helpMenu;
+    short* image_array;
+    
+    Ui::ImageViewer ui;
 };
 
 

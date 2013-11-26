@@ -1,23 +1,33 @@
 #include "ImageViewer.h"
 
 
-ImageViewer::ImageViewer()
+ImageViewer::ImageViewer(QMainWindow *parent)
+    : QMainWindow(parent)
+    , image_array(NULL)
 {
-    imageLabel = new QLabel;
-    imageLabel->setBackgroundRole(QPalette::Base);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
+    ui.setupUi(this);
 
-    scrollArea = new QScrollArea;
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(imageLabel);
-    setCentralWidget(scrollArea);
+    ui.imageLabel->setBackgroundRole(QPalette::Base);
+    ui.imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui.imageLabel->setScaledContents(true);
 
+    ui.scrollArea->setBackgroundRole(QPalette::Dark);
+    ui.scrollArea->setWidget(ui.imageLabel);
+    //setCentralWidget(ui.scrollArea);
+    
     createActions();
-    createMenus();
 
     setWindowTitle(tr("Image Viewer"));
-    resize(500, 400);
+}
+
+
+ImageViewer::~ImageViewer()
+{
+    if(image_array!=NULL)
+    {
+        delete [] image_array;
+        image_array = NULL;
+    }
 }
 
 
@@ -28,7 +38,6 @@ void ImageViewer::open()
     {
         ShortImageType::Pointer imageObj = ShortImageType::New();
         ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), imageObj);
-        short* image_array = NULL;
         int w = imageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
         int h = imageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
         ImageIO::PixelToArray(imageObj, &image_array);
@@ -41,21 +50,20 @@ void ImageViewer::open()
             }
         }
         
-        //QImage image(fileName);
         if(image.isNull())
         {
             QMessageBox::information(this, tr("Image Viewer"), tr("Cannot load %1.").arg(fileName));
             return;
         }
-        imageLabel->setPixmap(QPixmap::fromImage(image));
+        ui.imageLabel->setPixmap(QPixmap::fromImage(image));
         scaleFactor = 1.0;
-        printAct->setEnabled(true);
-        fitToWindowAct->setEnabled(true);
+        ui.actionPrint->setEnabled(true);
+        ui.actionFitToWindow->setEnabled(true);
         updateActions();
 
-        if(!fitToWindowAct->isChecked())
+        if(!ui.actionFitToWindow->isChecked())
         {
-            imageLabel->adjustSize();
+            ui.imageLabel->adjustSize();
         }
     }
 }
@@ -63,18 +71,35 @@ void ImageViewer::open()
 
 void ImageViewer::print()
 {
-    Q_ASSERT(imageLabel->pixmap());
+    Q_ASSERT(ui.imageLabel->pixmap());
     QPrintDialog dialog(&printer, this);
     if(dialog.exec())
     {
         QPainter painter(&printer);
         QRect rect = painter.viewport();
-        QSize size = imageLabel->pixmap()->size();
+        QSize size = ui.imageLabel->pixmap()->size();
         size.scale(rect.size(), Qt::KeepAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
-        painter.setWindow(imageLabel->pixmap()->rect());
-        painter.drawPixmap(0, 0, *imageLabel->pixmap());
+        painter.setWindow(ui.imageLabel->pixmap()->rect());
+        painter.drawPixmap(0, 0, *ui.imageLabel->pixmap());
     }
+}
+
+
+void ImageViewer::normalSize()
+{
+    ui.imageLabel->adjustSize();
+    scaleFactor = 1.0;
+}
+
+
+void ImageViewer::fitToWindow()
+{
+    bool fitToWindow = ui.actionFitToWindow->isChecked();
+    ui.scrollArea->setWidgetResizable(fitToWindow);
+    if(!fitToWindow)
+        normalSize();
+    updateActions();
 }
 
 
@@ -86,139 +111,63 @@ void ImageViewer::zoomIn()
 
 void ImageViewer::zoomOut()
 {
-    scaleImage(0.8);
-}
-
-
-void ImageViewer::normalSize()
-{
-    imageLabel->adjustSize();
-    scaleFactor = 1.0;
-}
-
-
-void ImageViewer::fitToWindow()
-{
-    bool fitToWindow = fitToWindowAct->isChecked();
-    scrollArea->setWidgetResizable(fitToWindow);
-    if(!fitToWindow)
-    {
-        normalSize();
-    }
-    updateActions();
-}
-
-
-void ImageViewer::about()
-{
-    QMessageBox::about(this, tr("About Image Viewer"),
-                       tr("<p>Ths <b>Image Viewer</b> example shows how to combine QLabel"
-                          "and QScrollArea to display an image. QLable is typically used "
-                          "for displaying a text, but it can also display an image. "
-                          "QScrollArea provides a scrolling view around another widget. "
-                          "If the child widget exceeds the size of the frame, QScroolArea "
-                          "automatically provides scroll bars. </p><p>The example "
-                          "demonstrates how QLabel's ability to scale its contents "
-                          "(QLabel::scaledContents), and QScrollArea's ability to "
-                          "automatically resize its contents "
-                          "(QScrollArea::widgetResizable), can be used to implement "
-                          "zooming and scaling features. </p><p>In addtion the example "
-                          "shows how to use QPainter to print an image.</p>"));
+    scaleImage(0.75);
 }
 
 
 void ImageViewer::createActions()
 {
-    openAct = new QAction(tr("&Open..."), this);
-    openAct->setShortcut(tr("Ctrl+O"));
-    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+    ui.actionOpen_DICOM->setShortcut(tr("Ctrl+O"));
+    connect(ui.actionOpen_DICOM, SIGNAL(triggered()), this, SLOT(open()));
 
-    printAct = new QAction(tr("&Print..."), this);
-    printAct->setShortcut(tr("Ctrl+P"));
-    printAct->setEnabled(false);
-    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+    ui.actionPrint->setShortcut(tr("Ctrl+P"));
+    ui.actionPrint->setEnabled(false);
+    connect(ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcut(tr("Ctrl+Q"));
-    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+    ui.actionExit->setShortcut(tr("Ctrl+Q"));
+    connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
-    zoomInAct = new QAction(tr("Zoom &In (25%)"), this);
-    zoomInAct->setShortcut(tr("Ctrl++"));
-    zoomInAct->setEnabled(false);
-    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    ui.actionFitToWindow->setEnabled(false);
+    ui.actionFitToWindow->setShortcut(tr("Ctrl+F"));
+    connect(ui.actionFitToWindow, SIGNAL(triggered()), this, SLOT(fitToWindow()));
 
-    zoomOutAct = new QAction(tr("Zoom &Out (25%)"), this);
-    zoomOutAct->setShortcut(tr("Ctrl+-"));
-    zoomOutAct->setEnabled(false);
-    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    ui.actionNormalSize->setShortcut(tr("Ctrl+S"));
+    ui.actionNormalSize->setEnabled(false);
+    connect(ui.actionNormalSize, SIGNAL(triggered()), this, SLOT(normalSize()));
 
-    normalSizeAct = new QAction(tr("&Normal Size"), this);
-    normalSizeAct->setShortcut(tr("Ctrl+S"));
-    normalSizeAct->setEnabled(false);
-    connect(normalSizeAct, SIGNAL(triggered()), this, SLOT(normalSize()));
+    ui.actionZoom_in_25->setShortcut(tr("Ctrl++"));
+    ui.actionZoom_in_25->setEnabled(false);
+    connect(ui.actionZoom_in_25, SIGNAL(triggered()), this, SLOT(zoomIn()));
 
-    fitToWindowAct = new QAction(tr("&Fit to Window"), this);
-    fitToWindowAct->setEnabled(false);
-    fitToWindowAct->setCheckable(true);
-    fitToWindowAct->setShortcut(tr("Ctrl+F"));
-    connect(fitToWindowAct, SIGNAL(triggered()), this, SLOT(fitToWindow()));
-
-    aboutAct = new QAction(tr("&About"), this);
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
-
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-}
-
-
-void ImageViewer::createMenus()
-{
-    fileMenu = new QMenu(tr("&File"), this);
-    fileMenu->addAction(openAct);
-    fileMenu->addAction(printAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
-
-    viewMenu = new QMenu(tr("&View"), this);
-    viewMenu->addAction(zoomInAct);
-    viewMenu->addAction(zoomOutAct);
-    viewMenu->addAction(normalSizeAct);
-    viewMenu->addSeparator();
-    viewMenu->addAction(fitToWindowAct);
-
-    helpMenu = new QMenu(tr("&Help"), this);
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
-
-    menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(viewMenu);
-    menuBar()->addMenu(helpMenu);
-}
-
-
-void ImageViewer::updateActions()
-{
-    zoomInAct->setEnabled(!fitToWindowAct->isChecked());
-    zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
-    normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
+    ui.actionZoom_out_25->setShortcut(tr("Ctrl+-"));
+    ui.actionZoom_out_25->setEnabled(false);
+    connect(ui.actionZoom_out_25, SIGNAL(triggered()), this, SLOT(zoomOut()));
 }
 
 
 void ImageViewer::scaleImage(double factor)
 {
-    Q_ASSERT(imageLabel->pixmap());
-    scaleFactor *= factor;
-    imageLabel->resize(scaleFactor * imageLabel->pixmap()->size());
+    Q_ASSERT(ui.imageLabel->pixmap());
+    scaleFactor*=factor;
+    ui.imageLabel->resize(scaleFactor*ui.imageLabel->pixmap()->size());
 
-    adjustScrollBar(scrollArea->horizontalScrollBar(), factor);
-    adjustScrollBar(scrollArea->verticalScrollBar(), factor);
+    adjustScrollBar(ui.scrollArea->horizontalScrollBar(), factor);
+    adjustScrollBar(ui.scrollArea->verticalScrollBar(), factor);
 
-    zoomInAct->setEnabled(scaleFactor < 3.0);
-    zoomOutAct->setEnabled(scaleFactor > 0.333);
+    ui.actionZoom_in_25->setEnabled(scaleFactor<3.0);
+    ui.actionZoom_out_25->setEnabled(scaleFactor>0.333);
 }
 
 
-void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
+void ImageViewer::adjustScrollBar(QScrollBar* scrollBar, double factor)
 {
     scrollBar->setValue(int(factor*scrollBar->value()+((factor-1)*scrollBar->pageStep()/2)));
+}
+
+
+void ImageViewer::updateActions()
+{
+    ui.actionZoom_in_25->setEnabled(!ui.actionFitToWindow->isChecked());
+    ui.actionZoom_out_25->setEnabled(!ui.actionFitToWindow->isChecked());
+    ui.actionNormalSize->setEnabled(!ui.actionFitToWindow->isChecked());
 }

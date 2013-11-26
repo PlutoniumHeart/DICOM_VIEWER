@@ -15,6 +15,8 @@ find_package(Qt5PrintSupport REQUIRED)
 find_package(Qt5Declarative REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+qt5_wrap_ui(QTUI src/ImageViewer.ui)
+include_directories("${PROJECT_BINARY_DIR}")
 
 include_directories(src/include)
 
@@ -23,6 +25,7 @@ set(SOURCES src/main.cpp
             src/include/ImageIO.h src/ImageIO.cpp
             src/include/ImageFilter.h src/ImageFilter.cpp
             src/include/ImageViewer.h src/ImageViewer.cpp
+            src/ImageViewer.ui ${QTUI}
 )
 
 set(ALL_LIBS ${ITK_LIBRARIES}
