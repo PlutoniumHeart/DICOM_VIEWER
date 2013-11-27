@@ -22,6 +22,9 @@
 #include <itkBinaryErodeImageFilter.h>
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
+#include <itkConnectedComponentImageFilter.h>
+#include <itkRelabelComponentImageFilter.h>
+#include <itkSubtractImageFilter.h>
 
 
 const unsigned char D2 = 2;

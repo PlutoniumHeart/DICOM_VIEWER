@@ -37,9 +37,21 @@ public:
     template<class T1, class T2, class T3, class T1Pointer, class T2Pointer>
     static bool BinaryErosionFilter3D(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int Radius,
                                      int foreground, int background);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static bool BinaryConnectedComponentFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static bool BinaryConnectedComponentRelabelFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static void SelectComponent(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int component);
+
+    template<class T1, class T1Pointer, class T2, class T2Pointer>
+    static bool Difference(T1Pointer& lhs, T1Pointer& rhs, T1Pointer& difference);
 };
 
-
+ 
 template<class T1, class T2, class T1Pointer, class T2Pointer>
 bool ImageFilter::Cast(T1Pointer& imageObj_1, T2Pointer& imageObj_2)
 {
@@ -247,6 +259,126 @@ bool ImageFilter::BinaryErosionFilter3D(T1Pointer& imageObj_1, T2Pointer& imageO
     imageObj_2 = erosionFilter->GetOutput();
     
     return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+bool ImageFilter::BinaryConnectedComponentFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2)
+{
+    typedef itk::ConnectedComponentImageFilter<T1, T2> ConnectedComponentType;
+
+    typename ConnectedComponentType::Pointer connectedFilter = ConnectedComponentType::New();
+
+    connectedFilter->SetInput(imageObj_1);
+
+    try
+    {
+        connectedFilter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in analyzing connected components: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    imageObj_2 = connectedFilter->GetOutput();
+    return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+bool ImageFilter::BinaryConnectedComponentRelabelFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2)
+{
+    typedef itk::RelabelComponentImageFilter<T1, T2> RelabelComponentType;
+
+    typename RelabelComponentType::Pointer relabelFilter = RelabelComponentType::New();
+
+    relabelFilter->SetInput(imageObj_1);
+
+    try
+    {
+        relabelFilter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in relabeling connected components: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    imageObj_2 = relabelFilter->GetOutput();
+    return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+void ImageFilter::SelectComponent(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int component)
+{
+    typedef itk::ImageRegionConstIterator<T1> ConstIteratorType;
+    typedef itk::ImageRegionIterator<T2> IteratorType;
+    ConstIteratorType in(imageObj_1, imageObj_1->GetLargestPossibleRegion());
+    IteratorType out(imageObj_2, imageObj_2->GetLargestPossibleRegion());
+    in.GoToBegin();
+    out.GoToBegin();
+    while(!in.IsAtEnd())
+    {
+        if(in.Get()<=component && in.Get()!=0)
+            out.Set(255);
+        else
+            out.Set(0);
+        ++in;
+        ++out;
+    }
+}
+
+
+template<class T1, class T1Pointer, class T2, class T2Pointer>
+bool ImageFilter::Difference(T1Pointer& lhs, T1Pointer& rhs, T1Pointer& difference)
+{
+    /*typedef itk::SubtractImageFilter<T1, T1, T2> DifferenceFilterType;
+    T2Pointer temp = T2::New();
+    typename DifferenceFilterType::Pointer diffFilter = DifferenceFilterType::New();
+
+    diffFilter->SetInput1(lhs);
+    diffFilter->SetInput2(rhs);
+
+    try
+    {
+        diffFilter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in subtracting images: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    temp = diffFilter->GetOutput();
+    return true;
+    */
+    typedef itk::ImageRegionConstIterator<T1> ConstIteratorType;
+    typedef itk::ImageRegionIterator<T1> IteratorType;
+    ConstIteratorType in_l(lhs, lhs->GetLargestPossibleRegion());
+    ConstIteratorType in_r(rhs, rhs->GetLargestPossibleRegion());
+    IteratorType out(difference, difference->GetLargestPossibleRegion());
+    in_l.GoToBegin();
+    in_r.GoToBegin();
+    out.GoToBegin();
+    while(!in_l.IsAtEnd())
+    {
+        if((in_l.Get()-in_r.Get())>255)
+            out.Set(255);
+        else if((in_l.Get()-in_r.Get())<0)
+        {
+            out.Set(0);
+        }
+        else
+            out.Set((in_l.Get()-in_r.Get()));
+        
+        //out.Set(255);
+        ++in_l;
+        ++in_r;
+        ++out;
+    }
+    
 }
 
 

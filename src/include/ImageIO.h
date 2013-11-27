@@ -30,7 +30,7 @@ public:
     static bool ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
     static bool WriteDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
 
-    static void SetDICOMFolder(std::string folderName, std::string** pSeriesName);
+    static int SetDICOMFolder(std::string folderName, std::string** pSeriesName);
     static bool ReadDICOMSeries(std::string folderName, std::string seriesName,
                                 ShortSeriesType::Pointer& imageObj);
     static bool WriteDICOMSeries(std::string folderNmae, ShortSeriesType::Pointer& imageObj,

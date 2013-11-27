@@ -251,7 +251,7 @@ bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& i
 }
 
 
-void ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
+int ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
 {
     short i = 0;
     short sNumberOfSeries = 0;
@@ -268,6 +268,8 @@ void ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
     {
         (*pSeriesName)[i++] = *seriesItr;
     }
+
+    return sNumberOfSeries;
 }
 
 
