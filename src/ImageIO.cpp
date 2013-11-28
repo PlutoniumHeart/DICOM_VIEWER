@@ -210,10 +210,11 @@ bool ImageIO::WriteJPEGSeries(std::string folderName, UnsignedCharSeriesType::Po
 }
 
 
-bool ImageIO::ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj)
+bool ImageIO::ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj,
+                             DICOMIOType::Pointer& IO)
 {
     ShortImageReadType::Pointer reader = ShortImageReadType::New();
-    reader->SetImageIO(m_pDICOMIO);
+    reader->SetImageIO(IO);
     reader->SetFileName(inputFile);
     try
     {
@@ -230,11 +231,12 @@ bool ImageIO::ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& ima
 }
 
 
-bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& imageObj)
+bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& imageObj,
+                              DICOMIOType::Pointer& IO)
 {
     ShortImageWriteType::Pointer writer = ShortImageWriteType::New();
-    DICOMIOType::Pointer pDICOMIO = DICOMIOType::New();
-    writer->SetImageIO(m_pDICOMIO);
+    //DICOMIOType::Pointer pDICOMIO = DICOMIOType::New();
+    writer->SetImageIO(IO);
     writer->SetFileName(outputFile);
     writer->SetInput(imageObj);
     try
@@ -327,14 +329,14 @@ bool ImageIO::WriteDICOMSeries(std::string folderName, ShortSeriesType::Pointer&
 }
 
 
-int ImageIO::PixelToArray(ShortImageType::Pointer& imageObj, short** array)
+int ImageIO::PixelToArray(UnsignedCharImageType::Pointer& imageObj, unsigned char** array)
 {
     itk::ImageRegion<D2>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
     int w = tmp.GetElement(0);
     int h = tmp.GetElement(1);
-    *array = new short[w*h];
+    *array = new unsigned char[w*h];
     int i = 0;
-    ShortImageConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
+    UnsignedCharImageConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
     in.GoToBegin();
     while(!in.IsAtEnd())
     {
@@ -345,15 +347,15 @@ int ImageIO::PixelToArray(ShortImageType::Pointer& imageObj, short** array)
 }
 
 
-int ImageIO::PixelToArray(ShortSeriesType::Pointer imageObj, short** array)
+int ImageIO::PixelToArray(UnsignedCharSeriesType::Pointer& imageObj, unsigned char** array)
 {
     itk::ImageRegion<D3>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
     int w = tmp.GetElement(0);
     int h = tmp.GetElement(1);
     int d = tmp.GetElement(2);
-    *array = new short[w*h*d];
+    *array = new unsigned char[w*h*d];
     int i = 0;
-    ShortSeriesConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
+    UnsignedCharSeriesConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
     in.GoToBegin();
     while(!in.IsAtEnd())
     {

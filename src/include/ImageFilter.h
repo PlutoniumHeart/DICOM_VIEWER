@@ -49,6 +49,9 @@ public:
 
     template<class T1, class T1Pointer, class T2, class T2Pointer>
     static bool Difference(T1Pointer& lhs, T1Pointer& rhs, T1Pointer& difference);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static bool IntensityWindowingFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int WC, int WW);
 };
 
  
@@ -379,6 +382,34 @@ bool ImageFilter::Difference(T1Pointer& lhs, T1Pointer& rhs, T1Pointer& differen
         ++out;
     }
     
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+bool ImageFilter::IntensityWindowingFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int WC, int WW)
+{
+    typedef itk::IntensityWindowingImageFilter<T1, T2> windowingFilterType;
+    typename windowingFilterType::Pointer filter = windowingFilterType::New();
+
+    filter->SetInput(imageObj_1);
+    filter->SetWindowMinimum(WC-WW/2);
+    filter->SetWindowMaximum(WC+WW/2);
+    filter->SetOutputMinimum(0);
+    filter->SetOutputMaximum(255);
+
+    try
+    {
+        filter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in windowing images: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+    imageObj_2 = filter->GetOutput();
+    
+    return true;
 }
 
 

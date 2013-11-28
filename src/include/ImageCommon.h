@@ -25,6 +25,7 @@
 #include <itkConnectedComponentImageFilter.h>
 #include <itkRelabelComponentImageFilter.h>
 #include <itkSubtractImageFilter.h>
+#include <itkIntensityWindowingImageFilter.h>
 
 
 const unsigned char D2 = 2;

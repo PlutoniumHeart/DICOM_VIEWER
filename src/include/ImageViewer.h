@@ -8,6 +8,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include "ImageIO.h"
+#include "ImageFilter.h"
 #include "ui_ImageViewer.h"
 
 
@@ -31,7 +32,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private slots:
-    void open();
+    void openImage();
     void print();
     void fitToWindow();
     void normalSize();
@@ -39,6 +40,8 @@ private slots:
     void zoomOut();
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar* scrollBar, double factor);
+    void windowReset();
+    void updateDisplay();
 
 private:
     void createActions();
@@ -48,7 +51,13 @@ private:
     QPrinter printer;
     QAction *printAct;
 
-    short* image_array;
+    ShortImageType::Pointer m_imageObj;
+    DICOMIOType::Pointer m_dicomIO;
+
+    short m_sWidth;
+    short m_sHeight;
+    short m_sWC;
+    short m_sWW;
     
     Ui::ImageViewer ui;
 };

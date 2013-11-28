@@ -3,7 +3,10 @@
 
 ImageViewer::ImageViewer(QMainWindow *parent)
     : QMainWindow(parent)
-    , image_array(NULL)
+    , m_sWidth(0)
+    , m_sHeight(0)
+    , m_sWC(0)
+    , m_sWW(0)
 {
     ui.setupUi(this);
 
@@ -18,36 +21,48 @@ ImageViewer::ImageViewer(QMainWindow *parent)
     
     createActions();
 
+    m_imageObj = ShortImageType::New();
+    m_dicomIO = DICOMIOType::New();
+    
     setWindowTitle(tr("Image Viewer"));
 }
 
 
 ImageViewer::~ImageViewer()
 {
-    if(image_array!=NULL)
-    {
-        delete [] image_array;
-        image_array = NULL;
-    }
 }
 
 
-void ImageViewer::open()
+void ImageViewer::openImage()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
     if(!fileName.isEmpty())
     {
-        ShortImageType::Pointer imageObj = ShortImageType::New();
-        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), imageObj);
-        int w = imageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
-        int h = imageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
-        ImageIO::PixelToArray(imageObj, &image_array);
-        QImage image(w, h, QImage::Format_RGB32);
-        for(int i=0;i<w;i++)
+        unsigned char* image_array = NULL;
+        UnsignedCharImageType::Pointer windowedImage = UnsignedCharImageType::New();
+        
+        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_imageObj, m_dicomIO);
+        std::string temp;
+        m_dicomIO->GetValueFromTag("0028|1050", temp);
+        m_sWC = atoi(temp.c_str());
+        ui.spinBoxWC->setValue(m_sWC);
+        m_dicomIO->GetValueFromTag("0028|1051", temp);
+        m_sWW = atoi(temp.c_str());
+        ui.spinBoxWW->setValue(m_sWW);
+        m_sWidth = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
+        m_sHeight = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
+        
+        ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
+                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
+            (m_imageObj, windowedImage, ui.spinBoxWC->value(), ui.spinBoxWW->value());
+        
+        ImageIO::PixelToArray(windowedImage, &image_array);
+        QImage image(m_sWidth, m_sHeight, QImage::Format_RGB32);
+        for(int i=0;i<m_sWidth;i++)
         {
-            for(int j=0;j<h;j++)
+            for(int j=0;j<m_sHeight;j++)
             {
-                image.setPixel(i, j, qRgb(image_array[i+w*j], image_array[i+w*j], image_array[i+w*j]));
+                image.setPixel(i, j, qRgb(image_array[i+m_sWidth*j], image_array[i+m_sWidth*j], image_array[i+m_sWidth*j]));
             }
         }
         
@@ -63,6 +78,8 @@ void ImageViewer::open()
         updateActions();
 
         fitToWindow();
+
+        delete [] image_array;
     }
 }
 
@@ -113,14 +130,48 @@ void ImageViewer::zoomOut()
 }
 
 
+void ImageViewer::windowReset()
+{
+    ui.spinBoxWC->setValue(m_sWC);
+    ui.spinBoxWW->setValue(m_sWW);
+}
+
+
+void ImageViewer::updateDisplay()
+{
+    unsigned char* image_array = NULL;
+    UnsignedCharImageType::Pointer windowedImage = UnsignedCharImageType::New();
+    ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
+                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
+        (m_imageObj, windowedImage, ui.spinBoxWC->value(), ui.spinBoxWW->value());
+
+    ImageIO::PixelToArray(windowedImage, &image_array);
+    QImage image(m_sWidth, m_sHeight, QImage::Format_RGB32);
+    for(int i=0;i<m_sWidth;i++)
+    {
+        for(int j=0;j<m_sHeight;j++)
+        {
+            image.setPixel(i, j, qRgb(image_array[i+m_sWidth*j], image_array[i+m_sWidth*j], image_array[i+m_sWidth*j]));
+        }
+    }
+
+    ui.imageLabel->setPixmap(QPixmap::fromImage(image));
+
+    delete [] image_array;
+}
+
+
 void ImageViewer::createActions()
 {
-    connect(ui.actionOpen_DICOM, SIGNAL(triggered()), this, SLOT(open()));
+    connect(ui.actionOpen_DICOM, SIGNAL(triggered()), this, SLOT(openImage()));
     connect(ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
     connect(ui.actionFitToWindow, SIGNAL(triggered()), this, SLOT(fitToWindow()));
     connect(ui.actionNormalSize, SIGNAL(triggered()), this, SLOT(normalSize()));
     connect(ui.actionZoom_in_25, SIGNAL(triggered()), this, SLOT(zoomIn()));
     connect(ui.actionZoom_out_25, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(ui.pushButtonReset, SIGNAL(clicked()), this, SLOT(windowReset()));
+    connect(ui.spinBoxWC, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
+    connect(ui.spinBoxWW, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
 }
 
 
@@ -154,9 +205,11 @@ void ImageViewer::updateActions()
 
 void ImageViewer::resizeEvent(QResizeEvent * /* event */)
 {
+    /*
     int scrollAreaPosX = (this->width()/2-(ui.scrollArea->width()/2));
     int scrollAreaPosY = (((this->height()-ui.dockWidgetBottom->height())/2-(ui.scrollArea->height()/2)));
     int scrollAreaWidth = ui.scrollArea->width();
     int scrollAreaHeight = ui.scrollArea->height();
     ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
+    */
 }

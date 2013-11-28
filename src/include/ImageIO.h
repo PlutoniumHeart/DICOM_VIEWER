@@ -27,8 +27,10 @@ public:
     static bool WriteJPEGSeries(std::string folderName, UnsignedCharSeriesType::Pointer& imageObj,
                               std::string seriesFormat, int begin, int end);
 
-    static bool ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
-    static bool WriteDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj);
+    static bool ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj,
+                               DICOMIOType::Pointer& IO);
+    static bool WriteDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj,
+                                DICOMIOType::Pointer& IO);
 
     static int SetDICOMFolder(std::string folderName, std::string** pSeriesName);
     static bool ReadDICOMSeries(std::string folderName, std::string seriesName,
@@ -41,8 +43,8 @@ public:
     template<class T1, class T2>
     static bool CreateBlankSeries(T1 imageObj, int x, int y, int z);
 
-    static int PixelToArray(ShortImageType::Pointer& imageObj, short** array);
-    static int PixelToArray(ShortSeriesType::Pointer imageObj, short** array);
+    static int PixelToArray(UnsignedCharImageType::Pointer& imageObj, unsigned char** array);
+    static int PixelToArray(UnsignedCharSeriesType::Pointer& imageObj, unsigned char** array);
     
 private:
     static PNGIOType::Pointer m_pPNGIO;
