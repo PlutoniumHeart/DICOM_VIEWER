@@ -17,6 +17,9 @@ ImageViewer::ImageViewer(QMainWindow *parent)
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.imageLabel);
 
+    //labelUpperLeft = new QLabel;
+    //labelUpperRight = new QLabel;
+
     setCentralWidget(ui.scrollArea);
     
     createActions();
@@ -61,6 +64,10 @@ void ImageViewer::openImage()
         ui.windowWidth->setMaximum(atoi(temp.c_str()));
         m_sWidth = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
         m_sHeight = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
+
+        m_dicomIO->GetValueFromTag("0010|0010", m_patientName);
+        m_dicomIO->GetValueFromTag("0010|0040", m_sex);
+        m_dicomIO->GetValueFromTag("0010|0030", m_birthday);
         
         ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                               ShortImageType::Pointer, UnsignedCharImageType::Pointer>
@@ -81,6 +88,20 @@ void ImageViewer::openImage()
             QMessageBox::information(this, tr("Image Viewer"), tr("Cannot load %1.").arg(fileName));
             return;
         }
+
+        // Text overlay
+        QPainter* painter = new QPainter();
+        painter->begin(&image);
+        painter->setPen(Qt::yellow);
+        painter->setFont(QFont("Arial", 7));
+        // Top left
+        std::string topLeft = m_patientName + ", " + m_sex + ", " + m_birthday;
+        //labelUpperLeft->setText(topLeft.c_str());
+        //labelUpperRight->setStyleSheet("QLabel {color: blue;}");
+        painter->drawText(image.rect(), Qt::AlignLeft, topLeft.c_str());
+        painter->end();
+        delete painter;
+        
         ui.imageLabel->setPixmap(QPixmap::fromImage(image));
         scaleFactor = 1.0;
         ui.actionPrint->setEnabled(true);
@@ -93,7 +114,16 @@ void ImageViewer::openImage()
         updateActions();
 
         fitToWindow();
-
+        /*
+        int tmpX = ui.scrollArea->rect().center().x();
+        int tmpY = ui.scrollArea->rect().center().y();
+        int dX = m_sWidth/2;
+        int dY = m_sHeight/2;
+        labelUpperLeft->setGeometry(QRect(tmpX-dX, tmpY-dY, 256, 256));
+        labelUpperRight->setGeometry(QRect(tmpX+dX, tmpY-dY, 256, 256));
+        std::cout<<tmpX<<std::endl;
+        std::cout<<dX<<" "<<std::endl;
+        */
         delete [] image_array;
     }
 }
@@ -136,12 +166,14 @@ void ImageViewer::fitToWindow()
 void ImageViewer::zoomIn()
 {
     scaleImage(1.25);
+    //updateDisplay();
 }
 
 
 void ImageViewer::zoomOut()
 {
     scaleImage(0.75);
+    //updateDisplay();
 }
 
 
@@ -159,7 +191,7 @@ void ImageViewer::updateDisplay()
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                               ShortImageType::Pointer, UnsignedCharImageType::Pointer>
         (m_imageObj, windowedImage, ui.spinBoxWC->value(), ui.spinBoxWW->value());
-
+    
     ImageIO::PixelToArray(windowedImage, &image_array);
     QImage image(m_sWidth, m_sHeight, QImage::Format_RGB32);
     for(int i=0;i<m_sWidth;i++)
@@ -169,6 +201,22 @@ void ImageViewer::updateDisplay()
             image.setPixel(i, j, qRgb(image_array[i+m_sWidth*j], image_array[i+m_sWidth*j], image_array[i+m_sWidth*j]));
         }
     }
+
+    if(image.isNull())
+    {
+        return;
+    }
+
+    // Text overlay
+    QPainter* painter = new QPainter();
+    painter->begin(&image);
+    painter->setPen(Qt::yellow);
+    painter->setFont(QFont("Arial", 7));
+    // Top left
+    std::string topLeft = m_patientName + ", " + m_sex + ", " + m_birthday;
+    painter->drawText(image.rect(), Qt::AlignLeft, topLeft.c_str());
+    painter->end();
+    delete painter;
 
     ui.imageLabel->setPixmap(QPixmap::fromImage(image));
 
@@ -192,8 +240,8 @@ void ImageViewer::createActions()
 
 void ImageViewer::scaleImage(double factor)
 {
-    Q_ASSERT(ui.imageLabel->pixmap());
     scaleFactor*=factor;
+    Q_ASSERT(ui.imageLabel->pixmap());
     ui.imageLabel->resize(scaleFactor*ui.imageLabel->pixmap()->size());
 
     adjustScrollBar(ui.scrollArea->horizontalScrollBar(), factor);

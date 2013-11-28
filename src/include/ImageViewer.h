@@ -42,6 +42,7 @@ private slots:
     void adjustScrollBar(QScrollBar* scrollBar, double factor);
     void windowReset();
     void updateDisplay();
+    //void updateTextOverlay();
 
 private:
     void createActions();
@@ -50,6 +51,8 @@ private:
     double scaleFactor;
     QPrinter printer;
     QAction *printAct;
+    QLabel *labelUpperLeft;
+    QLabel *labelUpperRight;
 
     ShortImageType::Pointer m_imageObj;
     DICOMIOType::Pointer m_dicomIO;
@@ -58,6 +61,9 @@ private:
     short m_sHeight;
     short m_sWC;
     short m_sWW;
+    std::string m_patientName;
+    std::string m_sex;
+    std::string m_birthday;
     
     Ui::ImageViewer ui;
 };

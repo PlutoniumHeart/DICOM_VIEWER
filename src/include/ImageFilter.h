@@ -52,6 +52,9 @@ public:
 
     template<class T1, class T2, class T1Pointer, class T2Pointer>
     static bool IntensityWindowingFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int WC, int WW);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer, class T3>
+    static bool ResampleFilter2D(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int outSizeX, int outSizeY);
 };
 
  
@@ -408,6 +411,34 @@ bool ImageFilter::IntensityWindowingFilter(T1Pointer& imageObj_1, T2Pointer& ima
         return false;
     }
     imageObj_2 = filter->GetOutput();
+    
+    return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer, class T3>
+bool ImageFilter::ResampleFilter2D(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int outSizeX, int outSizeY)
+{
+    typedef itk::IdentityTransform<double, 2> TransformType;
+    typedef itk::ResampleImageFilter<T1, T2> ResampleImageFilterType;
+    typename ResampleImageFilterType::Pointer resampleFilter = ResampleImageFilterType::New();
+        
+    typename T1::SizeType inputSize = imageObj_1->GetLargestPossibleRegion().GetSize();
+    typename T2::SizeType outputSize;
+    outputSize[0] = outSizeX;
+    outputSize[1] = outSizeY;
+
+    typename T2::SpacingType outputSpacing;
+    outputSpacing[0] = imageObj_1->GetSpacing()[0]*(static_cast<double>(inputSize[0])/static_cast<double>(outputSize[0]));
+    outputSpacing[1] = imageObj_1->GetSpacing()[1]*(static_cast<double>(inputSize[1])/static_cast<double>(outputSize[1]));
+    
+    resampleFilter->SetInput(imageObj_1);
+    resampleFilter->SetSize(outputSize);
+    resampleFilter->SetOutputSpacing(outputSpacing);
+    resampleFilter->SetTransform(TransformType::New());
+    resampleFilter->UpdateLargestPossibleRegion();
+
+    imageObj_2 = resampleFilter->GetOutput();
     
     return true;
 }

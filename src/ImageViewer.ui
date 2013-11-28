@@ -60,6 +60,8 @@
        <height>510</height>
       </rect>
      </property>
+     <zorder>label</zorder>
+     <zorder>label</zorder>
     </widget>
    </widget>
   </widget>
