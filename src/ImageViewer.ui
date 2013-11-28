@@ -169,6 +169,9 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_3">
     <widget class="QPushButton" name="pushButtonReset">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>50</x>
@@ -191,33 +194,20 @@
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="spinBoxWC">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>2048</number>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="labelWC">
         <property name="text">
          <string>WC</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSlider" name="windowCenter">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="maximum">
-         <number>2048</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QSpinBox" name="spinBoxWC">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="maximum">
-         <number>2048</number>
         </property>
        </widget>
       </item>
@@ -228,10 +218,23 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QSlider" name="windowCenter">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>2048</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="QSlider" name="windowWidth">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -247,7 +250,7 @@
       <item row="1" column="2">
        <widget class="QSpinBox" name="spinBoxWW">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="maximum">
          <number>2048</number>
@@ -342,18 +345,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>spinBoxWC</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>windowCenter</receiver>
-   <slot>setValue(int)</slot>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>ImageViewer</receiver>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>237</x>
-     <y>631</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
-     <x>129</x>
-     <y>631</y>
+     <x>399</x>
+     <y>299</y>
     </hint>
    </hints>
   </connection>
@@ -374,18 +377,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBoxWW</sender>
+   <sender>spinBoxWC</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>windowWidth</receiver>
+   <receiver>windowCenter</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>237</x>
-     <y>661</y>
+     <y>631</y>
     </hint>
     <hint type="destinationlabel">
      <x>129</x>
-     <y>661</y>
+     <y>631</y>
     </hint>
    </hints>
   </connection>
@@ -406,18 +409,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionExit</sender>
-   <signal>triggered()</signal>
-   <receiver>ImageViewer</receiver>
-   <slot>close()</slot>
+   <sender>spinBoxWW</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>windowWidth</receiver>
+   <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
+     <x>237</x>
+     <y>661</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
+     <x>129</x>
+     <y>661</y>
     </hint>
    </hints>
   </connection>

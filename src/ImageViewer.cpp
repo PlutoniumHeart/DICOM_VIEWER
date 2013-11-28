@@ -49,6 +49,16 @@ void ImageViewer::openImage()
         m_dicomIO->GetValueFromTag("0028|1051", temp);
         m_sWW = atoi(temp.c_str());
         ui.spinBoxWW->setValue(m_sWW);
+        m_dicomIO->GetValueFromTag("0028|0106", temp);
+        ui.spinBoxWC->setMinimum(atoi(temp.c_str()));
+        ui.spinBoxWW->setMinimum(atoi(temp.c_str()));
+        ui.windowCenter->setMinimum(atoi(temp.c_str()));
+        ui.windowWidth->setMinimum(atoi(temp.c_str()));
+        m_dicomIO->GetValueFromTag("0028|0107", temp);
+        ui.spinBoxWC->setMaximum(atoi(temp.c_str()));
+        ui.spinBoxWW->setMaximum(atoi(temp.c_str()));
+        ui.windowCenter->setMaximum(atoi(temp.c_str()));
+        ui.windowWidth->setMaximum(atoi(temp.c_str()));
         m_sWidth = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
         m_sHeight = m_imageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
         
@@ -75,6 +85,11 @@ void ImageViewer::openImage()
         scaleFactor = 1.0;
         ui.actionPrint->setEnabled(true);
         ui.actionFitToWindow->setEnabled(true);
+        ui.spinBoxWC->setEnabled(true);
+        ui.spinBoxWW->setEnabled(true);
+        ui.windowCenter->setEnabled(true);
+        ui.windowWidth->setEnabled(true);
+        ui.pushButtonReset->setEnabled(true);
         updateActions();
 
         fitToWindow();
