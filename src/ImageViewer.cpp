@@ -7,16 +7,14 @@ ImageViewer::ImageViewer(QMainWindow *parent)
 {
     ui.setupUi(this);
 
-    std::cout<<"width: "<<this->width()<<std::endl;
     ui.imageLabel->setBackgroundRole(QPalette::Base);
-    //ui.imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ui.imageLabel->setMinimumSize(64, 64);
     ui.imageLabel->setScaledContents(true);
 
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.imageLabel);
 
-    //setCentralWidget(ui.scrollArea);
+    setCentralWidget(ui.scrollArea);
     
     createActions();
 
@@ -64,10 +62,7 @@ void ImageViewer::open()
         ui.actionFitToWindow->setEnabled(true);
         updateActions();
 
-        if(!ui.actionFitToWindow->isChecked())
-        {
-            ui.imageLabel->adjustSize();
-        }
+        fitToWindow();
     }
 }
 
@@ -120,30 +115,11 @@ void ImageViewer::zoomOut()
 
 void ImageViewer::createActions()
 {
-    ui.actionOpen_DICOM->setShortcut(tr("Ctrl+O"));
     connect(ui.actionOpen_DICOM, SIGNAL(triggered()), this, SLOT(open()));
-
-    ui.actionPrint->setShortcut(tr("Ctrl+P"));
-    ui.actionPrint->setEnabled(false);
     connect(ui.actionPrint, SIGNAL(triggered()), this, SLOT(print()));
-
-    ui.actionExit->setShortcut(tr("Ctrl+Q"));
-    connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
-
-    ui.actionFitToWindow->setEnabled(false);
-    ui.actionFitToWindow->setShortcut(tr("Ctrl+F"));
     connect(ui.actionFitToWindow, SIGNAL(triggered()), this, SLOT(fitToWindow()));
-
-    ui.actionNormalSize->setShortcut(tr("Ctrl+S"));
-    ui.actionNormalSize->setEnabled(false);
     connect(ui.actionNormalSize, SIGNAL(triggered()), this, SLOT(normalSize()));
-
-    ui.actionZoom_in_25->setShortcut(tr("Ctrl++"));
-    ui.actionZoom_in_25->setEnabled(false);
     connect(ui.actionZoom_in_25, SIGNAL(triggered()), this, SLOT(zoomIn()));
-
-    ui.actionZoom_out_25->setShortcut(tr("Ctrl+-"));
-    ui.actionZoom_out_25->setEnabled(false);
     connect(ui.actionZoom_out_25, SIGNAL(triggered()), this, SLOT(zoomOut()));
 }
 
@@ -178,4 +154,9 @@ void ImageViewer::updateActions()
 
 void ImageViewer::resizeEvent(QResizeEvent * /* event */)
 {
+    int scrollAreaPosX = (this->width()/2-(ui.scrollArea->width()/2));
+    int scrollAreaPosY = (((this->height()-ui.dockWidgetBottom->height())/2-(ui.scrollArea->height()/2)));
+    int scrollAreaWidth = ui.scrollArea->width();
+    int scrollAreaHeight = ui.scrollArea->height();
+    ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
 }
