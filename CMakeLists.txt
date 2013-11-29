@@ -9,6 +9,13 @@ else(ITK_FOUND)
   message(FATAL_ERROR "ITK not found. Please set ITK_DIR. ")
 endif(ITK_FOUND)
 
+find_package(VTK REQUIRED)
+if(VTK_FOUND)
+  include(${VTK_USE_FILE})
+else(VTK_FOUND)
+  message(FATAL_ERROR "VTK not found, Please set VTK_DIR. ")
+endif(VTK_FOUND)
+
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
@@ -22,13 +29,16 @@ include_directories(src/include)
 
 set(SOURCES src/main.cpp 
             src/include/ImageCommon.h
+            src/include/VTKRenderCommon.h
             src/include/ImageIO.h src/ImageIO.cpp
             src/include/ImageFilter.h src/ImageFilter.cpp
             src/include/ImageViewer.h src/ImageViewer.cpp
+            src/include/MyMouseInteractorStyle.h src/MyMouseInteractorStyle.cpp
             src/ImageViewer.ui ${QTUI}
 )
 
 set(ALL_LIBS ${ITK_LIBRARIES}
+             ${VTK_LIBRARIES}
              ${Qt5Widgets_LIBRARIES}
 )
 

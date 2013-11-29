@@ -10,15 +10,9 @@ ImageViewer::ImageViewer(QMainWindow *parent)
 {
     ui.setupUi(this);
 
-    ui.imageLabel->setBackgroundRole(QPalette::Base);
-    ui.imageLabel->setMinimumSize(64, 64);
-    ui.imageLabel->setScaledContents(true);
-
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
-    ui.scrollArea->setWidget(ui.imageLabel);
-
-    //labelUpperLeft = new QLabel;
-    //labelUpperRight = new QLabel;
+    ui.scrollArea->setWidget(ui.qvtkWidget);
+    m_imageView = vtkSmartPointer<vtkResliceImageViewer>::New();
 
     setCentralWidget(ui.scrollArea);
     
@@ -41,9 +35,6 @@ void ImageViewer::openImage()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
     if(!fileName.isEmpty())
     {
-        unsigned char* image_array = NULL;
-        UnsignedCharImageType::Pointer windowedImage = UnsignedCharImageType::New();
-        
         ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_imageObj, m_dicomIO);
         std::string temp;
         m_dicomIO->GetValueFromTag("0028|1050", temp);
@@ -68,41 +59,34 @@ void ImageViewer::openImage()
         m_dicomIO->GetValueFromTag("0010|0010", m_patientName);
         m_dicomIO->GetValueFromTag("0010|0040", m_sex);
         m_dicomIO->GetValueFromTag("0010|0030", m_birthday);
-        
-        ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
-                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-            (m_imageObj, windowedImage, ui.spinBoxWC->value(), ui.spinBoxWW->value());
-        
-        ImageIO::PixelToArray(windowedImage, &image_array);
-        QImage image(m_sWidth, m_sHeight, QImage::Format_RGB32);
-        for(int i=0;i<m_sWidth;i++)
-        {
-            for(int j=0;j<m_sHeight;j++)
-            {
-                image.setPixel(i, j, qRgb(image_array[i+m_sWidth*j], image_array[i+m_sWidth*j], image_array[i+m_sWidth*j]));
-            }
-        }
-        
-        if(image.isNull())
-        {
-            QMessageBox::information(this, tr("Image Viewer"), tr("Cannot load %1.").arg(fileName));
-            return;
-        }
 
-        // Text overlay
-        QPainter* painter = new QPainter();
-        painter->begin(&image);
-        painter->setPen(Qt::yellow);
-        painter->setFont(QFont("Arial", 7));
-        // Top left
-        std::string topLeft = m_patientName + ", " + m_sex + ", " + m_birthday;
-        //labelUpperLeft->setText(topLeft.c_str());
-        //labelUpperRight->setStyleSheet("QLabel {color: blue;}");
-        painter->drawText(image.rect(), Qt::AlignLeft, topLeft.c_str());
-        painter->end();
-        delete painter;
+        typedef itk::ImageToVTKImageFilter<ShortImageType> ConnectorType;
+        ConnectorType::Pointer connector = ConnectorType::New();
+        connector->SetInput(m_imageObj);
+        connector->Update();
+
+        windowLevelLookupTable = vtkSmartPointer<vtkWindowLevelLookupTable>::New();
+        windowLevelLookupTable->SetWindow(ui.spinBoxWW->value());
+        windowLevelLookupTable->SetLevel(ui.spinBoxWC->value());
+        windowLevelLookupTable->SetRampToLinear();
+        windowLevelLookupTable->Build();
         
-        ui.imageLabel->setPixmap(QPixmap::fromImage(image));
+        vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+        image->DeepCopy(connector->GetOutput());
+        ui.qvtkWidget->SetRenderWindow(m_imageView->GetRenderWindow());
+        vtkSmartPointer<vtkRenderWindowInteractor> interactor = ui.qvtkWidget->GetInteractor();
+
+        m_imageView->SetInputData(image);
+        m_imageView->SetSlice(m_imageView->GetSliceMax()/2);
+        m_imageView->GetRenderer()->ResetCamera();
+        m_imageView->SetLookupTable(windowLevelLookupTable);
+        m_imageView->GetRenderer()->ResetCamera();
+        m_imageView->SetupInteractor(interactor);
+        m_imageView->Render();
+        interactor->Disable();
+        
+        ui.qvtkWidget->update();
+        
         scaleFactor = 1.0;
         ui.actionPrint->setEnabled(true);
         ui.actionFitToWindow->setEnabled(true);
@@ -114,23 +98,13 @@ void ImageViewer::openImage()
         updateActions();
 
         fitToWindow();
-        /*
-        int tmpX = ui.scrollArea->rect().center().x();
-        int tmpY = ui.scrollArea->rect().center().y();
-        int dX = m_sWidth/2;
-        int dY = m_sHeight/2;
-        labelUpperLeft->setGeometry(QRect(tmpX-dX, tmpY-dY, 256, 256));
-        labelUpperRight->setGeometry(QRect(tmpX+dX, tmpY-dY, 256, 256));
-        std::cout<<tmpX<<std::endl;
-        std::cout<<dX<<" "<<std::endl;
-        */
-        delete [] image_array;
     }
 }
 
 
 void ImageViewer::print()
 {
+    /*
     Q_ASSERT(ui.imageLabel->pixmap());
     QPrintDialog dialog(&printer, this);
     if(dialog.exec())
@@ -143,12 +117,13 @@ void ImageViewer::print()
         painter.setWindow(ui.imageLabel->pixmap()->rect());
         painter.drawPixmap(0, 0, *ui.imageLabel->pixmap());
     }
+    */
 }
 
 
 void ImageViewer::normalSize()
 {
-    ui.imageLabel->adjustSize();
+    //ui.imageLabel->adjustSize();
     scaleFactor = 1.0;
 }
 
@@ -186,41 +161,9 @@ void ImageViewer::windowReset()
 
 void ImageViewer::updateDisplay()
 {
-    unsigned char* image_array = NULL;
-    UnsignedCharImageType::Pointer windowedImage = UnsignedCharImageType::New();
-    ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
-                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-        (m_imageObj, windowedImage, ui.spinBoxWC->value(), ui.spinBoxWW->value());
-    
-    ImageIO::PixelToArray(windowedImage, &image_array);
-    QImage image(m_sWidth, m_sHeight, QImage::Format_RGB32);
-    for(int i=0;i<m_sWidth;i++)
-    {
-        for(int j=0;j<m_sHeight;j++)
-        {
-            image.setPixel(i, j, qRgb(image_array[i+m_sWidth*j], image_array[i+m_sWidth*j], image_array[i+m_sWidth*j]));
-        }
-    }
-
-    if(image.isNull())
-    {
-        return;
-    }
-
-    // Text overlay
-    QPainter* painter = new QPainter();
-    painter->begin(&image);
-    painter->setPen(Qt::yellow);
-    painter->setFont(QFont("Arial", 7));
-    // Top left
-    std::string topLeft = m_patientName + ", " + m_sex + ", " + m_birthday;
-    painter->drawText(image.rect(), Qt::AlignLeft, topLeft.c_str());
-    painter->end();
-    delete painter;
-
-    ui.imageLabel->setPixmap(QPixmap::fromImage(image));
-
-    delete [] image_array;
+    m_imageView->SetColorWindow(ui.spinBoxWW->value());
+    m_imageView->SetColorLevel(ui.spinBoxWC->value());
+    m_imageView->Render();
 }
 
 
@@ -240,6 +183,7 @@ void ImageViewer::createActions()
 
 void ImageViewer::scaleImage(double factor)
 {
+    /*
     scaleFactor*=factor;
     Q_ASSERT(ui.imageLabel->pixmap());
     ui.imageLabel->resize(scaleFactor*ui.imageLabel->pixmap()->size());
@@ -249,6 +193,7 @@ void ImageViewer::scaleImage(double factor)
 
     ui.actionZoom_in_25->setEnabled(scaleFactor<3.0);
     ui.actionZoom_out_25->setEnabled(scaleFactor>0.333);
+    */
 }
 
 

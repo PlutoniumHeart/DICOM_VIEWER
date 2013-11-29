@@ -7,8 +7,11 @@
 #include <QImage>
 #include <QPrinter>
 #include <QPrintDialog>
+#include <itkImageToVTKImageFilter.h>
 #include "ImageIO.h"
 #include "ImageFilter.h"
+#include "VTKRenderCommon.h"
+#include "MyMouseInteractorStyle.h"
 #include "ui_ImageViewer.h"
 
 
@@ -64,6 +67,9 @@ private:
     std::string m_patientName;
     std::string m_sex;
     std::string m_birthday;
+
+    vtkSmartPointer<vtkResliceImageViewer> m_imageView;
+    vtkSmartPointer<vtkWindowLevelLookupTable> windowLevelLookupTable;
     
     Ui::ImageViewer ui;
 };
