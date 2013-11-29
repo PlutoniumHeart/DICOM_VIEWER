@@ -17,13 +17,16 @@ ImageViewer::ImageViewer(QMainWindow *parent)
     ui.qvtkWidget->setMouseTracking(true);
     ui.qvtkWidget->installEventFilter(this);
     m_imageView = vtkSmartPointer<vtkResliceImageViewer>::New();
-
+    
     setCentralWidget(ui.scrollArea);
     
     createActions();
 
     m_imageObj = ShortImageType::New();
     m_dicomIO = DICOMIOType::New();
+    
+    //ui.qvtkWidget->SetRenderWindow(m_imageView->GetRenderWindow());
+    //ui.qvtkWidget->update();
     
     setWindowTitle(tr("Image Viewer"));
 }
@@ -270,6 +273,7 @@ bool ImageViewer::eventFilter(QObject *obj, QEvent *event)
                     else if(temp>ui.spinBoxWC->maximum())
                         temp = ui.spinBoxWC->maximum();
                     ui.spinBoxWC->setValue(temp);
+                    m_mouseMiddleStartPos[0]=mouseEvent->x();
                 }
                 if(ui.spinBoxWW->isEnabled())
                 {
@@ -279,11 +283,11 @@ bool ImageViewer::eventFilter(QObject *obj, QEvent *event)
                     else if(temp>ui.spinBoxWW->maximum())
                         temp = ui.spinBoxWW->maximum();
                     ui.spinBoxWW->setValue(temp);
+                    m_mouseMiddleStartPos[1]=mouseEvent->y();
                 }
             }
         }
     }
 
-    return true;
-    //return QMainWindow::eventFilter(obj, event);
+    return QMainWindow::eventFilter(obj, event);
 }

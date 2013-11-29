@@ -47,7 +47,6 @@
        <height>510</height>
       </rect>
      </property>
-     <zorder>qvtkWidget</zorder>
     </widget>
    </widget>
    <widget class="QVTKWidget" name="qvtkWidget">
