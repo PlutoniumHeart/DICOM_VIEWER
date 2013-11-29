@@ -7,11 +7,15 @@ ImageViewer::ImageViewer(QMainWindow *parent)
     , m_sHeight(0)
     , m_sWC(0)
     , m_sWW(0)
+    , m_mouseLeftButtonDown(false)
+    , m_mouseMiddleButtonDown(false)
 {
     ui.setupUi(this);
 
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.qvtkWidget);
+    ui.qvtkWidget->setMouseTracking(true);
+    ui.qvtkWidget->installEventFilter(this);
     m_imageView = vtkSmartPointer<vtkResliceImageViewer>::New();
 
     setCentralWidget(ui.scrollArea);
@@ -220,4 +224,66 @@ void ImageViewer::resizeEvent(QResizeEvent * /* event */)
     int scrollAreaHeight = ui.scrollArea->height();
     ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
     */
+}
+
+
+void ImageViewer::mouseMoveEvent(QMouseEvent *event)
+{
+    //std::cout<<"Mouse moved."<<std::endl;
+}
+
+
+bool ImageViewer::eventFilter(QObject *obj, QEvent *event)
+{
+    if(obj==ui.qvtkWidget)
+    {
+        if(event->type() == QEvent::MouseButtonPress)
+        {
+            const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>(event);
+            if(mouseEvent->button()==Qt::MiddleButton)
+            {
+                m_mouseMiddleStartPos[0]=mouseEvent->x();
+                m_mouseMiddleStartPos[1]=mouseEvent->y();
+                m_mouseMiddleButtonDown = true;
+            }
+        }
+        else if(event->type() == QEvent::MouseButtonRelease)
+        {
+            const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>(event);
+            if(mouseEvent->button()==Qt::MiddleButton)
+            {
+                m_mouseMiddleButtonDown = false;
+            }
+        }
+        else if(event->type() == QEvent::MouseMove)
+        {
+            const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>(event);
+            if(m_mouseMiddleButtonDown)
+            {
+                m_mouseMiddleCurrentPos[0] = mouseEvent->pos().x();
+                m_mouseMiddleCurrentPos[1] = mouseEvent->pos().y();
+                if(ui.spinBoxWC->isEnabled())
+                {
+                    int temp = ui.spinBoxWC->value() + m_mouseMiddleCurrentPos[0]-m_mouseMiddleStartPos[0];
+                    if(temp<ui.spinBoxWC->minimum())
+                        temp = ui.spinBoxWC->minimum();
+                    else if(temp>ui.spinBoxWC->maximum())
+                        temp = ui.spinBoxWC->maximum();
+                    ui.spinBoxWC->setValue(temp);
+                }
+                if(ui.spinBoxWW->isEnabled())
+                {
+                    int temp = ui.spinBoxWW->value() + m_mouseMiddleCurrentPos[1]-m_mouseMiddleStartPos[1];
+                    if(temp<ui.spinBoxWW->minimum())
+                        temp = ui.spinBoxWW->minimum();
+                    else if(temp>ui.spinBoxWW->maximum())
+                        temp = ui.spinBoxWW->maximum();
+                    ui.spinBoxWW->setValue(temp);
+                }
+            }
+        }
+    }
+
+    return true;
+    //return QMainWindow::eventFilter(obj, event);
 }

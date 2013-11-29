@@ -31,8 +31,11 @@ public:
     ImageViewer(QMainWindow *parent = 0);
     ~ImageViewer();
 
+    bool eventFilter(QObject *obj, QEvent* event);
+
 protected:
     void resizeEvent(QResizeEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
     void openImage();
@@ -64,9 +67,13 @@ private:
     short m_sHeight;
     short m_sWC;
     short m_sWW;
+    short m_mouseMiddleStartPos[2];
+    short m_mouseMiddleCurrentPos[2];
     std::string m_patientName;
     std::string m_sex;
     std::string m_birthday;
+    bool m_mouseLeftButtonDown;
+    bool m_mouseMiddleButtonDown;
 
     vtkSmartPointer<vtkResliceImageViewer> m_imageView;
     vtkSmartPointer<vtkWindowLevelLookupTable> windowLevelLookupTable;
