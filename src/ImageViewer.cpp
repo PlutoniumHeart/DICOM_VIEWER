@@ -14,7 +14,11 @@ ImageViewer::ImageViewer(QMainWindow *parent)
 
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.qvtkWidget);
-    //ui.scrollArea->setWidgetResizable(true);
+    ui.scrollArea->setWidgetResizable(true);
+    ui.scrollArea->setMouseTracking(true);
+    ui.scrollArea->installEventFilter(this);
+    ui.scrollArea->viewport()->setMouseTracking(true);
+    ui.scrollArea->viewport()->installEventFilter(this);
     ui.qvtkWidget->setMouseTracking(true);
     ui.qvtkWidget->installEventFilter(this);
 
@@ -224,6 +228,7 @@ void ImageViewer::updateDisplay()
     m_imageView->SetColorWindow(ui.spinBoxWW->value());
     m_imageView->SetColorLevel(ui.spinBoxWC->value());
     m_imageView->Render();
+    ui.qvtkWidget->update();
 }
 
 
@@ -238,6 +243,8 @@ void ImageViewer::createActions()
     connect(ui.pushButtonReset, SIGNAL(clicked()), this, SLOT(windowReset()));
     connect(ui.spinBoxWC, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
     connect(ui.spinBoxWW, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
+    connect(ui.scrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
+    connect(ui.scrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(updateDisplay()));
 }
 
 
@@ -283,13 +290,20 @@ void ImageViewer::resizeEvent(QResizeEvent * /* event */)
     int scrollAreaHeight = ui.scrollArea->height();
     ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
     */
-    scaleImage(1);
+    updateDisplay();
 }
 
 
 void ImageViewer::mouseMoveEvent(QMouseEvent *event)
 {
     //std::cout<<"Mouse moved."<<std::endl;
+}
+
+
+void ImageViewer::wheelEvent(QWheelEvent *event)
+{
+    //std::cout<<"Update"<<std::endl;
+    //updateDisplay();
 }
 
 
@@ -353,6 +367,11 @@ bool ImageViewer::eventFilter(QObject *obj, QEvent *event)
                 ui.spinBoxWW->setValue(m_sWW);
             }
         }
+    }
+
+    if(obj == ui.scrollArea || obj == ui.scrollArea->viewport())
+    {
+        updateDisplay();
     }
 
     return QMainWindow::eventFilter(obj, event);
