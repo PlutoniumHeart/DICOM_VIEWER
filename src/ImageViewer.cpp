@@ -91,7 +91,7 @@ void ImageViewer::openImage()
         m_imageView->SetupInteractor(interactor);
         m_imageView->Render();
         interactor->Disable();
-        
+        ui.qvtkWidget->resize(m_sWidth, m_sHeight);
         ui.qvtkWidget->update();
         
         scaleFactor = 1.0;
@@ -285,6 +285,15 @@ bool ImageViewer::eventFilter(QObject *obj, QEvent *event)
                     ui.spinBoxWW->setValue(temp);
                     m_mouseMiddleStartPos[1]=mouseEvent->y();
                 }
+            }
+        }
+        else if(event->type() == QEvent::MouseButtonDblClick)
+        {
+            const QMouseEvent* const mouseEvent = static_cast<const QMouseEvent*>(event);
+            if(mouseEvent->button() == Qt::MiddleButton)
+            {
+                ui.spinBoxWC->setValue(m_sWC);
+                ui.spinBoxWW->setValue(m_sWW);
             }
         }
     }
