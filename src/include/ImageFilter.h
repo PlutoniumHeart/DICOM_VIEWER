@@ -55,6 +55,9 @@ public:
 
     template<class T1, class T2, class T1Pointer, class T2Pointer, class T3>
     static bool ResampleFilter2D(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int outSizeX, int outSizeY);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static bool FlipImageFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int x, int y);
 };
 
  
@@ -440,6 +443,36 @@ bool ImageFilter::ResampleFilter2D(T1Pointer& imageObj_1, T2Pointer& imageObj_2,
 
     imageObj_2 = resampleFilter->GetOutput();
     
+    return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+bool ImageFilter::FlipImageFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int y, int x)
+{
+    typedef itk::FlipImageFilter<T1> FilterType;
+    typename FilterType::FlipAxesArrayType flipArray;
+    typename FilterType::Pointer filter = FilterType::New();
+
+    flipArray[0] = y;
+    flipArray[1] = x;
+    
+    filter->SetFlipAxes(flipArray);
+    filter->SetInput(imageObj_1);
+
+    try
+    {
+        filter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in windowing images: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+
+    imageObj_2 = filter->GetOutput();
+
     return true;
 }
 

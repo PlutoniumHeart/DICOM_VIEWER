@@ -97,9 +97,13 @@ void ImageViewer::openImage()
         m_dicomIO->GetValueFromTag("0010|0040", m_sex);
         m_dicomIO->GetValueFromTag("0010|0030", m_birthday);
 
+        ShortImageType::Pointer imageObj_flip = ShortImageType::New();
+        ImageFilter::FlipImageFilter<ShortImageType, ShortImageType,
+                                     ShortImageType::Pointer, ShortImageType::Pointer>
+            (m_imageObj, imageObj_flip, 0, 1);
         typedef itk::ImageToVTKImageFilter<ShortImageType> ConnectorType;
         ConnectorType::Pointer connector = ConnectorType::New();
-        connector->SetInput(m_imageObj);
+        connector->SetInput(imageObj_flip);
         connector->Update();
         
         windowLevelLookupTable->SetWindow(ui.spinBoxWW->value());
@@ -143,7 +147,8 @@ void ImageViewer::openImage()
 
         ui.qvtkWidget->adjustSize();
         
-        scaleFactor = 1.0;
+        scaleFactor = 1;
+        
         ui.actionPrint->setEnabled(true);
         ui.actionFitToWindow->setEnabled(true);
         ui.spinBoxWC->setEnabled(true);
@@ -155,6 +160,10 @@ void ImageViewer::openImage()
 
         fitToWindow();
 
+        double scale = (double)(ui.scrollArea->size().height()/(double)m_sWidth);
+        //std::cout<<scaleFactor<<std::endl;
+        scaleImage(scale);
+        std::cout<<(double)ui.scrollArea->size().height()<<" "<<m_sWidth<<" "<<scaleFactor<<std::endl;
         updateDisplay();
     }
 }
@@ -261,8 +270,8 @@ void ImageViewer::scaleImage(double factor)
     adjustScrollBar(ui.scrollArea->horizontalScrollBar(), factor);
     adjustScrollBar(ui.scrollArea->verticalScrollBar(), factor);
 
-    ui.actionZoom_in_25->setEnabled(scaleFactor<3.0);
-    ui.actionZoom_out_25->setEnabled(scaleFactor>0.333);
+    //ui.actionZoom_in_25->setEnabled(scaleFactor<3.0);
+    //ui.actionZoom_out_25->setEnabled(scaleFactor>0.333);
     
 }
 
@@ -290,7 +299,16 @@ void ImageViewer::resizeEvent(QResizeEvent * /* event */)
     int scrollAreaHeight = ui.scrollArea->height();
     ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
     */
-    updateDisplay();
+    /*
+    if(m_sWidth!=0)
+    {
+        double scale = (double)(ui.scrollArea->size().height()/(double)(m_sWidth*scaleFactor));
+        std::cout<<scaleFactor<<std::endl;
+        scaleImage(scale);
+        //std::cout<<(double)ui.scrollArea->size().height()<<" "<<m_sWidth<<" "<<scaleFactor<<std::endl;
+    }
+    */
+    updateDisplay();    
 }
 
 
