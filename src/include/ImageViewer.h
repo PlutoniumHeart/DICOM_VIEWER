@@ -77,7 +77,7 @@ private:
 
     vtkSmartPointer<vtkResliceImageViewer> m_imageView;
     vtkSmartPointer<vtkWindowLevelLookupTable> windowLevelLookupTable;
-    //vtkSmartPointer<vtkImageData> image;
+    vtkSmartPointer<vtkImageData> image;
     
     Ui::ImageViewer ui;
 };

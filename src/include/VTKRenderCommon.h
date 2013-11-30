@@ -12,6 +12,7 @@
 #include <vtkInteractorStyleImage.h>
 #include <vtkObjectFactory.h>
 //#include <QVTKInteractor.h>
+#include <vtkCamera.h>
 
 
 #endif // VTKRENDERCOMMON_H

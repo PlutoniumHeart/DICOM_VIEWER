@@ -14,19 +14,45 @@ ImageViewer::ImageViewer(QMainWindow *parent)
 
     ui.scrollArea->setBackgroundRole(QPalette::Dark);
     ui.scrollArea->setWidget(ui.qvtkWidget);
+    //ui.scrollArea->setWidgetResizable(true);
     ui.qvtkWidget->setMouseTracking(true);
     ui.qvtkWidget->installEventFilter(this);
-    m_imageView = vtkSmartPointer<vtkResliceImageViewer>::New();
-    
-    setCentralWidget(ui.scrollArea);
-    
-    createActions();
 
     m_imageObj = ShortImageType::New();
     m_dicomIO = DICOMIOType::New();
+    image = vtkSmartPointer<vtkImageData>::New();
+    m_imageView = vtkSmartPointer<vtkResliceImageViewer>::New();
+    windowLevelLookupTable = vtkSmartPointer<vtkWindowLevelLookupTable>::New();
     
-    //ui.qvtkWidget->SetRenderWindow(m_imageView->GetRenderWindow());
-    //ui.qvtkWidget->update();
+    setCentralWidget(ui.scrollArea);
+    
+    //QSize size = this->size();
+    //std::cout<<size.width()<<" "<<size.height()<<std::endl;
+    //ui.qvtkWidget->resize(size);
+    ui.qvtkWidget->GetRenderWindow()->SetSize(0,0);
+
+    //
+    ImageIO::CreateBlankImage<ShortImageType::Pointer, ShortImageType::RegionType>(m_imageObj, 512, 512);
+    typedef itk::ImageToVTKImageFilter<ShortImageType> ConnectorType;
+    ConnectorType::Pointer connector = ConnectorType::New();
+    connector->SetInput(m_imageObj);
+    connector->Update();
+
+    image->DeepCopy(connector->GetOutput());
+    ui.qvtkWidget->SetRenderWindow(m_imageView->GetRenderWindow());
+    vtkSmartPointer<vtkRenderWindowInteractor> interactor = ui.qvtkWidget->GetInteractor();
+
+    m_imageView->SetInputData(image);
+    m_imageView->SetLookupTable(windowLevelLookupTable);
+
+    m_imageView->SetupInteractor(interactor);
+    m_imageView->Render();
+    interactor->Disable();
+    ui.qvtkWidget->update();
+    ui.qvtkWidget->adjustSize();
+    //
+    
+    createActions();
     
     setWindowTitle(tr("Image Viewer"));
 }
@@ -71,28 +97,47 @@ void ImageViewer::openImage()
         ConnectorType::Pointer connector = ConnectorType::New();
         connector->SetInput(m_imageObj);
         connector->Update();
-
-        windowLevelLookupTable = vtkSmartPointer<vtkWindowLevelLookupTable>::New();
+        
         windowLevelLookupTable->SetWindow(ui.spinBoxWW->value());
         windowLevelLookupTable->SetLevel(ui.spinBoxWC->value());
         windowLevelLookupTable->SetRampToLinear();
         windowLevelLookupTable->Build();
         
-        vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
         image->DeepCopy(connector->GetOutput());
         ui.qvtkWidget->SetRenderWindow(m_imageView->GetRenderWindow());
         vtkSmartPointer<vtkRenderWindowInteractor> interactor = ui.qvtkWidget->GetInteractor();
 
         m_imageView->SetInputData(image);
         m_imageView->SetSlice(m_imageView->GetSliceMax()/2);
-        m_imageView->GetRenderer()->ResetCamera();
         m_imageView->SetLookupTable(windowLevelLookupTable);
         m_imageView->GetRenderer()->ResetCamera();
+
+        //
+        vtkCamera* camera = m_imageView->GetRenderer()->GetActiveCamera();
+        //m_imageView->GetRenderer()->SetBackground(1,0,0);
+        int extent[6];
+        double origin[3];
+        double spacing[3];
+        image->GetExtent(extent);
+        image->GetOrigin(origin);
+        image->GetSpacing(spacing);
+        float xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0];
+        float yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1];
+        float yd = (extent[3] - extent[2] + 1)*spacing[1];
+        float d = camera->GetDistance();
+        camera->SetParallelScale(0.5f*static_cast<float>(yd));
+        camera->SetFocalPoint(xc,yc,0.0);
+        camera->SetPosition(xc,yc,+d);
+
+        m_imageView->GetRenderer()->SetActiveCamera(camera);
+        //
+
         m_imageView->SetupInteractor(interactor);
         m_imageView->Render();
         interactor->Disable();
-        ui.qvtkWidget->resize(m_sWidth, m_sHeight);
         ui.qvtkWidget->update();
+
+        ui.qvtkWidget->adjustSize();
         
         scaleFactor = 1.0;
         ui.actionPrint->setEnabled(true);
@@ -105,6 +150,8 @@ void ImageViewer::openImage()
         updateActions();
 
         fitToWindow();
+
+        updateDisplay();
     }
 }
 
@@ -130,8 +177,9 @@ void ImageViewer::print()
 
 void ImageViewer::normalSize()
 {
-    //ui.imageLabel->adjustSize();
+    ui.qvtkWidget->adjustSize();
     scaleFactor = 1.0;
+    scaleImage(scaleFactor);
 }
 
 
@@ -141,6 +189,11 @@ void ImageViewer::fitToWindow()
     ui.scrollArea->setWidgetResizable(fitToWindow);
     if(!fitToWindow)
         normalSize();
+    else
+    {
+        scaleImage(scaleFactor);
+        updateDisplay();
+    }
     updateActions();
 }
 
@@ -148,14 +201,14 @@ void ImageViewer::fitToWindow()
 void ImageViewer::zoomIn()
 {
     scaleImage(1.25);
-    //updateDisplay();
+    updateDisplay();
 }
 
 
 void ImageViewer::zoomOut()
 {
     scaleImage(0.75);
-    //updateDisplay();
+    updateDisplay();
 }
 
 
@@ -190,17 +243,20 @@ void ImageViewer::createActions()
 
 void ImageViewer::scaleImage(double factor)
 {
-    /*
+    
     scaleFactor*=factor;
-    Q_ASSERT(ui.imageLabel->pixmap());
-    ui.imageLabel->resize(scaleFactor*ui.imageLabel->pixmap()->size());
+    //Q_ASSERT(ui.imageLabel->pixmap());
+    ui.qvtkWidget->GetRenderWindow()->SetSize(m_sWidth*scaleFactor, m_sHeight*scaleFactor);
+    //std::cout<<m_sWidth<<std::endl;
+    m_imageView->Render();
+    ui.qvtkWidget->update();
 
     adjustScrollBar(ui.scrollArea->horizontalScrollBar(), factor);
     adjustScrollBar(ui.scrollArea->verticalScrollBar(), factor);
 
     ui.actionZoom_in_25->setEnabled(scaleFactor<3.0);
     ui.actionZoom_out_25->setEnabled(scaleFactor>0.333);
-    */
+    
 }
 
 
@@ -227,6 +283,7 @@ void ImageViewer::resizeEvent(QResizeEvent * /* event */)
     int scrollAreaHeight = ui.scrollArea->height();
     ui.scrollArea->setGeometry(QRect(scrollAreaPosX, scrollAreaPosY, scrollAreaWidth, scrollAreaHeight));
     */
+    scaleImage(1);
 }
 
 
