@@ -33,7 +33,7 @@ private:
     QScrollArea *m_scrollArea;
     QTimer *m_timer;
     QMenu *m_mainMenu;
-    ImageWindowDock *m_lowerDock;
+    ImageWindowDock *m_imageWindowingDock;
     Helper helper;
 
     void setupMenuBar();

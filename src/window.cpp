@@ -6,7 +6,7 @@ Window::Window()
     , m_scrollArea(NULL)
     , m_timer(NULL)
     , m_mainMenu(NULL)
-    , m_lowerDock(NULL)
+    , m_imageWindowingDock(NULL)
 {
     setWindowTitle(tr("DICOM Viewer"));
     resize(800, 600);
@@ -23,16 +23,16 @@ Window::Window()
     m_scrollArea->setWidget(m_glDisplay);
     setCentralWidget(m_scrollArea);
 
-    m_lowerDock = new ImageWindowDock;
-    addDockWidget(Qt::BottomDockWidgetArea, m_lowerDock);
+    m_imageWindowingDock = new ImageWindowDock;
+    addDockWidget(Qt::BottomDockWidgetArea, m_imageWindowingDock);
     
     m_timer->start(50);
     
-    connect(m_glDisplay, SIGNAL(middleButtonMove(int, int)), m_lowerDock, SLOT(updateWindowLevel(int, int)));
-    connect(m_lowerDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
-    connect(m_lowerDock->GetSliderWW(), SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
+    connect(m_glDisplay, SIGNAL(middleButtonMove(int, int)), m_imageWindowingDock, SLOT(updateWindowLevel(int, int)));
+    connect(m_imageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
+    connect(m_imageWindowingDock->GetSliderWW(), SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
     connect(m_glDisplay, SIGNAL(middleButtonDoubleClick()), this, SLOT(resetWindow()));
-    connect(m_lowerDock->GetResetButton(), SIGNAL(clicked()), this, SLOT(resetWindow()));
+    connect(m_imageWindowingDock->GetResetButton(), SIGNAL(clicked()), this, SLOT(resetWindow()));
     connect(m_glDisplay, SIGNAL(rightButtonMove(int)), this, SLOT(pan(int)));
 }
 
@@ -42,7 +42,7 @@ Window::~Window()
     delete m_glDisplay;
     delete m_scrollArea;
     delete m_timer;
-    delete m_lowerDock;
+    delete m_imageWindowingDock;
 }
 
 
@@ -59,34 +59,35 @@ void Window::openDICOM()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
     helper.openImage(fileName);
     
-    m_lowerDock->GetSpinBoxWC()->setMinimum(helper.GetLowerBound());
-    m_lowerDock->GetSpinBoxWC()->setMaximum(helper.GetUpperBound());
-    m_lowerDock->GetSliderWC()->setMinimum(helper.GetLowerBound());
-    m_lowerDock->GetSliderWC()->setMaximum(helper.GetUpperBound());
-    m_lowerDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
+    m_imageWindowingDock->GetSpinBoxWC()->setMinimum(helper.GetLowerBound());
+    m_imageWindowingDock->GetSpinBoxWC()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSliderWC()->setMinimum(helper.GetLowerBound());
+    m_imageWindowingDock->GetSliderWC()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
 
-    m_lowerDock->GetSpinBoxWW()->setMinimum(helper.GetLowerBound());
-    m_lowerDock->GetSpinBoxWW()->setMaximum(helper.GetUpperBound());
-    m_lowerDock->GetSliderWW()->setMinimum(helper.GetLowerBound());
-    m_lowerDock->GetSliderWW()->setMaximum(helper.GetUpperBound());
-    m_lowerDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
+    m_imageWindowingDock->GetSpinBoxWW()->setMinimum(helper.GetLowerBound());
+    m_imageWindowingDock->GetSpinBoxWW()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSliderWW()->setMinimum(helper.GetLowerBound());
+    m_imageWindowingDock->GetSliderWW()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
     
     connect(m_timer, SIGNAL(timeout()), m_glDisplay, SLOT(animate()));
     
-    m_lowerDock->EnableWidgets();
+    m_imageWindowingDock->EnableWidgets();
 }
 
 
 void Window::updateImage()
 {
-    helper.updateImage(m_lowerDock->GetSpinBoxWC()->value(), m_lowerDock->GetSpinBoxWW()->value());
+    helper.updateImage(m_imageWindowingDock->GetSpinBoxWC()->value(),
+                       m_imageWindowingDock->GetSpinBoxWW()->value());
 }
 
 
 void Window::resetWindow()
 {
-    m_lowerDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
-    m_lowerDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
+    m_imageWindowingDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
+    m_imageWindowingDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
     helper.updateImage(helper.GetDefaultImageWC(), helper.GetDefaultImageWW());
 }
 
