@@ -9,41 +9,33 @@ else(ITK_FOUND)
   message(FATAL_ERROR "ITK not found. Please set ITK_DIR. ")
 endif(ITK_FOUND)
 
-find_package(VTK REQUIRED)
-if(VTK_FOUND)
-  include(${VTK_USE_FILE})
-else(VTK_FOUND)
-  message(FATAL_ERROR "VTK not found, Please set VTK_DIR. ")
-endif(VTK_FOUND)
-
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 find_package(Qt5Declarative REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-qt5_wrap_ui(QTUI src/ImageViewer.ui)
 include_directories("${PROJECT_BINARY_DIR}")
 
 include_directories(src/include)
 
 set(SOURCES src/main.cpp 
             src/include/ImageCommon.h
-            src/include/VTKRenderCommon.h
             src/include/ImageIO.h src/ImageIO.cpp
             src/include/ImageFilter.h src/ImageFilter.cpp
-            src/include/ImageViewer.h src/ImageViewer.cpp
-            src/include/MyMouseInteractorStyle.h src/MyMouseInteractorStyle.cpp
-            src/ImageViewer.ui ${QTUI}
+            src/include/glwidget.h src/glwidget.cpp
+            src/include/helper.h src/helper.cpp
+            src/include/window.h src/window.cpp
+            src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
 )
 
 set(ALL_LIBS ${ITK_LIBRARIES}
-             ${VTK_LIBRARIES}
              ${Qt5Widgets_LIBRARIES}
 )
 
 add_executable(DICOM_Tool ${SOURCES})
 
-qt5_use_modules(DICOM_Tool Widgets Core Declarative PrintSupport)
+qt5_use_modules(DICOM_Tool Widgets Core Declarative PrintSupport OpenGL)
 
 target_link_libraries(DICOM_Tool ${ALL_LIBS})

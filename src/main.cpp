@@ -1,13 +1,11 @@
-#include <QApplication>
-#include "ImageIO.h"
-#include "ImageFilter.h"
-#include "ImageViewer.h"
+#include "window.h"
 
+#include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    ImageViewer imageViewer;
-    imageViewer.show();
+    Window window;
+    window.show();
     return app.exec();
 }
