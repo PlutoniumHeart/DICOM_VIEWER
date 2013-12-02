@@ -27,6 +27,9 @@ Window::Window()
     m_imageWindowingDock = new ImageWindowDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_imageWindowingDock);
 
+    m_fileToolBar = new FileToolBar;
+    addToolBar(m_fileToolBar);
+
     m_resizeToolBar = new ResizeToolBar;
     addToolBar(m_resizeToolBar);
     
@@ -38,6 +41,7 @@ Window::Window()
     connect(m_glDisplay, SIGNAL(middleButtonDoubleClick()), this, SLOT(resetWindow()));
     connect(m_imageWindowingDock->GetResetButton(), SIGNAL(clicked()), this, SLOT(resetWindow()));
     connect(m_glDisplay, SIGNAL(rightButtonMove(int)), this, SLOT(pan(int)));
+    connect(m_fileToolBar->GetOpenDICOMAction(), SIGNAL(triggered()), this, SLOT(openDICOM()));
 }
 
 

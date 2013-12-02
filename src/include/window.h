@@ -13,6 +13,7 @@
 #include "glwidget.h"
 #include "helper.h"
 #include "ImageWindowingDock.h"
+#include "FileToolBar.h"
 #include "ResizeToolBar.h"
 
 
@@ -35,6 +36,7 @@ private:
     QScrollArea *m_scrollArea;
     QTimer *m_timer;
     QMenu *m_mainMenu;
+    FileToolBar *m_fileToolBar;
     ResizeToolBar *m_resizeToolBar;
     ImageWindowDock *m_imageWindowingDock;
     Helper helper;

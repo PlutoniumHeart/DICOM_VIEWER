@@ -29,6 +29,7 @@ set(SOURCES src/main.cpp
             src/include/window.h src/window.cpp
             src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
             src/include/ResizeToolBar.h src/ResizeToolBar.cpp
+            src/include/FileToolBar.h src/FileToolBar.cpp
 )
 
 set(ALL_LIBS ${ITK_LIBRARIES}
