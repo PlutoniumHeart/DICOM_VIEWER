@@ -6,6 +6,7 @@ Window::Window()
     , m_scrollArea(NULL)
     , m_timer(NULL)
     , m_mainMenu(NULL)
+    , m_resizeToolBar(NULL)
     , m_imageWindowingDock(NULL)
 {
     setWindowTitle(tr("DICOM Viewer"));
@@ -25,6 +26,9 @@ Window::Window()
 
     m_imageWindowingDock = new ImageWindowDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_imageWindowingDock);
+
+    m_resizeToolBar = new ResizeToolBar;
+    addToolBar(m_resizeToolBar);
     
     m_timer->start(50);
     

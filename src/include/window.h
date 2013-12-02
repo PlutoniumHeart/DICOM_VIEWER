@@ -9,9 +9,11 @@
 #include <QMenuBar>
 #include <QFileDialog>
 
+
 #include "glwidget.h"
 #include "helper.h"
 #include "ImageWindowingDock.h"
+#include "ResizeToolBar.h"
 
 
 class Window : public QMainWindow
@@ -33,6 +35,7 @@ private:
     QScrollArea *m_scrollArea;
     QTimer *m_timer;
     QMenu *m_mainMenu;
+    ResizeToolBar *m_resizeToolBar;
     ImageWindowDock *m_imageWindowingDock;
     Helper helper;
 
