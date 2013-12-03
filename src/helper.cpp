@@ -87,6 +87,18 @@ void Helper::updateImage(int wc, int ww)
 }
 
 
+short Helper::GetImageWidth()
+{
+    return m_sImageWidth;
+}
+
+
+short Helper::GetImageHeight()
+{
+    return m_sImageHeight;
+}
+
+
 short Helper::GetDefaultImageWC()
 {
     return m_sDefaultWC;

@@ -23,6 +23,8 @@ public:
 public:
     void paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect);
     void openImage(QString fileName);
+    short GetImageWidth();
+    short GetImageHeight();
     short GetDefaultImageWC();
     short GetDefaultImageWW();
     short GetUpperBound();

@@ -102,5 +102,11 @@ void Window::resetWindow()
 
 void Window::pan(int scale)
 {
-    m_glDisplay->resize(m_glDisplay->width()+scale, m_glDisplay->height()+scale);
+    if(m_glDisplay->width()+scale<=8*helper.GetImageWidth() &&
+       m_glDisplay->height()+scale<=8*helper.GetImageHeight() &&
+       m_glDisplay->width()+scale>=helper.GetImageWidth()/8 &&
+       m_glDisplay->height()+scale>=helper.GetImageHeight()/8)
+    {
+        m_glDisplay->resize(m_glDisplay->width()+scale, m_glDisplay->height()+scale);
+    }
 }

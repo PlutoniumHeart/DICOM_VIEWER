@@ -11,7 +11,7 @@
 
 
 #include "glwidget.h"
-#include "helper.h"
+//#include "helper.h"
 #include "ImageWindowingDock.h"
 #include "FileToolBar.h"
 #include "ResizeToolBar.h"
