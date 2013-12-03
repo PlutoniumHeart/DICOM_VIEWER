@@ -46,6 +46,8 @@ Window::Window()
     connect(m_resizeToolBar->GetActionZoomOut(), SIGNAL(triggered()), this, SLOT(zoomOut25Present()));
     connect(m_resizeToolBar->GetActionOriginalSize(), SIGNAL(triggered()), this, SLOT(zoomOriginalSize()));
     connect(m_resizeToolBar->GetActionFitToHeight(), SIGNAL(triggered()), this, SLOT(zoomFitToHeight()));
+    connect(m_resizeToolBar->GetComboResize(), SIGNAL(currentIndexChanged(int)), this, SLOT(zoomComboResize(int)));
+    connect(m_resizeToolBar->GetComboResize()->lineEdit(), SIGNAL(editingFinished()), this, SLOT(zoomCustomSize()));
 }
 
 
@@ -144,4 +146,58 @@ void Window::zoomFitToHeight()
     short tmp = m_scrollArea->height();
     double temp = (double)tmp/m_glDisplay->height();
     m_glDisplay->resize(m_glDisplay->size()*temp);
+}
+
+
+void Window::zoomComboResize(int index)
+{
+    QSize original = QSize(helper.GetImageWidth(), helper.GetImageHeight());
+    switch(index)
+    {
+    case 0:
+        m_glDisplay->resize(original*8.0);
+        break;
+    case 1:
+        m_glDisplay->resize(original*7.0);
+        break;
+    case 2:
+        m_glDisplay->resize(original*6.0);
+        break;
+    case 3:
+        m_glDisplay->resize(original*5.0);
+        break;
+    case 4:
+        m_glDisplay->resize(original*4.0);
+        break;
+    case 5:
+        m_glDisplay->resize(original*3.0);
+        break;
+    case 6:
+        m_glDisplay->resize(original*2.0);
+        break;
+    case 7:
+        m_glDisplay->resize(original*1.0);
+        break;
+    case 8:
+        m_glDisplay->resize(original*0.5);
+        break;
+    default:
+        std::cout<<"Combo resize: no such index found."<<std::endl;
+        break;
+    }
+}
+
+
+void Window::zoomCustomSize()
+{
+    std::string temp = m_resizeToolBar->GetComboResize()->currentText().toUtf8().constData();
+
+    short tmp = atoi(temp.c_str());
+    std::stringstream ss;
+    ss<<tmp;
+    std::string currentText = ss.str() + "%";
+    m_resizeToolBar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
+    
+    QSize original = QSize(helper.GetImageWidth(), helper.GetImageHeight());
+    m_glDisplay->resize(original*tmp/100.0);
 }

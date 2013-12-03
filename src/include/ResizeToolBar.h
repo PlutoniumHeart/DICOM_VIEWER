@@ -20,6 +20,8 @@ public:
     QAction* GetActionOriginalSize();
     QAction* GetActionFitToHeight();
 
+    QComboBox* GetComboResize();
+
 private:
     QComboBox* m_dropDownZoom;
 

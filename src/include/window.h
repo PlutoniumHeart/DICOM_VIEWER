@@ -2,16 +2,18 @@
 #define WINDOW_H
 
 
+#include <string>
+#include <sstream>
 #include <QMainWindow>
 #include <QTimer>
 #include <QScrollArea>
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QLineEdit>
 
 
 #include "glwidget.h"
-//#include "helper.h"
 #include "ImageWindowingDock.h"
 #include "FileToolBar.h"
 #include "ResizeToolBar.h"
@@ -34,6 +36,8 @@ private slots:
     void zoomOut25Present();
     void zoomOriginalSize();
     void zoomFitToHeight();
+    void zoomComboResize(int index);
+    void zoomCustomSize();
     
 private:
     GLWidget *m_glDisplay;
