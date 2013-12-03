@@ -42,6 +42,10 @@ Window::Window()
     connect(m_imageWindowingDock->GetResetButton(), SIGNAL(clicked()), this, SLOT(resetWindow()));
     connect(m_glDisplay, SIGNAL(rightButtonMove(int)), this, SLOT(pan(int)));
     connect(m_fileToolBar->GetOpenDICOMAction(), SIGNAL(triggered()), this, SLOT(openDICOM()));
+    connect(m_resizeToolBar->GetActionZoomIn(), SIGNAL(triggered()), this, SLOT(zoomIn25Present()));
+    connect(m_resizeToolBar->GetActionZoomOut(), SIGNAL(triggered()), this, SLOT(zoomOut25Present()));
+    connect(m_resizeToolBar->GetActionOriginalSize(), SIGNAL(triggered()), this, SLOT(zoomOriginalSize()));
+    connect(m_resizeToolBar->GetActionFitToHeight(), SIGNAL(triggered()), this, SLOT(zoomFitToHeight()));
 }
 
 
@@ -66,17 +70,19 @@ void Window::openDICOM()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
     helper.openImage(fileName);
+
+    m_glDisplay->resize(helper.GetImageWidth(), helper.GetImageHeight());
     
-    m_imageWindowingDock->GetSpinBoxWC()->setMinimum(helper.GetLowerBound());
-    m_imageWindowingDock->GetSpinBoxWC()->setMaximum(helper.GetUpperBound());
-    m_imageWindowingDock->GetSliderWC()->setMinimum(helper.GetLowerBound());
-    m_imageWindowingDock->GetSliderWC()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSpinBoxWC()->setMinimum(-2048);
+    m_imageWindowingDock->GetSpinBoxWC()->setMaximum(2048);
+    m_imageWindowingDock->GetSliderWC()->setMinimum(-2048);
+    m_imageWindowingDock->GetSliderWC()->setMaximum(2048);
     m_imageWindowingDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
 
-    m_imageWindowingDock->GetSpinBoxWW()->setMinimum(helper.GetLowerBound());
-    m_imageWindowingDock->GetSpinBoxWW()->setMaximum(helper.GetUpperBound());
-    m_imageWindowingDock->GetSliderWW()->setMinimum(helper.GetLowerBound());
-    m_imageWindowingDock->GetSliderWW()->setMaximum(helper.GetUpperBound());
+    m_imageWindowingDock->GetSpinBoxWW()->setMinimum(-2048);
+    m_imageWindowingDock->GetSpinBoxWW()->setMaximum(2048);
+    m_imageWindowingDock->GetSliderWW()->setMinimum(-2048);
+    m_imageWindowingDock->GetSliderWW()->setMaximum(2048);
     m_imageWindowingDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
     
     connect(m_timer, SIGNAL(timeout()), m_glDisplay, SLOT(animate()));
@@ -102,11 +108,40 @@ void Window::resetWindow()
 
 void Window::pan(int scale)
 {
-    if(m_glDisplay->width()+scale<=8*helper.GetImageWidth() &&
-       m_glDisplay->height()+scale<=8*helper.GetImageHeight() &&
-       m_glDisplay->width()+scale>=helper.GetImageWidth()/8 &&
-       m_glDisplay->height()+scale>=helper.GetImageHeight()/8)
+    double presentage = scale/100.0;
+    QSize temp = presentage*m_glDisplay->size();
+    if(m_glDisplay->size().width()+temp.width()<=8*helper.GetImageWidth() &&
+       m_glDisplay->size().height()+temp.height()<=8*helper.GetImageHeight() &&
+       m_glDisplay->size().width()+temp.width()>=helper.GetImageWidth()/8 &&
+       m_glDisplay->size().height()+temp.height()>=helper.GetImageHeight()/8)
     {
-        m_glDisplay->resize(m_glDisplay->width()+scale, m_glDisplay->height()+scale);
+        m_glDisplay->resize(m_glDisplay->size()+temp);
     }
+    
+}
+
+
+void Window::zoomIn25Present()
+{
+    pan(25);
+}
+
+
+void Window::zoomOut25Present()
+{
+    pan(-25);
+}
+
+
+void Window::zoomOriginalSize()
+{
+    m_glDisplay->resize(helper.GetImageWidth(), helper.GetImageHeight());
+}
+
+
+void Window::zoomFitToHeight()
+{
+    short tmp = m_scrollArea->height();
+    double temp = (double)tmp/m_glDisplay->height();
+    m_glDisplay->resize(m_glDisplay->size()*temp);
 }

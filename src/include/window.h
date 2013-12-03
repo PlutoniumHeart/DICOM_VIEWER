@@ -30,6 +30,10 @@ private slots:
     void updateImage();
     void resetWindow();
     void pan(int scale);
+    void zoomIn25Present();
+    void zoomOut25Present();
+    void zoomOriginalSize();
+    void zoomFitToHeight();
     
 private:
     GLWidget *m_glDisplay;

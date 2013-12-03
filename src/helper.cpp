@@ -35,9 +35,6 @@ void Helper::openImage(QString fileName)
     if(!fileName.isEmpty())
     {
         ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_sImageObj, m_dicomIO);
-        ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
-                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-            (m_sImageObj, m_ucDisplayImageObj, 153, 385);
 
         std::string temp;
         m_dicomIO->GetValueFromTag("0028|1050", temp);
@@ -51,6 +48,10 @@ void Helper::openImage(QString fileName)
 
         m_dicomIO->GetValueFromTag("0028|0107", temp);
         m_sUpperBound = atoi(temp.c_str());
+
+        ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
+                                              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
+            (m_sImageObj, m_ucDisplayImageObj, m_sDefaultWC, m_sDefaultWW);
         
         m_sImageWidth = m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
         m_sImageHeight = m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
@@ -71,8 +72,8 @@ void Helper::ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage*
     {
         for(j=0;j<m_sImageWidth;j++)
         {
-            short temp = m_ucPixArray[i+j*m_sImageWidth];
-            (*qt_image)->setPixel(i, j, qRgb(temp, temp, temp));
+            short temp = m_ucPixArray[j+i*m_sImageWidth];
+            (*qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
         }
     }
 }

@@ -15,8 +15,18 @@ public:
     ResizeToolBar();
     ~ResizeToolBar();
 
+    QAction* GetActionZoomIn();
+    QAction* GetActionZoomOut();
+    QAction* GetActionOriginalSize();
+    QAction* GetActionFitToHeight();
+
 private:
     QComboBox* m_dropDownZoom;
+
+    QAction* m_zoomIn;
+    QAction* m_zoomOut;
+    QAction* m_originSize;
+    QAction* m_fitToHeight;
 };
 
 
