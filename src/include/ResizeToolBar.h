@@ -23,12 +23,12 @@ public:
     QComboBox* GetComboResize();
 
 private:
-    QComboBox* m_dropDownZoom;
+    QComboBox* m_DropDownZoom;
 
-    QAction* m_zoomIn;
-    QAction* m_zoomOut;
-    QAction* m_originSize;
-    QAction* m_fitToHeight;
+    QAction* m_ZoomIn;
+    QAction* m_ZoomOut;
+    QAction* m_OriginSize;
+    QAction* m_FitToHeight;
 };
 
 

@@ -21,15 +21,15 @@ public:
     ~Helper();
     
 public:
-    void paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect);
-    void openImage(QString fileName);
+    void Paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect);
+    void OpenImage(QString fileName);
     short GetImageWidth();
     short GetImageHeight();
     short GetDefaultImageWC();
     short GetDefaultImageWW();
     short GetUpperBound();
     short GetLowerBound();
-    void updateImage(int wc, int ww);
+    void UpdateImage(int wc, int ww);
 
 private:
     void ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage** qt_image);
@@ -38,7 +38,7 @@ private:
 
     UnsignedCharImageType::Pointer m_ucDisplayImageObj;
     ShortImageType::Pointer m_sImageObj;
-    DICOMIOType::Pointer m_dicomIO;
+    DICOMIOType::Pointer m_DicomIO;
     unsigned char *m_ucPixArray;
     short m_sImageWidth;
     short m_sImageHeight;

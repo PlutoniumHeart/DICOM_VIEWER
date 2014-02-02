@@ -1,4 +1,4 @@
-#include "helper.h"
+#include "Helper.h"
 
 
 Helper::Helper()
@@ -8,7 +8,7 @@ Helper::Helper()
 {
     m_ucDisplayImageObj = UnsignedCharImageType::New();
     m_sImageObj = ShortImageType::New();
-    m_dicomIO = DICOMIOType::New();
+    m_DicomIO = DICOMIOType::New();
     m_qtDisplayImage = new QImage();
 }
 
@@ -23,30 +23,30 @@ Helper::~Helper()
 }
 
 
-void Helper::paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect)
+void Helper::Paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect)
 {
     QRect rect1 = QRect(0, 0, rect.width(), rect.height());
     painter->drawImage(rect1, *m_qtDisplayImage);
 }
 
 
-void Helper::openImage(QString fileName)
+void Helper::OpenImage(QString fileName)
 {
     if(!fileName.isEmpty())
     {
-        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_sImageObj, m_dicomIO);
+        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_sImageObj, m_DicomIO);
 
         std::string temp;
-        m_dicomIO->GetValueFromTag("0028|1050", temp);
+        m_DicomIO->GetValueFromTag("0028|1050", temp);
         m_sDefaultWC = atoi(temp.c_str());
         
-        m_dicomIO->GetValueFromTag("0028|1051", temp);
+        m_DicomIO->GetValueFromTag("0028|1051", temp);
         m_sDefaultWW = atoi(temp.c_str());
 
-        m_dicomIO->GetValueFromTag("0028|0106", temp);
+        m_DicomIO->GetValueFromTag("0028|0106", temp);
         m_sLowerBound = atoi(temp.c_str());
 
-        m_dicomIO->GetValueFromTag("0028|0107", temp);
+        m_DicomIO->GetValueFromTag("0028|0107", temp);
         m_sUpperBound = atoi(temp.c_str());
 
         ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
@@ -79,7 +79,7 @@ void Helper::ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage*
 }
 
 
-void Helper::updateImage(int wc, int ww)
+void Helper::UpdateImage(int wc, int ww)
 {
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                           ShortImageType::Pointer, UnsignedCharImageType::Pointer>

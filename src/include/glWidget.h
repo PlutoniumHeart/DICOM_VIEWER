@@ -4,7 +4,7 @@
 
 #include <QGLWidget>
 #include <QTimer>
-#include "helper.h"
+#include "Helper.h"
 
 
 class Helper;
@@ -17,12 +17,12 @@ public:
     GLWidget(Helper *helper, QWidget *parent);
 
 public slots:
-    void animate();
+    void Animate();
 
 signals:
-    void middleButtonMove(int x, int y);
-    void rightButtonMove(int y);
-    void middleButtonDoubleClick();
+    void MiddleButtonMove(int x, int y);
+    void RightButtonMove(int y);
+    void MiddleButtonDoubleClick();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -31,17 +31,18 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
 
-    short m_mouseMiddleStartPos[2];
-    short m_mouseMiddleCurrentPos[2];
-    short m_mouseRightStartPos[2];
-    short m_mouseRightCurrentPos[2];
+protected:
+    short m_MouseMiddleStartPos[2];
+    short m_MouseMiddleCurrentPos[2];
+    short m_MouseRightStartPos[2];
+    short m_MouseRightCurrentPos[2];
     
-    bool m_middleButtonDown;
-    bool m_rightButtonDown;
+    bool m_MiddleButtonDown;
+    bool m_RightButtonDown;
     
 private:
-    Helper *helper;
-    int elapsed;
+    Helper *m_Helper;
+    int m_iElapsed;
 };
 
 

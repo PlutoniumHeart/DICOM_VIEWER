@@ -24,9 +24,9 @@ set(SOURCES src/main.cpp
             src/include/ImageCommon.h
             src/include/ImageIO.h src/ImageIO.cpp
             src/include/ImageFilter.h src/ImageFilter.cpp
-            src/include/glwidget.h src/glwidget.cpp
-            src/include/helper.h src/helper.cpp
-            src/include/window.h src/window.cpp
+            src/include/glWidget.h src/glWidget.cpp
+            src/include/Helper.h src/Helper.cpp
+            src/include/Window.h src/Window.cpp
             src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
             src/include/ResizeToolBar.h src/ResizeToolBar.cpp
             src/include/FileToolBar.h src/FileToolBar.cpp

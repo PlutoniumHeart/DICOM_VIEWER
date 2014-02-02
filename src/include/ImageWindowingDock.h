@@ -28,21 +28,21 @@ public:
     void EnableWidgets();
 
 public slots:
-    void updateWindowLevel(int x, int y);
-    void setFloatingProperty(bool floating);
+    void UpdateWindowLevel(int x, int y);
+    void SetFloatingProperty(bool floating);
 
 private:
     QWidget *m_DockContents;
-    QWidget *m_layoutWidget;
+    QWidget *m_LayoutWidget;
     
-    QGridLayout *m_layout;
-    QLabel *m_labelWC;
-    QLabel *m_labelWW;
-    QSlider *m_sliderWC;
-    QSlider *m_sliderWW;
-    QSpinBox *m_spinBoxWC;
-    QSpinBox *m_spinBoxWW;
-    QPushButton *m_pushButtonReset;
+    QGridLayout *m_Layout;
+    QLabel *m_LabelWC;
+    QLabel *m_LabelWW;
+    QSlider *m_SliderWC;
+    QSlider *m_SliderWW;
+    QSpinBox *m_SpinBoxWC;
+    QSpinBox *m_SpinBoxWW;
+    QPushButton *m_PushButtonReset;
 };
 
 
