@@ -7,6 +7,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <QMenu>
 #include <QMenuBar>
 #include <QFileDialog>
@@ -49,8 +50,12 @@ private:
     ImageWindowDock *m_ImageWindowingDock;
     Helper m_Helper;
 
-private:    
-    void SetupMenuBar();
+private:
+    void CreateActions();
+    void CreateMenuBar();
+    void CreateDockWindows();
+    void CreateToolBar();
+    void AdjustScrollBar(QScrollBar* scrollBar, double factor);
 };
 
 

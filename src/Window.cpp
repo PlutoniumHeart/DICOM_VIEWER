@@ -11,8 +11,6 @@ Window::Window()
 {
     setWindowTitle(tr("DICOM Viewer"));
     resize(1024, 768);
-
-    SetupMenuBar();
     
     m_glDisplay = new GLWidget(&m_Helper, this);
     m_ScrollArea = new QScrollArea;
@@ -22,19 +20,32 @@ Window::Window()
     m_ScrollArea->setBackgroundRole(QPalette::Dark);
     m_ScrollArea->setAlignment(Qt::AlignCenter);
     m_ScrollArea->setWidget(m_glDisplay);
+    m_ScrollArea->setWidgetResizable(false);
+    m_ScrollArea->ensureWidgetVisible(m_glDisplay);
     setCentralWidget(m_ScrollArea);
 
-    m_ImageWindowingDock = new ImageWindowDock;
-    addDockWidget(Qt::BottomDockWidgetArea, m_ImageWindowingDock);
-
-    m_FileToolBar = new FileToolBar;
-    addToolBar(m_FileToolBar);
-
-    m_ResizeToolBar = new ResizeToolBar;
-    addToolBar(m_ResizeToolBar);
+    CreateMenuBar();
+    CreateDockWindows();
+    CreateToolBar();
+    CreateActions();
     
     m_Timer->start(50);
-    
+
+    setUnifiedTitleAndToolBarOnMac(true);
+}
+
+
+Window::~Window()
+{
+    delete m_glDisplay;
+    delete m_ScrollArea;
+    delete m_Timer;
+    delete m_ImageWindowingDock;
+}
+
+
+void Window::CreateActions()
+{
     connect(m_glDisplay, SIGNAL(MiddleButtonMove(int, int)),
             m_ImageWindowingDock, SLOT(UpdateWindowLevel(int, int)));
     connect(m_ImageWindowingDock->GetSliderWC(),
@@ -62,20 +73,28 @@ Window::Window()
 }
 
 
-Window::~Window()
-{
-    delete m_glDisplay;
-    delete m_ScrollArea;
-    delete m_Timer;
-    delete m_ImageWindowingDock;
-}
-
-
-void Window::SetupMenuBar()
+void Window::CreateMenuBar()
 {
     m_MainMenu = menuBar()->addMenu(tr("&File"));
     m_MainMenu->addAction(tr("&Open"), this, SLOT(OpenDICOM()));
     m_MainMenu->addAction(tr("&Quit"), this, SLOT(close()));
+}
+
+
+void Window::CreateDockWindows()
+{
+    m_ImageWindowingDock = new ImageWindowDock;
+    addDockWidget(Qt::BottomDockWidgetArea, m_ImageWindowingDock);
+}
+
+
+void Window::CreateToolBar()
+{
+    m_FileToolBar = new FileToolBar;
+    addToolBar(m_FileToolBar);
+
+    m_ResizeToolBar = new ResizeToolBar;
+    addToolBar(m_ResizeToolBar);
 }
 
 
@@ -138,7 +157,17 @@ void Window::Pan(int scale)
         std::string currentText(ss.str());
         currentText = currentText + "%";
         m_ResizeToolBar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
+
+        AdjustScrollBar(m_ScrollArea->horizontalScrollBar(), presentage);
+        AdjustScrollBar(m_ScrollArea->verticalScrollBar(), presentage);
+        m_ScrollArea->update();
     }
+}
+
+
+void Window::AdjustScrollBar(QScrollBar* scrollBar, double factor)
+{
+    scrollBar->setValue(int(factor*scrollBar->value() + ((factor-1)*scrollBar->pageStep()/2)));
 }
 
 

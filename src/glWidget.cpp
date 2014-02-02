@@ -80,13 +80,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
-    {
         m_MiddleButtonDown = false;
-    }
     else if(event->button()==Qt::RightButton)
-    {
         m_RightButtonDown = false;
-    }
 }
 
 
