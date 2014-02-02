@@ -41,6 +41,7 @@ ImageWindowDock::ImageWindowDock()
     connect(m_sliderWC, SIGNAL(valueChanged(int)), m_spinBoxWC, SLOT(setValue(int)));
     connect(m_spinBoxWW, SIGNAL(valueChanged(int)), m_sliderWW, SLOT(setValue(int)));
     connect(m_sliderWW, SIGNAL(valueChanged(int)), m_spinBoxWW, SLOT(setValue(int)));
+    connect(this, SIGNAL(topLevelChanged(bool)), this, SLOT(setFloatingProperty(bool)));
 
     m_sliderWC->setDisabled(true);
     m_sliderWW->setDisabled(true);
@@ -79,6 +80,13 @@ void ImageWindowDock::updateWindowLevel(int x, int y)
 {
     m_spinBoxWC->setValue(m_spinBoxWC->value()-x);
     m_spinBoxWW->setValue(m_spinBoxWW->value()-y);
+}
+
+
+void ImageWindowDock::setFloatingProperty(bool floating)
+{
+    if(floating)
+        resize(280, 160);
 }
 
 

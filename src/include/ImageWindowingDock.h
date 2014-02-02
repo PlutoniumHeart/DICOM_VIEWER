@@ -29,6 +29,7 @@ public:
 
 public slots:
     void updateWindowLevel(int x, int y);
+    void setFloatingProperty(bool floating);
 
 private:
     QWidget *m_DockContents;
