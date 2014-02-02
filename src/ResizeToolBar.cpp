@@ -21,11 +21,15 @@ ResizeToolBar::ResizeToolBar()
     m_DropDownZoom->addItem("50%", 0.5);
     m_DropDownZoom->setCurrentText("100%");
     
-    m_ZoomIn = addAction(QIcon(QPixmap(":/icons/Zoom_In.png")), "Zoom in (25%)");
-    m_ZoomOut = addAction(QIcon(QPixmap(":/icons/Zoom_Out.png")), "Zoom out (25%)");
+    m_ZoomIn = new QAction(QIcon(":/icons/Zoom_In.png"), tr("Zoom in (25%)"), this);
+    m_ZoomOut = new QAction(QIcon(":/icons/Zoom_Out.png"), tr("Zoom out (25%)"), this);
+    addAction(m_ZoomIn);
+    addAction(m_ZoomOut);
     addWidget(m_DropDownZoom);
-    m_OriginSize = addAction(QIcon(QPixmap(":/icons/Zoom.png")), "Original size");
-    m_FitToHeight = addAction(QIcon(QPixmap(":/icons/viewmagfit.png")), "Fit to height");
+    m_OriginSize = new QAction(QIcon(":/icons/Zoom.png"), tr("Original size"), this);
+    m_FitToHeight = new QAction(QIcon(":/icons/viewmagfit.png"), tr("Fit to height"), this);
+    addAction(m_OriginSize);
+    addAction(m_FitToHeight);
 }
 
 

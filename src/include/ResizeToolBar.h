@@ -2,6 +2,7 @@
 #define RESIZETOOLBAR_H
 
 
+#include <QAction>
 #include <QToolBar>
 #include <QIcon>
 #include <QComboBox>
