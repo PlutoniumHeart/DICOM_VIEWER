@@ -206,7 +206,7 @@ void Window::zoomCustomSize()
 {
     std::string temp = m_resizeToolBar->GetComboResize()->currentText().toUtf8().constData();
 
-    short tmp = atoi(temp.c_str());
+    double tmp = atof(temp.c_str());
     std::stringstream ss;
     ss<<tmp;
     std::string currentText = ss.str() + "%";
