@@ -17,7 +17,7 @@ find_package(Qt5OpenGL REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 include_directories("${PROJECT_BINARY_DIR}")
-
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(src/include)
 
 set(SOURCES src/main.cpp 
@@ -31,12 +31,15 @@ set(SOURCES src/main.cpp
             src/include/ResizeToolBar.h src/ResizeToolBar.cpp
             src/include/FileToolBar.h src/FileToolBar.cpp
 )
+set(RESOURCES src/DICOM_TOOL.qrc)
 
 set(ALL_LIBS ${ITK_LIBRARIES}
              ${Qt5Widgets_LIBRARIES}
 )
 
-add_executable(DICOM_Tool ${SOURCES})
+qt5_add_resources(Resources ${RESOURCES})
+
+add_executable(DICOM_Tool ${SOURCES} ${Resources})
 
 qt5_use_modules(DICOM_Tool Widgets Core Declarative PrintSupport OpenGL)
 

@@ -5,7 +5,7 @@ FileToolBar::FileToolBar()
 {
     setWindowTitle("FileToolBar");
 
-    openDICOM = addAction(QIcon(QPixmap("./icons/Image.png")), "Open DICOM image");
+    openDICOM = addAction(QIcon(":/icons/Image.png"), "Open DICOM image");
 }
 
 

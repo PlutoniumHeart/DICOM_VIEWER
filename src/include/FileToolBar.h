@@ -4,6 +4,7 @@
 
 #include <QToolBar>
 #include <QIcon>
+#include <QAction>
 
 
 class FileToolBar : public QToolBar
