@@ -19,7 +19,7 @@ ResizeToolBar::ResizeToolBar()
     m_dropDownZoom->addItem("200%", 2.0);
     m_dropDownZoom->addItem("100%", 1.0);
     m_dropDownZoom->addItem("50%", 0.5);
-    m_dropDownZoom->setCurrentText("testing...");
+    m_dropDownZoom->setCurrentText("100%");
     
     m_zoomIn = addAction(QIcon(QPixmap("./icons/Zoom_In.png")), "Zoom in (25%)");
     m_zoomOut = addAction(QIcon(QPixmap("./icons/Zoom_Out.png")), "Zoom out (25%)");

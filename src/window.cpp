@@ -111,13 +111,20 @@ void Window::resetWindow()
 void Window::pan(int scale)
 {
     double presentage = scale/100.0;
-    QSize temp = presentage*m_glDisplay->size();
-    if(m_glDisplay->size().width()+temp.width()<=8*helper.GetImageWidth() &&
-       m_glDisplay->size().height()+temp.height()<=8*helper.GetImageHeight() &&
-       m_glDisplay->size().width()+temp.width()>=helper.GetImageWidth()/8 &&
-       m_glDisplay->size().height()+temp.height()>=helper.GetImageHeight()/8)
+    QSize temp = (1.0+presentage)*m_glDisplay->size();
+    if(temp.width()<=8*helper.GetImageWidth() &&
+       temp.height()<=8*helper.GetImageHeight())
     {
-        m_glDisplay->resize(m_glDisplay->size()+temp);
+        m_glDisplay->resize(temp);
+
+        std::string currentSize =
+            m_resizeToolBar->GetComboResize()->currentText().toUtf8().constData();
+        short tmp = atoi(currentSize.c_str());
+        std::ostringstream ss;
+        ss << tmp*(1.0+presentage);
+        std::string currentText(ss.str());
+        currentText = currentText + "%";
+        m_resizeToolBar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
     }
     
 }
@@ -138,6 +145,7 @@ void Window::zoomOut25Present()
 void Window::zoomOriginalSize()
 {
     m_glDisplay->resize(helper.GetImageWidth(), helper.GetImageHeight());
+    m_resizeToolBar->GetComboResize()->setCurrentText(QString("100%"));
 }
 
 
@@ -146,6 +154,11 @@ void Window::zoomFitToHeight()
     short tmp = m_scrollArea->height();
     double temp = (double)tmp/m_glDisplay->height();
     m_glDisplay->resize(m_glDisplay->size()*temp);
+    std::ostringstream ss;
+    ss << temp*100;
+    std::string currentText(ss.str());
+    currentText = currentText + "%";
+    m_resizeToolBar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
 }
 
 
