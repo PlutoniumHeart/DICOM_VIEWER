@@ -6,3 +6,5 @@ data
 *.cuh~
 *.cu~
 *.backup
+*~
+*.*~
