@@ -92,5 +92,6 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    emit MiddleButtonDoubleClick();
+    if(event->button()==Qt::MiddleButton)
+        emit MiddleButtonDoubleClick();
 }
