@@ -75,15 +75,15 @@ void Window::openDICOM()
 
     m_glDisplay->resize(helper.GetImageWidth(), helper.GetImageHeight());
     
-    m_imageWindowingDock->GetSpinBoxWC()->setMinimum(-2048);
+    m_imageWindowingDock->GetSpinBoxWC()->setMinimum(0);
     m_imageWindowingDock->GetSpinBoxWC()->setMaximum(2048);
-    m_imageWindowingDock->GetSliderWC()->setMinimum(-2048);
+    m_imageWindowingDock->GetSliderWC()->setMinimum(0);
     m_imageWindowingDock->GetSliderWC()->setMaximum(2048);
     m_imageWindowingDock->GetSpinBoxWC()->setValue(helper.GetDefaultImageWC());
 
-    m_imageWindowingDock->GetSpinBoxWW()->setMinimum(-2048);
+    m_imageWindowingDock->GetSpinBoxWW()->setMinimum(0);
     m_imageWindowingDock->GetSpinBoxWW()->setMaximum(2048);
-    m_imageWindowingDock->GetSliderWW()->setMinimum(-2048);
+    m_imageWindowingDock->GetSliderWW()->setMinimum(0);
     m_imageWindowingDock->GetSliderWW()->setMaximum(2048);
     m_imageWindowingDock->GetSpinBoxWW()->setValue(helper.GetDefaultImageWW());
     
