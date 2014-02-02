@@ -10,7 +10,7 @@ Window::Window()
     , m_imageWindowingDock(NULL)
 {
     setWindowTitle(tr("DICOM Viewer"));
-    resize(800, 600);
+    resize(1024, 768);
 
     setupMenuBar();
     
