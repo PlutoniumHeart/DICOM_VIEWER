@@ -22,6 +22,8 @@ public:
     short GetDefaultWindowWidth();
     short GetWindowLowerBound();
     short GetWindowUpperBound();
+    std::string GetPatientName();
+    std::string GetStudyInstanceUID();
     
 private:
     ShortImageType::Pointer m_sImageObj;

@@ -67,3 +67,19 @@ short ImageContainer::GetWindowUpperBound()
     m_DicomIO->GetValueFromTag("0028|0107", temp);
     return atoi(temp.c_str());
 }
+
+
+std::string ImageContainer::GetPatientName()
+{
+    std::string temp;
+    m_DicomIO->GetValueFromTag("0010|0010", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetStudyInstanceUID()
+{
+    std::string temp;
+    m_DicomIO->GetValueFromTag("0020|000D", temp);
+    return temp;
+}

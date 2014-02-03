@@ -8,6 +8,7 @@ Window::Window()
     , m_MainMenu(NULL)
     , m_ResizeToolBar(NULL)
     , m_ImageWindowingDock(NULL)
+    , m_ImageListDock(NULL)
 {
     m_glDisplay = new GLWidget(&m_Helper, this);
     m_ScrollArea = new QScrollArea;
@@ -41,6 +42,7 @@ Window::~Window()
     delete m_ScrollArea;
     delete m_Timer;
     delete m_ImageWindowingDock;
+    delete m_ImageListDock;
 }
 
 
@@ -77,12 +79,16 @@ void Window::CreateMenuBar()
 {
     m_MainMenu = menuBar()->addMenu(tr("&File"));
     m_MainMenu->addAction(tr("&Open"), this, SLOT(OpenDICOM()));
+    m_MainMenu->addAction(tr("&Close"), this, SLOT(CloseSeries()));
     m_MainMenu->addAction(tr("&Quit"), this, SLOT(close()));
 }
 
 
 void Window::CreateDockWindows()
 {
+    m_ImageListDock = new ImageListDock;
+    addDockWidget(Qt::BottomDockWidgetArea, m_ImageListDock);
+    
     m_ImageWindowingDock = new ImageWindowDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_ImageWindowingDock);
 }
@@ -100,8 +106,10 @@ void Window::CreateToolBar()
 
 void Window::OpenDICOM()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
-    m_Helper.OpenImage(fileName);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open DICOM file"),
+                                                    QDir::currentPath());
+    if(!m_Helper.OpenImage(fileName))
+        return;
 
     m_glDisplay->resize(m_Helper.GetImageWidth(), m_Helper.GetImageHeight());
     
@@ -116,10 +124,49 @@ void Window::OpenDICOM()
     m_ImageWindowingDock->GetSliderWW()->setMinimum(0);
     m_ImageWindowingDock->GetSliderWW()->setMaximum(2048);
     m_ImageWindowingDock->GetSpinBoxWW()->setValue(m_Helper.GetDefaultImageWW());
+
+    m_ImageListDock->InsertImageSeries(&m_Helper);
     
     connect(m_Timer, SIGNAL(timeout()), m_glDisplay, SLOT(Animate()));
+    connect(m_ImageListDock->GetTable(), SIGNAL(clicked(QModelIndex)),
+            this, SLOT(UpdateImageID(QModelIndex)));
     
     m_ImageWindowingDock->EnableWidgets();
+}
+
+
+void Window::CloseSeries()
+{
+    if(m_Helper.GetOpenedImageNumber() == 1)
+    {
+        m_Helper.CloseSeries(1, "");
+        m_ImageListDock->RemoveImageSeries(&m_Helper);
+        m_glDisplay->resize(0,0);
+        m_ScrollArea->viewport()->update();
+    }
+    else
+    {
+        std::string temp;
+        if(m_Helper.GetCurrentImageID()-2 < 0)
+        {
+            temp = m_ImageListDock->GetUID(1);
+        }
+        else
+        {
+            temp = m_ImageListDock->GetUID(m_Helper.GetCurrentImageID()-2);
+        }
+    
+        if(m_Helper.GetCurrentImageID()-1 == 0)
+            m_Helper.CloseSeries(1, temp);
+        else
+            m_Helper.CloseSeries(m_Helper.GetCurrentImageID()-1, temp);
+    
+        m_ImageListDock->RemoveImageSeries(&m_Helper);
+        UpdateImage();
+        ZoomOriginalSize();
+        m_ImageWindowingDock->GetSpinBoxWC()->setValue(m_Helper.GetDefaultImageWC());
+        m_ImageWindowingDock->GetSpinBoxWW()->setValue(m_Helper.GetDefaultImageWW());
+    }
 }
 
 
@@ -254,4 +301,15 @@ void Window::ZoomCustomSize()
     
     QSize original = QSize(m_Helper.GetImageWidth(), m_Helper.GetImageHeight());
     m_glDisplay->resize(original*tmp/100.0);
+}
+
+
+void Window::UpdateImageID(QModelIndex index)
+{
+    std::string temp = m_ImageListDock->GetUID(index.row());
+    m_Helper.SetCurrentImageID(index.row()+1, temp);
+    UpdateImage();
+    ZoomOriginalSize();
+    m_ImageWindowingDock->GetSpinBoxWC()->setValue(m_Helper.GetDefaultImageWC());
+    m_ImageWindowingDock->GetSpinBoxWW()->setValue(m_Helper.GetDefaultImageWW());
 }

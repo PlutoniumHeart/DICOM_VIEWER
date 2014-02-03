@@ -17,6 +17,7 @@
 
 #include "glWidget.h"
 #include "ImageWindowingDock.h"
+#include "ImageListDock.h"
 #include "FileToolBar.h"
 #include "ResizeToolBar.h"
 
@@ -31,6 +32,7 @@ public:
 
 private slots:
     void OpenDICOM();
+    void CloseSeries();
     void UpdateImage();
     void ResetWindow();
     void Pan(int scale);
@@ -40,6 +42,7 @@ private slots:
     void ZoomFitToHeight();
     void ZoomComboResize(int index);
     void ZoomCustomSize();
+    void UpdateImageID(QModelIndex index);
     
 private:
     GLWidget *m_glDisplay;
@@ -49,6 +52,7 @@ private:
     FileToolBar *m_FileToolBar;
     ResizeToolBar *m_ResizeToolBar;
     ImageWindowDock *m_ImageWindowingDock;
+    ImageListDock *m_ImageListDock;
     Helper m_Helper;
 
 private:

@@ -28,6 +28,7 @@ set(SOURCES src/main.cpp
             src/include/Helper.h src/Helper.cpp
             src/include/Window.h src/Window.cpp
             src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
+            src/include/ImageListDock.h src/ImageListDock.cpp
             src/include/ResizeToolBar.h src/ResizeToolBar.cpp
             src/include/FileToolBar.h src/FileToolBar.cpp
             src/include/ImageContainer.h src/ImageContainer.cpp
