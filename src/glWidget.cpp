@@ -2,7 +2,8 @@
 
 
 GLWidget::GLWidget(Helper *helper, QWidget *parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), m_Helper(helper)
+    : QWidget(parent)
+    , m_Helper(helper)
     , m_MiddleButtonDown(false)
     , m_RightButtonDown(false)
 {

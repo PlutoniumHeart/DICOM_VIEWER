@@ -2,14 +2,14 @@
 #define GLWIDGET_H
 
 
-#include <QGLWidget>
+#include <QWidget>
 #include <QTimer>
 #include "Helper.h"
 
 
 class Helper;
 
-class GLWidget : public QGLWidget
+class GLWidget : public QWidget
 {
     Q_OBJECT
 

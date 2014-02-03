@@ -9,9 +9,6 @@ Window::Window()
     , m_ResizeToolBar(NULL)
     , m_ImageWindowingDock(NULL)
 {
-    setWindowTitle(tr("DICOM Viewer"));
-    resize(1024, 768);
-    
     m_glDisplay = new GLWidget(&m_Helper, this);
     m_ScrollArea = new QScrollArea;
     m_Timer = new QTimer(this);
@@ -28,6 +25,9 @@ Window::Window()
     CreateDockWindows();
     CreateToolBar();
     CreateActions();
+
+    setWindowTitle(tr("DICOM Viewer"));
+    resize(1024, 768);
     
     m_Timer->start(50);
 
