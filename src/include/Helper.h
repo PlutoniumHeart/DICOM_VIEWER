@@ -1,6 +1,9 @@
 #ifndef HELPER_H
 #define HELPER_H
 
+
+#include <map>
+
 #include <QBrush>
 #include <QFont>
 #include <QPen>
@@ -12,6 +15,7 @@
 
 #include "ImageIO.h"
 #include "ImageFilter.h"
+#include "ImageContainer.h"
 
 
 class Helper
@@ -37,8 +41,8 @@ private:
     QImage *m_qtDisplayImage;
 
     UnsignedCharImageType::Pointer m_ucDisplayImageObj;
-    ShortImageType::Pointer m_sImageObj;
-    DICOMIOType::Pointer m_DicomIO;
+    //ShortImageType::Pointer m_sImageObj;
+    //DICOMIOType::Pointer m_DicomIO;
     unsigned char *m_ucPixArray;
     short m_sImageWidth;
     short m_sImageHeight;
@@ -46,6 +50,7 @@ private:
     short m_sDefaultWW;
     short m_sUpperBound;
     short m_sLowerBound;
+    std::map<int, ImageContainer*> m_ImageList;
 };
 
 

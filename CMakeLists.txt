@@ -30,6 +30,7 @@ set(SOURCES src/main.cpp
             src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
             src/include/ResizeToolBar.h src/ResizeToolBar.cpp
             src/include/FileToolBar.h src/FileToolBar.cpp
+            src/include/ImageContainer.h src/ImageContainer.cpp
 )
 set(RESOURCES src/DICOM_TOOL.qrc)
 

@@ -7,8 +7,8 @@ Helper::Helper()
     , m_sImageHeight(0)
 {
     m_ucDisplayImageObj = UnsignedCharImageType::New();
-    m_sImageObj = ShortImageType::New();
-    m_DicomIO = DICOMIOType::New();
+    //m_sImageObj = ShortImageType::New();
+    //m_DicomIO = DICOMIOType::New();
     m_qtDisplayImage = new QImage();
 }
 
@@ -34,30 +34,26 @@ void Helper::OpenImage(QString fileName)
 {
     if(!fileName.isEmpty())
     {
-        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(), m_sImageObj, m_DicomIO);
+        ImageContainer* image = new ImageContainer;
+        ImageIO::ReadDICOMImage(fileName.toUtf8().constData(),
+                                *image->GetShortImagePointer(), *image->GetIOObject());
 
-        std::string temp;
-        m_DicomIO->GetValueFromTag("0028|1050", temp);
-        m_sDefaultWC = atoi(temp.c_str());
-        
-        m_DicomIO->GetValueFromTag("0028|1051", temp);
-        m_sDefaultWW = atoi(temp.c_str());
-
-        m_DicomIO->GetValueFromTag("0028|0106", temp);
-        m_sLowerBound = atoi(temp.c_str());
-
-        m_DicomIO->GetValueFromTag("0028|0107", temp);
-        m_sUpperBound = atoi(temp.c_str());
+        m_sDefaultWC = image->GetDefaultWindowCenter();
+        m_sDefaultWW = image->GetDefaultWindowWidth();
+        m_sLowerBound = image->GetWindowLowerBound();
+        m_sUpperBound = image->GetWindowUpperBound();
 
         ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                               ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-            (m_sImageObj, m_ucDisplayImageObj, m_sDefaultWC, m_sDefaultWW);
+            (*image->GetShortImagePointer(), m_ucDisplayImageObj, m_sDefaultWC, m_sDefaultWW);
         
-        m_sImageWidth = m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
-        m_sImageHeight = m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
+        m_sImageWidth = image->GetImageWidth();
+        m_sImageHeight = image->GetImageHeight();
 
         m_ucPixArray = new unsigned char[m_sImageWidth*m_sImageHeight];
         ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
+
+        m_ImageList.insert(std::pair<int, ImageContainer*>(1, image));
     }
 }
 
@@ -83,7 +79,7 @@ void Helper::UpdateImage(int wc, int ww)
 {
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                           ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-        (m_sImageObj, m_ucDisplayImageObj, wc, ww);
+        (*m_ImageList[1]->GetShortImagePointer(), m_ucDisplayImageObj, wc, ww);
     ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
 }
 
