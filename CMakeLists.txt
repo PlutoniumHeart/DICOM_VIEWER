@@ -12,7 +12,7 @@ endif(ITK_FOUND)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
-find_package(Qt5Declarative REQUIRED)
+find_package(Qt5Core REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -43,6 +43,6 @@ qt5_add_resources(Resources ${RESOURCES})
 
 add_executable(DICOM_Tool ${SOURCES} ${Resources})
 
-qt5_use_modules(DICOM_Tool Widgets Core Declarative PrintSupport OpenGL)
+qt5_use_modules(DICOM_Tool Widgets Core PrintSupport OpenGL)
 
 target_link_libraries(DICOM_Tool ${ALL_LIBS})
