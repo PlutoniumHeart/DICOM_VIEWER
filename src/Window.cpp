@@ -28,7 +28,7 @@ Window::Window()
     CreateActions();
 
     setWindowTitle(tr("DICOM Viewer"));
-    resize(1024, 768);
+    resize(1600, 900);
     
     m_Timer->start(50);
 
@@ -48,8 +48,8 @@ Window::~Window()
 
 void Window::CreateActions()
 {
-    connect(m_glDisplay, SIGNAL(MiddleButtonMove(int, int)),
-            m_ImageWindowingDock, SLOT(UpdateWindowLevel(int, int)));
+    connect(m_glDisplay, SIGNAL(MiddleButtonMove(float, float)),
+            m_ImageWindowingDock, SLOT(UpdateWindowLevel(float, float)));
     connect(m_ImageWindowingDock->GetSliderWC(),
             SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
     connect(m_ImageWindowingDock->GetSliderWW(),
@@ -58,7 +58,7 @@ void Window::CreateActions()
             this, SLOT(ResetWindow()));
     connect(m_ImageWindowingDock->GetResetButton(), SIGNAL(clicked()),
             this, SLOT(ResetWindow()));
-    connect(m_glDisplay, SIGNAL(RightButtonMove(int)), this, SLOT(Pan(int)));
+    connect(m_glDisplay, SIGNAL(RightButtonMove(float)), this, SLOT(Pan(float)));
     connect(m_FileToolBar->GetOpenDICOMAction(), SIGNAL(triggered()), this, SLOT(OpenDICOM()));
     connect(m_ResizeToolBar->GetActionZoomIn(), SIGNAL(triggered()),
             this, SLOT(ZoomIn25Present()));
@@ -185,9 +185,9 @@ void Window::ResetWindow()
 }
 
 
-void Window::Pan(int scale)
+void Window::Pan(float scale)
 {
-    double presentage = scale/100.0;
+    double presentage = scale;
     QSize temp = (1.0+presentage)*m_glDisplay->size();
     if(((double)temp.width()/(double)m_Helper.GetImageWidth())<=8.0 &&
        ((double)temp.height()/(double)m_Helper.GetImageHeight())<=8.0 &&
@@ -220,13 +220,13 @@ void Window::AdjustScrollBar(QScrollBar* scrollBar, double factor)
 
 void Window::ZoomIn25Present()
 {
-    Pan(25);
+    Pan(0.25);
 }
 
 
 void Window::ZoomOut25Present()
 {
-    Pan(-25);
+    Pan(-0.25);
 }
 
 

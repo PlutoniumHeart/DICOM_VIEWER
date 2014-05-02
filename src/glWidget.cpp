@@ -35,14 +35,14 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     if(event->button()==Qt::MiddleButton)
     {
         m_MiddleButtonDown = true;
-        m_MouseMiddleStartPos[0] = event->x();
-        m_MouseMiddleStartPos[1] = event->y();
+        m_MouseMiddleStartPos[0] = event->x()/(float)width();
+        m_MouseMiddleStartPos[1] = event->y()/(float)height();
     }
     else if(event->button()==Qt::RightButton)
     {
         m_RightButtonDown = true;
-        m_MouseRightStartPos[0] = event->x();
-        m_MouseRightStartPos[1] = event->y();
+        m_MouseRightStartPos[0] = event->x()/(float)width();
+        m_MouseRightStartPos[1] = event->y()/(float)height();
     }
 }
 
@@ -51,27 +51,42 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_MiddleButtonDown)
     {
-        m_MouseMiddleCurrentPos[0] = event->x();
-        m_MouseMiddleCurrentPos[1] = event->y();
+        m_MouseMiddleCurrentPos[0] = event->x()/(float)width();
+        m_MouseMiddleCurrentPos[1] = event->y()/(float)height();
 
-        int tmpX = m_MouseMiddleCurrentPos[0] - m_MouseMiddleStartPos[0];
-        int tmpY = m_MouseMiddleCurrentPos[1] - m_MouseMiddleStartPos[1];
+        float tmpX = m_MouseMiddleCurrentPos[0] - m_MouseMiddleStartPos[0];
+        float tmpY = m_MouseMiddleCurrentPos[1] - m_MouseMiddleStartPos[1];
+
+        if(tmpX>1.0)
+            tmpX = 1.0;
+        else if(tmpX<-1.0)
+            tmpX = -1.0;
+
+        if(tmpY>1.0)
+            tmpY = 1.0;
+        else if(tmpY<-1.0)
+            tmpY = -1.0;
         
-        m_MouseMiddleStartPos[0] = event->x();
-        m_MouseMiddleStartPos[1] = event->y();
+        m_MouseMiddleStartPos[0] = event->x()/(float)width();
+        m_MouseMiddleStartPos[1] = event->y()/(float)height();
 
         emit MiddleButtonMove(tmpX, tmpY);
     }
     else if(m_RightButtonDown)
     {
-        m_MouseRightCurrentPos[0] = event->x();
-        m_MouseRightCurrentPos[1] = event->y();
+        m_MouseRightCurrentPos[0] = event->x()/(float)width();
+        m_MouseRightCurrentPos[1] = event->y()/(float)height();
 
-        int tmpX = m_MouseRightCurrentPos[0] - m_MouseRightStartPos[0];
-        int tmpY = m_MouseRightCurrentPos[1] - m_MouseRightStartPos[1];
+        float tmpX = m_MouseRightCurrentPos[0] - m_MouseRightStartPos[0];
+        float tmpY = m_MouseRightCurrentPos[1] - m_MouseRightStartPos[1];
+
+        if(tmpY>1.0)
+            tmpY = 1.0;
+        else if(tmpY<-1.0)
+            tmpY = -1.0;
         
-        m_MouseRightStartPos[0] = event->x();
-        m_MouseRightStartPos[1] = event->y();
+        m_MouseRightStartPos[0] = event->x()/(float)width();
+        m_MouseRightStartPos[1] = event->y()/(float)height();
 
         emit RightButtonMove(tmpY);
     }
@@ -81,9 +96,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
+    {
         m_MiddleButtonDown = false;
+        m_MouseMiddleCurrentPos[0] = 0.0;
+        m_MouseMiddleCurrentPos[1] = 0.0;
+        m_MouseMiddleStartPos[0] = 0.0;
+        m_MouseMiddleStartPos[1] = 0.0;
+    }
     else if(event->button()==Qt::RightButton)
+    {
         m_RightButtonDown = false;
+        m_MouseRightCurrentPos[0] = 0.0;
+        m_MouseRightCurrentPos[1] = 0.0;
+        m_MouseRightStartPos[0] = 0.0;
+        m_MouseRightStartPos[1] = 0.0;
+    }
 }
 
 

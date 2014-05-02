@@ -35,7 +35,7 @@ private slots:
     void CloseSeries();
     void UpdateImage();
     void ResetWindow();
-    void Pan(int scale);
+    void Pan(float scale);
     void ZoomIn25Present();
     void ZoomOut25Present();
     void ZoomOriginalSize();

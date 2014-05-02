@@ -20,8 +20,8 @@ public slots:
     void Animate();
 
 signals:
-    void MiddleButtonMove(int x, int y);
-    void RightButtonMove(int y);
+    void MiddleButtonMove(float x, float y);
+    void RightButtonMove(float y);
     void MiddleButtonDoubleClick();
 
 protected:
@@ -32,10 +32,10 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
 protected:
-    short m_MouseMiddleStartPos[2];
-    short m_MouseMiddleCurrentPos[2];
-    short m_MouseRightStartPos[2];
-    short m_MouseRightCurrentPos[2];
+    float m_MouseMiddleStartPos[2];
+    float m_MouseMiddleCurrentPos[2];
+    float m_MouseRightStartPos[2];
+    float m_MouseRightCurrentPos[2];
     
     bool m_MiddleButtonDown;
     bool m_RightButtonDown;

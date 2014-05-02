@@ -33,7 +33,8 @@ ImageWindowDock::ImageWindowDock()
     m_Layout->addWidget(m_SliderWW, 1, 1, 1, 1);
         
     setWidget(m_DockContents);
-    
+
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     setMinimumSize(QSize(280, 160));
     setStyleSheet(QStringLiteral("QDockWidget::title {background: rgb(181, 195, 255)}"));
 
@@ -76,10 +77,12 @@ void ImageWindowDock::EnableWidgets()
 }
 
 
-void ImageWindowDock::UpdateWindowLevel(int x, int y)
+void ImageWindowDock::UpdateWindowLevel(float x, float y)
 {
-    m_SpinBoxWC->setValue(m_SpinBoxWC->value()-x);
-    m_SpinBoxWW->setValue(m_SpinBoxWW->value()-y);
+    int X = (int)(x*1000.0);
+    int Y = (int)(y*1000.0);
+    m_SpinBoxWC->setValue(m_SpinBoxWC->value()-X);
+    m_SpinBoxWW->setValue(m_SpinBoxWW->value()-Y);
 }
 
 

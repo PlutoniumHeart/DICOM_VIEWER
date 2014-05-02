@@ -17,7 +17,7 @@ class ImageWindowDock : public QDockWidget
     
 public:
     ImageWindowDock();
-    ~ImageWindowDock();
+    virtual ~ImageWindowDock();
 
     QSlider* GetSliderWC();
     QSlider* GetSliderWW();
@@ -28,7 +28,7 @@ public:
     void EnableWidgets();
 
 public slots:
-    void UpdateWindowLevel(int x, int y);
+    void UpdateWindowLevel(float x, float y);
     void SetFloatingProperty(bool floating);
 
 private:

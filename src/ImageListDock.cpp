@@ -13,6 +13,8 @@ ImageListDock::ImageListDock()
     m_Table = new QTableView;
     m_Table->setModel(m_Model);
     m_Table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    setMinimumSize(QSize(560, 160));
+    setAllowedAreas(Qt::BottomDockWidgetArea);
     setWidget(m_Table);
 }
 
