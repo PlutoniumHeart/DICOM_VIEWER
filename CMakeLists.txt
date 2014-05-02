@@ -21,17 +21,17 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(src/include)
 
 set(SOURCES src/main.cpp 
-            src/include/ImageCommon.h
-            src/include/ImageIO.h src/ImageIO.cpp
-            src/include/ImageFilter.h src/ImageFilter.cpp
-            src/include/glWidget.h src/glWidget.cpp
-            src/include/Helper.h src/Helper.cpp
-            src/include/Window.h src/Window.cpp
-            src/include/ImageWindowingDock.h src/ImageWindowingDock.cpp
-            src/include/ImageListDock.h src/ImageListDock.cpp
-            src/include/ResizeToolBar.h src/ResizeToolBar.cpp
-            src/include/FileToolBar.h src/FileToolBar.cpp
-            src/include/ImageContainer.h src/ImageContainer.cpp
+            src/ImageCommon.h
+            src/ImageIO.h src/ImageIO.cpp
+            src/ImageFilter.h src/ImageFilter.cpp
+            src/glWidget.h src/glWidget.cpp
+            src/Helper.h src/Helper.cpp
+            src/Window.h src/Window.cpp
+            src/ImageWindowingDock.h src/ImageWindowingDock.cpp
+            src/ImageListDock.h src/ImageListDock.cpp
+            src/ResizeToolBar.h src/ResizeToolBar.cpp
+            src/FileToolBar.h src/FileToolBar.cpp
+            src/ImageContainer.h src/ImageContainer.cpp
 )
 set(RESOURCES src/DICOM_TOOL.qrc)
 
