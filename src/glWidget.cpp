@@ -84,7 +84,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             tmpY = 1.0;
         else if(tmpY<-1.0)
             tmpY = -1.0;
-        
+
         m_MouseRightStartPos[0] = event->x()/(float)width();
         m_MouseRightStartPos[1] = event->y()/(float)height();
 
