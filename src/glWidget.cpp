@@ -41,8 +41,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     else if(event->button()==Qt::RightButton)
     {
         m_RightButtonDown = true;
-        m_MouseRightStartPos[0] = event->x()/(float)width();
-        m_MouseRightStartPos[1] = event->y()/(float)height();
+        m_MouseRightStartPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
+        m_MouseRightStartPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
     }
 }
 
@@ -74,20 +74,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     }
     else if(m_RightButtonDown)
     {
-        m_MouseRightCurrentPos[0] = event->x()/(float)width();
-        m_MouseRightCurrentPos[1] = event->y()/(float)height();
-
-        float tmpX = m_MouseRightCurrentPos[0] - m_MouseRightStartPos[0];
+        m_MouseRightCurrentPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
         float tmpY = m_MouseRightCurrentPos[1] - m_MouseRightStartPos[1];
-
-        if(tmpY>1.0)
-            tmpY = 1.0;
-        else if(tmpY<-1.0)
-            tmpY = -1.0;
-
-        m_MouseRightStartPos[0] = event->x()/(float)width();
-        m_MouseRightStartPos[1] = event->y()/(float)height();
-
+        m_MouseRightStartPos[1] = m_MouseRightCurrentPos[1];
         emit RightButtonMove(tmpY);
     }
 }

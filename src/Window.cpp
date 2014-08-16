@@ -187,7 +187,7 @@ void Window::ResetWindow()
 
 void Window::Pan(float scale)
 {
-    double presentage = scale;
+    double presentage = scale*10;
     QSize temp = (1.0+presentage)*m_glDisplay->size();
     if(((double)temp.width()/(double)m_Helper.GetImageWidth())<=8.0 &&
        ((double)temp.height()/(double)m_Helper.GetImageHeight())<=8.0 &&

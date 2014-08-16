@@ -4,6 +4,8 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QScreen>
+#include <QGuiApplication>
 #include "Helper.h"
 
 
@@ -43,6 +45,7 @@ protected:
 private:
     Helper *m_Helper;
     int m_iElapsed;
+
 };
 
 
