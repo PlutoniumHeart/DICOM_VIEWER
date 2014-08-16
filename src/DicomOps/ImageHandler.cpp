@@ -115,7 +115,7 @@ void ImageHandler::UpdateImage(short wc, short ww)
 {
     m_vecImages[m_iActiveIndex]->SetCurrentWC(wc);
     m_vecImages[m_iActiveIndex]->SetCurrentWW(ww);
-    std::cout<<"===>"<<m_iActiveIndex<<": "<<wc<<" "<<ww<<std::endl;
+
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                           ShortImageType::Pointer, UnsignedCharImageType::Pointer>
         (*(m_vecImages[m_iActiveIndex]->GetImage()), m_ucDisplayImageObj, wc, ww);
