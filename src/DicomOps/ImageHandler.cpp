@@ -36,6 +36,8 @@ bool ImageHandler::AddImage(QString filename)
 
     ImageIO::ReadDICOMImage(filename.toStdString(), *image->GetImage(), *image->GetIOObject());
     image->SetDimension(2);
+    image->SetCurrentWC(image->GetDefaultWC());
+    image->SetCurrentWW(image->GetDefaultWW());
 
     m_vecImages.push_back(image);
     m_pCurrentImage = image;
@@ -63,10 +65,10 @@ bool ImageHandler::RemoveImage()
     if(temp != NULL)
         temp.reset();
 
-    if(m_vecImages.size() != 0)
+    if(m_vecImages.size() != -1)
     {
         m_iActiveIndex = m_vecImages.size()-1;
-        UpdateImage(m_vecImages[m_iActiveIndex]->GetDefaultWC(), m_vecImages[m_iActiveIndex]->GetDefaultWW());
+        UpdateImage(m_vecImages[m_iActiveIndex]->GetCurrentWC(), m_vecImages[m_iActiveIndex]->GetCurrentWW());
     }
     else
     {
@@ -111,6 +113,9 @@ void ImageHandler::DisplayImage(short wc, short ww)
 
 void ImageHandler::UpdateImage(short wc, short ww)
 {
+    m_vecImages[m_iActiveIndex]->SetCurrentWC(wc);
+    m_vecImages[m_iActiveIndex]->SetCurrentWW(ww);
+    std::cout<<"===>"<<m_iActiveIndex<<": "<<wc<<" "<<ww<<std::endl;
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                           ShortImageType::Pointer, UnsignedCharImageType::Pointer>
         (*(m_vecImages[m_iActiveIndex]->GetImage()), m_ucDisplayImageObj, wc, ww);

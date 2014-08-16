@@ -32,6 +32,7 @@ private:
     QAction* m_ZoomOut;
     QAction* m_OriginSize;
     QAction* m_FitToHeight;
+
 };
 
 

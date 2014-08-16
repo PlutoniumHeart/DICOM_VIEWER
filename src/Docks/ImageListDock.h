@@ -28,6 +28,13 @@ public:
 private:
     QTableView* m_Table;
     QStandardItemModel* m_Model;
+
+private slots:
+    void UpdateSelection(QModelIndex index);
+
+signals:
+    void SelectionChanged(int index);
+
 };
 
 

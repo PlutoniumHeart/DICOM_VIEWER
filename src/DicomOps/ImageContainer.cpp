@@ -79,3 +79,27 @@ std::string ImageContainer::GetStudyInstanceUID()
     m_DicomIO->GetValueFromTag("0020|000D", temp);
     return temp;
 }
+
+
+void ImageContainer::SetCurrentWC(short wc)
+{
+    m_sCurrentWC = wc;
+}
+
+
+short ImageContainer::GetCurrentWC()
+{
+    return m_sCurrentWC;
+}
+
+
+void ImageContainer::SetCurrentWW(short ww)
+{
+    m_sCurrentWW = ww;
+}
+
+
+short ImageContainer::GetCurrentWW()
+{
+    return m_sCurrentWW;
+}

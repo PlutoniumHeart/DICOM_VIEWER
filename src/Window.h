@@ -54,6 +54,7 @@ private slots:
     void CloseDicomImage();
     void Pan(float scale);
     void UpdateImage();
+    void UpdateImage(int index);
     void ResetWindow();
     void ZoomIn25Present();
     void ZoomOut25Present();

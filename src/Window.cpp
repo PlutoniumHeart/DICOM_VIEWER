@@ -95,6 +95,8 @@ void Window::CreateConnections()
     connect(m_pResizeToolbar->GetActionFitToHeight(), SIGNAL(triggered()), this, SLOT(ZoomFitToHeight()));
     connect(m_pResizeToolbar->GetComboResize(), SIGNAL(currentIndexChanged(int)), this, SLOT(ZoomComboResize(int)));
     connect(m_pResizeToolbar->GetComboResize()->lineEdit(), SIGNAL(editingFinished()), this, SLOT(ZoomCustomSize()));
+
+    connect(m_pImageListDock, SIGNAL(SelectionChanged(int)), this, SLOT(UpdateImage(int)));
 }
 
 
@@ -125,6 +127,7 @@ void Window::CloseDicomImage()
 
     m_pImageListDock->RemoveImageSeries(&m_ImageHandler);
     m_ImageHandler.RemoveImage();
+
     if(m_ImageHandler.GetNumberOfOpenedImages()<=0)
     {
         m_pDisplay->resize(0, 0);
@@ -132,6 +135,11 @@ void Window::CloseDicomImage()
         m_pResizeToolbar->SetWidgetsDisabled(true);
     }
     m_pScrollArea->viewport()->update();
+
+    short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
+    short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
 }
 
 
@@ -154,8 +162,21 @@ void Window::Pan(float scale)
 
 void Window::UpdateImage()
 {
-    m_ImageHandler.UpdateImage(m_pImageWindowingDock->GetSpinBoxWC()->value(),
-                               m_pImageWindowingDock->GetSpinBoxWW()->value());
+    short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
+    short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
+    m_ImageHandler.UpdateImage(tmp1,
+                               tmp2);
+}
+
+
+void Window::UpdateImage(int index)
+{
+    m_ImageHandler.SetActiveIndex(index);
+    short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
+    short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
+    UpdateImage();
 }
 
 
