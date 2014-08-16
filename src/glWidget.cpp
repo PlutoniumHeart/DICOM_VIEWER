@@ -35,8 +35,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     if(event->button()==Qt::MiddleButton)
     {
         m_MiddleButtonDown = true;
-        m_MouseMiddleStartPos[0] = event->x()/(float)width();
-        m_MouseMiddleStartPos[1] = event->y()/(float)height();
+        m_MouseMiddleStartPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
+        m_MouseMiddleStartPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
     }
     else if(event->button()==Qt::RightButton)
     {
@@ -51,24 +51,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_MiddleButtonDown)
     {
-        m_MouseMiddleCurrentPos[0] = event->x()/(float)width();
-        m_MouseMiddleCurrentPos[1] = event->y()/(float)height();
+        m_MouseMiddleCurrentPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
+        m_MouseMiddleCurrentPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
 
         float tmpX = m_MouseMiddleCurrentPos[0] - m_MouseMiddleStartPos[0];
         float tmpY = m_MouseMiddleCurrentPos[1] - m_MouseMiddleStartPos[1];
-
-        if(tmpX>1.0)
-            tmpX = 1.0;
-        else if(tmpX<-1.0)
-            tmpX = -1.0;
-
-        if(tmpY>1.0)
-            tmpY = 1.0;
-        else if(tmpY<-1.0)
-            tmpY = -1.0;
         
-        m_MouseMiddleStartPos[0] = event->x()/(float)width();
-        m_MouseMiddleStartPos[1] = event->y()/(float)height();
+        m_MouseMiddleStartPos[0] = m_MouseMiddleCurrentPos[0];
+        m_MouseMiddleStartPos[1] = m_MouseMiddleCurrentPos[1];
 
         emit MiddleButtonMove(tmpX, tmpY);
     }
