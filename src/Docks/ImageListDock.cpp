@@ -10,8 +10,12 @@ ImageListDock::ImageListDock()
     QString line = tr("Patient, StudyInstanceUID");
     QStringList list = line.simplified().split(",");
     m_Model->setHorizontalHeaderLabels(list);
+
     m_Table = new QTableView;
     m_Table->setModel(m_Model);
+    m_Table->setColumnWidth(0, 100);
+    m_Table->setColumnWidth(1, 500);
+    m_Table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_Table->setSelectionBehavior(QAbstractItemView::SelectRows);
     setMinimumSize(QSize(560, 160));
     setAllowedAreas(Qt::BottomDockWidgetArea);
@@ -35,6 +39,7 @@ void ImageListDock::InsertImageSeries(ImageHandler* handler)
     newItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
     m_Model->setItem(handler->GetNumberOfOpenedImages()-1,0,newItem);
     m_Model->setItem(handler->GetNumberOfOpenedImages()-1,1,newItem1);
+    m_Table->setCurrentIndex(m_Table->model()->index(0,0));
 }
 
 
@@ -42,7 +47,10 @@ void ImageListDock::RemoveImageSeries(ImageHandler* handler)
 {
     int temp = handler->GetActiveIndex();
     if(temp>=0)
+    {
         m_Model->removeRows(temp, 1);
+        m_Table->setCurrentIndex(m_Table->model()->index(0,0));
+    }
 }
 
 
