@@ -1,22 +1,22 @@
-#ifndef GLWIDGET_H
-#define GLWIDGET_H
+#ifndef DISPLAYWIDGET_H
+#define DISPLAYWIDGET_H
 
 
 #include <QWidget>
 #include <QTimer>
 #include <QScreen>
 #include <QGuiApplication>
-#include "Helper.h"
+#include "ImageHandler.h"
 
 
-class Helper;
+//class ImageHandler;
 
-class GLWidget : public QWidget
+class DisplayWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(Helper *helper, QWidget *parent);
+    DisplayWidget(ImageHandler *handler, QWidget *parent);
 
 public slots:
     void Animate();
@@ -43,10 +43,10 @@ protected:
     bool m_RightButtonDown;
     
 private:
-    Helper *m_Helper;
+    ImageHandler* m_Handler;
     int m_iElapsed;
 
 };
 
 
-#endif
+#endif // DISPLAYWIDGET_H

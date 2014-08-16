@@ -25,23 +25,24 @@ ImageListDock::~ImageListDock()
 }
 
 
-void ImageListDock::InsertImageSeries(Helper* helper)
+void ImageListDock::InsertImageSeries(ImageHandler* handler)
 {
     std::string patientName
-        = helper->GetCurrentContainer()->GetPatientName();
-    std::string studyInstanceUID = helper->GetCurrentContainer()->GetStudyInstanceUID();
+        = handler->GetImageObj()->GetPatientName();
+    std::string studyInstanceUID = handler->GetImageObj()->GetStudyInstanceUID();
     QStandardItem *newItem = new QStandardItem(tr(patientName.c_str()));
     QStandardItem *newItem1 = new QStandardItem(tr(studyInstanceUID.c_str()));
     newItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-    m_Model->setItem(helper->GetOpenedImageNumber()-1,0,newItem);
-    m_Model->setItem(helper->GetOpenedImageNumber()-1,1,newItem1);
+    m_Model->setItem(handler->GetNumberOfOpenedImages()-1,0,newItem);
+    m_Model->setItem(handler->GetNumberOfOpenedImages()-1,1,newItem1);
 }
 
 
-void ImageListDock::RemoveImageSeries(Helper* helper)
+void ImageListDock::RemoveImageSeries(ImageHandler* handler)
 {
-    int temp = helper->GetCurrentImageID();
-    m_Model->removeRows(temp, 1);
+    int temp = handler->GetActiveIndex();
+    if(temp>=0)
+        m_Model->removeRows(temp, 1);
 }
 
 

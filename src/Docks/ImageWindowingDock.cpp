@@ -67,13 +67,13 @@ ImageWindowDock::~ImageWindowDock()
 }
 
 
-void ImageWindowDock::EnableWidgets()
+void ImageWindowDock::SetWidgetsDisabled(bool disabled)
 {
-    m_SliderWC->setDisabled(false);
-    m_SliderWW->setDisabled(false);
-    m_SpinBoxWC->setDisabled(false);
-    m_SpinBoxWW->setDisabled(false);
-    m_PushButtonReset->setDisabled(false);
+    m_SliderWC->setDisabled(disabled);
+    m_SliderWW->setDisabled(disabled);
+    m_SpinBoxWC->setDisabled(disabled);
+    m_SpinBoxWW->setDisabled(disabled);
+    m_PushButtonReset->setDisabled(disabled);
 }
 
 

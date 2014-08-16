@@ -9,7 +9,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 
-#include "Helper.h"
+#include "ImageHandler.h"
 
 
 class ImageListDock : public QDockWidget
@@ -20,8 +20,8 @@ public:
     ImageListDock();
     virtual ~ImageListDock();
 
-    void InsertImageSeries(Helper* helper);
-    void RemoveImageSeries(Helper* helper);
+    void InsertImageSeries(ImageHandler* handler);
+    void RemoveImageSeries(ImageHandler* handler);
     QTableView* GetTable();
     std::string GetUID(int i);
 

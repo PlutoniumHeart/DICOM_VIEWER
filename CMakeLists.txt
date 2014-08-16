@@ -16,22 +16,41 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++0x -fpermissive")
+
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(src/include)
+include_directories(src/DicomOps/)
+include_directories(src/Toolbars/)
+include_directories(src/CenterWidgets/)
+include_directories(src/Docks/)
+include_directories(src/)
 
 set(SOURCES src/main.cpp 
-            src/ImageCommon.h
-            src/ImageIO.h src/ImageIO.cpp
-            src/ImageFilter.h src/ImageFilter.cpp
-            src/glWidget.h src/glWidget.cpp
-            src/Helper.h src/Helper.cpp
             src/Window.h src/Window.cpp
-            src/ImageWindowingDock.h src/ImageWindowingDock.cpp
-            src/ImageListDock.h src/ImageListDock.cpp
-            src/ResizeToolBar.h src/ResizeToolBar.cpp
-            src/FileToolBar.h src/FileToolBar.cpp
-            src/ImageContainer.h src/ImageContainer.cpp
+
+            src/Toolbars/FileToolbar.h
+            src/Toolbars/FileToolbar.cpp
+            src/Toolbars/ResizeToolbar.h
+            src/Toolbars/ResizeToolbar.cpp
+
+            src/CenterWidgets/DisplayWidget.h
+            src/CenterWidgets/DisplayWidget.cpp
+
+            src/Docks/ImageWindowingDock.h
+            src/Docks/ImageWindowingDock.cpp
+            src/Docks/ImageListDock.h
+            src/Docks/ImageListDock.cpp
+
+            src/DicomOps/ImageCommon.h
+            src/DicomOps/ImageIO.h
+            src/DicomOps/ImageIO.cpp
+            src/DicomOps/ImageFilter.h
+            src/DicomOps/ImageFilter.cpp
+            src/DicomOps/ImageContainer.h
+            src/DicomOps/ImageContainer.cpp
+            src/DicomOps/ImageHandler.h
+            src/DicomOps/ImageHandler.cpp
 )
 set(RESOURCES src/DICOM_TOOL.qrc)
 

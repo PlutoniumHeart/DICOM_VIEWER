@@ -1,9 +1,9 @@
-#include "ResizeToolBar.h"
+#include "ResizeToolbar.h"
 
 
-ResizeToolBar::ResizeToolBar()
+ResizeToolbar::ResizeToolbar()
 {
-    setWindowTitle("ResizeToolBar");
+    setWindowTitle("ResizeToolbar");
 
     m_DropDownZoom = new QComboBox;
     m_DropDownZoom->setEditable(true);
@@ -33,37 +33,37 @@ ResizeToolBar::ResizeToolBar()
 }
 
 
-ResizeToolBar::~ResizeToolBar()
+ResizeToolbar::~ResizeToolbar()
 {
     delete m_DropDownZoom;
 }
 
 
-QAction* ResizeToolBar::GetActionZoomIn()
+QAction* ResizeToolbar::GetActionZoomIn()
 {
     return m_ZoomIn;
 }
 
 
-QAction* ResizeToolBar::GetActionZoomOut()
+QAction* ResizeToolbar::GetActionZoomOut()
 {
     return m_ZoomOut;
 }
 
 
-QAction* ResizeToolBar::GetActionOriginalSize()
+QAction* ResizeToolbar::GetActionOriginalSize()
 {
     return m_OriginSize;
 }
 
 
-QAction* ResizeToolBar::GetActionFitToHeight()
+QAction* ResizeToolbar::GetActionFitToHeight()
 {
     return m_FitToHeight;
 }
 
 
-QComboBox* ResizeToolBar::GetComboResize()
+QComboBox* ResizeToolbar::GetComboResize()
 {
     return m_DropDownZoom;
 }

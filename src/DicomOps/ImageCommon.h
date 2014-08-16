@@ -28,7 +28,7 @@
 #include <itkIntensityWindowingImageFilter.h>
 #include <itkIdentityTransform.h>
 #include <itkResampleImageFilter.h>
-#include "itkFlipImageFilter.h"
+#include <itkFlipImageFilter.h>
 
 
 const unsigned char D2 = 2;

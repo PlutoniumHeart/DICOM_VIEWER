@@ -1,9 +1,9 @@
-#include "glWidget.h"
+#include "DisplayWidget.h"
 
 
-GLWidget::GLWidget(Helper *helper, QWidget *parent)
+DisplayWidget::DisplayWidget(ImageHandler *handler, QWidget *parent)
     : QWidget(parent)
-    , m_Helper(helper)
+    , m_Handler(handler)
     , m_MiddleButtonDown(false)
     , m_RightButtonDown(false)
 {
@@ -13,24 +13,24 @@ GLWidget::GLWidget(Helper *helper, QWidget *parent)
 }
 
 
-void GLWidget::Animate()
+void DisplayWidget::Animate()
 {
     m_iElapsed = (m_iElapsed + qobject_cast<QTimer*>(sender())->interval()) % 1000;
     repaint();
 }
 
 
-void GLWidget::paintEvent(QPaintEvent *event)
+void DisplayWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    m_Helper->Paint(&painter, event, m_iElapsed, geometry());
+    m_Handler->Paint(&painter, event, m_iElapsed, geometry());
     painter.end();
 }
 
 
-void GLWidget::mousePressEvent(QMouseEvent *event)
+void DisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
     {
@@ -47,7 +47,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 }
 
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event)
+void DisplayWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(m_MiddleButtonDown)
     {
@@ -72,7 +72,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 
-void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+void DisplayWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
     {
@@ -93,7 +93,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
-void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
+void DisplayWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
         emit MiddleButtonDoubleClick();

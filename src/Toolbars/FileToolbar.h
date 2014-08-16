@@ -7,18 +7,19 @@
 #include <QAction>
 
 
-class FileToolBar : public QToolBar
+class FileToolbar : public QToolBar
 {
     Q_OBJECT
 
 public:
-    FileToolBar();
-    ~FileToolBar();
+    FileToolbar();
+    ~FileToolbar();
 
     QAction* GetOpenDICOMAction();
 
 private:
     QAction *openDICOM;
+
 };
 
 

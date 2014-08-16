@@ -2,10 +2,7 @@
 #define IMAGECONTAINER_H
 
 
-#include <iostream>
-#include <cstdlib>
-
-#include "ImageIO.h"
+#include "ImageCommon.h"
 
 
 class ImageContainer
@@ -14,20 +11,23 @@ public:
     ImageContainer();
     virtual ~ImageContainer();
 
-    ShortImageType::Pointer* GetShortImagePointer();
+    void SetDimension(unsigned int dim);
+    unsigned int GetDimension();
+    ShortImageType::Pointer* GetImage();
     DICOMIOType::Pointer* GetIOObject();
-    short GetImageWidth();
-    short GetImageHeight();
-    short GetDefaultWindowCenter();
-    short GetDefaultWindowWidth();
-    short GetWindowLowerBound();
-    short GetWindowUpperBound();
+    short GetWidth();
+    short GetHeight();
+    short GetLength();
+    short GetDefaultWC();
+    short GetDefaultWW();
     std::string GetPatientName();
     std::string GetStudyInstanceUID();
-    
+
 private:
+    unsigned int m_uiDim;
     ShortImageType::Pointer m_sImageObj;
     DICOMIOType::Pointer m_DicomIO;
+
 };
 
 

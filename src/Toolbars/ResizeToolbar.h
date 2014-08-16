@@ -8,13 +8,13 @@
 #include <QComboBox>
 
 
-class ResizeToolBar : public QToolBar
+class ResizeToolbar : public QToolBar
 {
     Q_OBJECT
 
 public:
-    ResizeToolBar();
-    ~ResizeToolBar();
+    ResizeToolbar();
+    ~ResizeToolbar();
 
     QAction* GetActionZoomIn();
     QAction* GetActionZoomOut();

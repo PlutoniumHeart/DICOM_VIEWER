@@ -2,6 +2,7 @@
 
 
 ImageContainer::ImageContainer()
+    : m_uiDim(0)
 {
     m_sImageObj = ShortImageType::New();
     m_DicomIO = DICOMIOType::New();
@@ -13,7 +14,13 @@ ImageContainer::~ImageContainer()
 }
 
 
-ShortImageType::Pointer* ImageContainer::GetShortImagePointer()
+void ImageContainer::SetDimension(unsigned int dim)
+{
+    m_uiDim = dim;
+}
+
+
+ShortImageType::Pointer* ImageContainer::GetImage()
 {
     return &m_sImageObj;
 }
@@ -25,19 +32,24 @@ DICOMIOType::Pointer* ImageContainer::GetIOObject()
 }
 
 
-short ImageContainer::GetImageWidth()
+short ImageContainer::GetWidth()
 {
     return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
 }
 
-
-short ImageContainer::GetImageHeight()
+short ImageContainer::GetHeight()
 {
     return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
 }
 
 
-short ImageContainer::GetDefaultWindowCenter()
+short ImageContainer::GetLength()
+{
+    return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(2);
+}
+
+
+short ImageContainer::GetDefaultWC()
 {
     std::string temp;
     m_DicomIO->GetValueFromTag("0028|1050", temp);
@@ -45,26 +57,10 @@ short ImageContainer::GetDefaultWindowCenter()
 }
 
 
-short ImageContainer::GetDefaultWindowWidth()
+short ImageContainer::GetDefaultWW()
 {
     std::string temp;
     m_DicomIO->GetValueFromTag("0028|1051", temp);
-    return atoi(temp.c_str());
-}
-
-
-short ImageContainer::GetWindowLowerBound()
-{
-    std::string temp;
-    m_DicomIO->GetValueFromTag("0028|0106", temp);
-    return atoi(temp.c_str());
-}
-
-
-short ImageContainer::GetWindowUpperBound()
-{
-    std::string temp;
-    m_DicomIO->GetValueFromTag("0028|0107", temp);
     return atoi(temp.c_str());
 }
 

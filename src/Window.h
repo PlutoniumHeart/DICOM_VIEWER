@@ -14,12 +14,12 @@
 #include <QFileDialog>
 #include <QLineEdit>
 
-
-#include "glWidget.h"
+#include "FileToolbar.h"
+#include "ResizeToolbar.h"
+#include "ImageHandler.h"
+#include "DisplayWidget.h"
 #include "ImageWindowingDock.h"
 #include "ImageListDock.h"
-#include "FileToolBar.h"
-#include "ResizeToolBar.h"
 
 
 class Window : public QMainWindow
@@ -30,37 +30,38 @@ public:
     Window();
     ~Window();
 
+private:
+    QMenu* m_pMenu;
+    FileToolbar* m_pFileToolbar;
+    ResizeToolbar* m_pResizeToolbar;
+    DisplayWidget* m_pDisplay;
+    QScrollArea* m_pScrollArea;
+    QTimer* m_pTimer;
+    ImageWindowDock* m_pImageWindowingDock;
+    ImageListDock* m_pImageListDock;
+
+    ImageHandler m_ImageHandler;
+
+private:
+    void CreateMenus();
+    void CreateToolbars();
+    void CreateCenterWidgets();
+    void CreateDocks();
+    void CreateConnections();
+
 private slots:
-    void OpenDICOM();
-    void CloseSeries();
+    void OpenDicomImage();
+    void CloseDicomImage();
+    void Pan(float scale);
     void UpdateImage();
     void ResetWindow();
-    void Pan(float scale);
     void ZoomIn25Present();
     void ZoomOut25Present();
     void ZoomOriginalSize();
     void ZoomFitToHeight();
     void ZoomComboResize(int index);
     void ZoomCustomSize();
-    void UpdateImageID(QModelIndex index);
-    
-private:
-    GLWidget *m_glDisplay;
-    QScrollArea *m_ScrollArea;
-    QTimer *m_Timer;
-    QMenu *m_MainMenu;
-    FileToolBar *m_FileToolBar;
-    ResizeToolBar *m_ResizeToolBar;
-    ImageWindowDock *m_ImageWindowingDock;
-    ImageListDock *m_ImageListDock;
-    Helper m_Helper;
 
-private:
-    void CreateActions();
-    void CreateMenuBar();
-    void CreateDockWindows();
-    void CreateToolBar();
-    void AdjustScrollBar(QScrollBar* scrollBar, double factor);
 };
 
 

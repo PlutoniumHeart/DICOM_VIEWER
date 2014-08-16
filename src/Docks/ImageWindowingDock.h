@@ -25,7 +25,7 @@ public:
     QSpinBox* GetSpinBoxWW();
     QPushButton* GetResetButton();
 
-    void EnableWidgets();
+    void SetWidgetsDisabled(bool disabled);
 
 public slots:
     void UpdateWindowLevel(float x, float y);
