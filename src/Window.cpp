@@ -74,8 +74,6 @@ void Window::CreateDocks()
     m_pImageWindowingDock->GetSpinBoxWW()->setMaximum(4096);
     m_pImageWindowingDock->GetSliderWW()->setMinimum(0);
     m_pImageWindowingDock->GetSliderWW()->setMaximum(4096);
-
-    m_pImageWindowingDock->SetWidgetsDisabled(false);
 }
 
 
@@ -112,6 +110,7 @@ void Window::OpenDicomImage()
     ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
+    m_pResizeToolbar->SetWidgetsDisabled(false);
 
     m_pImageListDock->InsertImageSeries(&m_ImageHandler);
 
@@ -130,6 +129,7 @@ void Window::CloseDicomImage()
     {
         m_pDisplay->resize(0, 0);
         m_pImageWindowingDock->SetWidgetsDisabled(true);
+        m_pResizeToolbar->SetWidgetsDisabled(true);
     }
     m_pScrollArea->viewport()->update();
 }

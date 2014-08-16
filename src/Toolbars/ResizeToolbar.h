@@ -23,6 +23,8 @@ public:
 
     QComboBox* GetComboResize();
 
+    void SetWidgetsDisabled(bool disabled);
+
 private:
     QComboBox* m_DropDownZoom;
 

@@ -30,6 +30,8 @@ ResizeToolbar::ResizeToolbar()
     m_FitToHeight = new QAction(QIcon(":/icons/viewmagfit.png"), tr("Fit to height"), this);
     addAction(m_OriginSize);
     addAction(m_FitToHeight);
+
+    SetWidgetsDisabled(true);
 }
 
 
@@ -66,4 +68,14 @@ QAction* ResizeToolbar::GetActionFitToHeight()
 QComboBox* ResizeToolbar::GetComboResize()
 {
     return m_DropDownZoom;
+}
+
+
+void ResizeToolbar::SetWidgetsDisabled(bool disabled)
+{
+    m_DropDownZoom->setDisabled(disabled);
+    m_ZoomIn->setDisabled(disabled);
+    m_ZoomOut->setDisabled(disabled);
+    m_OriginSize->setDisabled(disabled);
+    m_FitToHeight->setDisabled(disabled);
 }

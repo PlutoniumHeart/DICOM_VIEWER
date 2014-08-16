@@ -44,11 +44,7 @@ ImageWindowDock::ImageWindowDock()
     connect(m_SliderWW, SIGNAL(valueChanged(int)), m_SpinBoxWW, SLOT(setValue(int)));
     connect(this, SIGNAL(topLevelChanged(bool)), this, SLOT(SetFloatingProperty(bool)));
 
-    m_SliderWC->setDisabled(true);
-    m_SliderWW->setDisabled(true);
-    m_SpinBoxWC->setDisabled(true);
-    m_SpinBoxWW->setDisabled(true);
-    m_PushButtonReset->setDisabled(true);
+    SetWidgetsDisabled(true);
 }
 
 
