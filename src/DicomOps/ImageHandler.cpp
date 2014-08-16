@@ -65,7 +65,7 @@ bool ImageHandler::RemoveImage()
     if(temp != NULL)
         temp.reset();
 
-    if(m_vecImages.size() != -1)
+    if(m_vecImages.size() != 0)
     {
         m_iActiveIndex = m_vecImages.size()-1;
         UpdateImage(m_vecImages[m_iActiveIndex]->GetCurrentWC(), m_vecImages[m_iActiveIndex]->GetCurrentWW());

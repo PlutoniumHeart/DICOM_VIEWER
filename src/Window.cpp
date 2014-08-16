@@ -134,12 +134,14 @@ void Window::CloseDicomImage()
         m_pImageWindowingDock->SetWidgetsDisabled(true);
         m_pResizeToolbar->SetWidgetsDisabled(true);
     }
+    else
+    {
+        short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
+        short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
+        m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
+        m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
+    }
     m_pScrollArea->viewport()->update();
-
-    short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
-    short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
 }
 
 
