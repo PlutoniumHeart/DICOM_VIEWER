@@ -28,6 +28,7 @@ ImageListDock::ImageListDock()
 
 ImageListDock::~ImageListDock()
 {
+    delete m_Model;
     delete m_Table;
 }
 

@@ -331,10 +331,6 @@ bool ImageIO::WriteDICOMSeries(std::string folderName, ShortSeriesType::Pointer&
 
 int ImageIO::PixelToArray(UnsignedCharImageType::Pointer& imageObj, unsigned char** array)
 {
-    itk::ImageRegion<D2>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
-    int w = tmp.GetElement(0);
-    int h = tmp.GetElement(1);
-    *array = new unsigned char[w*h];
     int i = 0;
     UnsignedCharImageConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
     in.GoToBegin();
@@ -349,11 +345,6 @@ int ImageIO::PixelToArray(UnsignedCharImageType::Pointer& imageObj, unsigned cha
 
 int ImageIO::PixelToArray(UnsignedCharSeriesType::Pointer& imageObj, unsigned char** array)
 {
-    itk::ImageRegion<D3>::SizeType tmp = imageObj->GetLargestPossibleRegion().GetSize();
-    int w = tmp.GetElement(0);
-    int h = tmp.GetElement(1);
-    int d = tmp.GetElement(2);
-    *array = new unsigned char[w*h*d];
     int i = 0;
     UnsignedCharSeriesConstIteratorType in(imageObj, imageObj->GetLargestPossibleRegion());
     in.GoToBegin();

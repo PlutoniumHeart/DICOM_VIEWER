@@ -15,6 +15,13 @@ Window::Window()
 
 Window::~Window()
 {
+    delete m_pFileToolbar;
+    delete m_pResizeToolbar;
+    delete m_pDisplay;
+    delete m_pScrollArea;
+    delete m_pTimer;
+    delete m_pImageListDock;
+    delete m_pImageWindowingDock;
 }
 
 

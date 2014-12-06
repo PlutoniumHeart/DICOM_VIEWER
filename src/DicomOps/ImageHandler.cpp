@@ -100,6 +100,13 @@ bool ImageHandler::RemoveImage()
 void ImageHandler::DisplayImage(short wc, short ww)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
+
+    if(m_ucPixArray != NULL)
+    {
+        delete [] m_ucPixArray;
+        m_ucPixArray = NULL;
+    }
+
     m_ucPixArray = new unsigned char[currentImage->GetWidth()*currentImage->GetHeight()];
 
     ImageFilter::IntensityWindowingFilter
