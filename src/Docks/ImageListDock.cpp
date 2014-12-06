@@ -35,8 +35,8 @@ ImageListDock::~ImageListDock()
 
 void ImageListDock::InsertImageSeries(ImageHandler* handler)
 {
-    std::string patientName = handler->GetImageObj()->GetPatientName();
-    std::string studyInstanceUID = handler->GetImageObj()->GetStudyInstanceUID();
+    std::string patientName = handler->GetImageObj()->GetPatientName(handler->GetImageObj()->GetActiveSlice());
+    std::string studyInstanceUID = handler->GetImageObj()->GetStudyInstanceUID(handler->GetImageObj()->GetActiveSlice());
     QStandardItem *newItem = new QStandardItem(tr(patientName.c_str()));
     QStandardItem *newItem1 = new QStandardItem(tr(studyInstanceUID.c_str()));
     newItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);

@@ -98,3 +98,11 @@ void DisplayWidget::mouseDoubleClickEvent(QMouseEvent *event)
     if(event->button()==Qt::MiddleButton)
         emit MiddleButtonDoubleClick();
 }
+
+
+void DisplayWidget::wheelEvent(QWheelEvent *event)
+{
+    QPoint numDegrees = event->angleDelta()/(8*15);
+
+    emit WheelMovement(numDegrees.rx(), numDegrees.ry());
+}

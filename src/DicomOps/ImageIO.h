@@ -32,6 +32,7 @@ public:
     static bool WriteDICOMImage(std::string inputFile, ShortImageType::Pointer& imageObj,
                                 DICOMIOType::Pointer& IO);
 
+    static int ProbeDICOMFolder(std::string folderName, std::vector<std::string> &fileNames);
     static int SetDICOMFolder(std::string folderName, std::string** pSeriesName);
     static bool ReadDICOMSeries(std::string folderName, std::string seriesName,
                                 ShortSeriesType::Pointer& imageObj, DICOMIOType::Pointer &IO);

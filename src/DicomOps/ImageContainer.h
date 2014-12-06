@@ -15,25 +15,34 @@ public:
     void SetDimension(unsigned int dim);
     unsigned int GetDimension();
     ShortImageType::Pointer* GetImage(int slice);
-    DICOMIOType::Pointer* GetIOObject();
+    DICOMIOType::Pointer* GetIOObject(int slice);
     short GetWidth(int slice);
     short GetHeight(int slice);
     short GetLength(int slice);
-    short GetDefaultWC();
-    short GetDefaultWW();
+    short GetDefaultWC(int slice);
+    short GetDefaultWW(int slice);
     void SetCurrentWC(short wc);
     short GetCurrentWC();
     void SetCurrentWW(short ww);
     short GetCurrentWW();
-    std::string GetPatientName();
-    std::string GetStudyInstanceUID();
+    std::string GetPatientName(int slice);
+    std::string GetStudyInstanceUID(int slice);
+    void SetActiveSlice(int slice);
+    int GetActiveSlice();
+    void SetMinSliceNum(int min);
+    int GetMinSliceNum();
+    void SetMaxSliceNum(int max);
+    int GetMaxSliceNum();
 
 private:
     unsigned int m_uiDim;
     ShortImageType::Pointer* m_sImageObj;
-    DICOMIOType::Pointer m_DicomIO;
+    DICOMIOType::Pointer* m_DicomIO;
     short m_sCurrentWC;
     short m_sCurrentWW;
+    int m_iActiveSlice;
+    int m_iMinSliceNum;
+    int m_iMaxSliceNum;
 
 };
 

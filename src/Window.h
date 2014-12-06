@@ -56,6 +56,7 @@ private slots:
     void Pan(float scale);
     void UpdateImage();
     void UpdateImage(int index);
+    void UpdateActiveSlice(int deltaX, int deltaY);
     void ResetWindow();
     void ZoomIn25Present();
     void ZoomOut25Present();

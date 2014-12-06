@@ -4,8 +4,11 @@
 ImageContainer::ImageContainer()
     : m_uiDim(0)
     , m_sImageObj(NULL)
+    , m_DicomIO(NULL)
+    , m_iActiveSlice(0)
+    , m_iMinSliceNum(0)
+    , m_iMaxSliceNum(0)
 {
-    m_DicomIO = DICOMIOType::New();
 }
 
 
@@ -15,6 +18,12 @@ ImageContainer::~ImageContainer()
     {
         delete [] m_sImageObj;
         m_sImageObj = NULL;
+    }
+
+    if(m_DicomIO != NULL)
+    {
+        delete [] m_DicomIO;
+        m_DicomIO = NULL;
     }
 }
 
@@ -26,10 +35,17 @@ void ImageContainer::Allocate(int sliceNumber)
         delete [] m_sImageObj;
         m_sImageObj = NULL;
     }
+    if(m_DicomIO != NULL)
+    {
+        delete [] m_DicomIO;
+        m_DicomIO = NULL;
+    }
     m_sImageObj = new ShortImageType::Pointer[sliceNumber];
+    m_DicomIO = new DICOMIOType::Pointer[sliceNumber];
     for(int i=0;i<sliceNumber;i++)
     {
         m_sImageObj[i] = ShortImageType::New();
+        m_DicomIO[i] = DICOMIOType::New();
     }
 }
 
@@ -46,9 +62,9 @@ ShortImageType::Pointer* ImageContainer::GetImage(int slice)
 }
 
 
-DICOMIOType::Pointer* ImageContainer::GetIOObject()
+DICOMIOType::Pointer* ImageContainer::GetIOObject(int slice)
 {
-    return &m_DicomIO;
+    return &m_DicomIO[slice];
 }
 
 
@@ -69,34 +85,34 @@ short ImageContainer::GetLength(int slice)
 }
 
 
-short ImageContainer::GetDefaultWC()
+short ImageContainer::GetDefaultWC(int slice)
 {
     std::string temp;
-    m_DicomIO->GetValueFromTag("0028|1050", temp);
+    m_DicomIO[slice]->GetValueFromTag("0028|1050", temp);
     return atoi(temp.c_str());
 }
 
 
-short ImageContainer::GetDefaultWW()
+short ImageContainer::GetDefaultWW(int slice)
 {
     std::string temp;
-    m_DicomIO->GetValueFromTag("0028|1051", temp);
+    m_DicomIO[slice]->GetValueFromTag("0028|1051", temp);
     return atoi(temp.c_str());
 }
 
 
-std::string ImageContainer::GetPatientName()
+std::string ImageContainer::GetPatientName(int slice)
 {
     std::string temp;
-    m_DicomIO->GetValueFromTag("0010|0010", temp);
+    m_DicomIO[slice]->GetValueFromTag("0010|0010", temp);
     return temp;
 }
 
 
-std::string ImageContainer::GetStudyInstanceUID()
+std::string ImageContainer::GetStudyInstanceUID(int slice)
 {
     std::string temp;
-    m_DicomIO->GetValueFromTag("0020|000D", temp);
+    m_DicomIO[slice]->GetValueFromTag("0020|000D", temp);
     return temp;
 }
 
@@ -122,4 +138,40 @@ void ImageContainer::SetCurrentWW(short ww)
 short ImageContainer::GetCurrentWW()
 {
     return m_sCurrentWW;
+}
+
+
+void ImageContainer::SetActiveSlice(int slice)
+{
+    m_iActiveSlice = slice;
+}
+
+
+int ImageContainer::GetActiveSlice()
+{
+    return m_iActiveSlice;
+}
+
+
+void ImageContainer::SetMinSliceNum(int min)
+{
+    m_iMinSliceNum = min;
+}
+
+
+int ImageContainer::GetMinSliceNum()
+{
+    return m_iMinSliceNum;
+}
+
+
+void ImageContainer::SetMaxSliceNum(int max)
+{
+    m_iMaxSliceNum = max;
+}
+
+
+int ImageContainer::GetMaxSliceNum()
+{
+    return m_iMaxSliceNum;
 }

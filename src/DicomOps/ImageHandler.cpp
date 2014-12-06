@@ -5,7 +5,6 @@ ImageHandler::ImageHandler()
     : m_pCurrentImage(NULL)
     , m_ucPixArray(NULL)
     , m_iActiveIndex(-1)
-    , m_iActiveSlice(0)
 {
     m_qtDisplayImage = new QImage();
     m_ucDisplayImageObj = UnsignedCharImageType::New();
@@ -36,17 +35,19 @@ bool ImageHandler::AddImage(QString filename)
     std::shared_ptr<ImageContainer> image = std::make_shared<ImageContainer>();
     image->Allocate(1);
 
-    ImageIO::ReadDICOMImage(filename.toStdString(), *image->GetImage(0), *image->GetIOObject());
+    ImageIO::ReadDICOMImage(filename.toStdString(), *image->GetImage(0), *image->GetIOObject(0));
     image->SetDimension(2);
-    image->SetCurrentWC(image->GetDefaultWC());
-    image->SetCurrentWW(image->GetDefaultWW());
+    image->SetCurrentWC(image->GetDefaultWC(image->GetActiveSlice()));
+    image->SetCurrentWW(image->GetDefaultWW(image->GetActiveSlice()));
 
     m_vecImages.push_back(image);
     m_pCurrentImage = image;
     m_iActiveIndex = m_vecImages.size()-1;
-    m_iActiveSlice = 0;
+    image->SetActiveSlice(0);
+    image->SetMinSliceNum(0);
+    image->SetMaxSliceNum(0);
 
-    DisplayImage(image->GetDefaultWC(), image->GetDefaultWW());
+    DisplayImage(image->GetDefaultWC(image->GetActiveSlice()), image->GetDefaultWW(image->GetActiveSlice()));
 
     std::cout<<"Contain "<<m_vecImages.size()<<" images."<<std::endl;
     std::cout<<"Active image: "<<m_iActiveIndex<<std::endl;
@@ -62,34 +63,29 @@ bool ImageHandler::AddImageSeries(QString folderPath)
 
     std::shared_ptr<ImageContainer> imageSeries = std::make_shared<ImageContainer>();
 
-    ShortSeriesType::Pointer tempImages = ShortSeriesType::New();
+    std::vector<std::string> filenames;
 
-    ImageIO::ReadDICOMSeries(folderPath.toStdString(), "", tempImages, *imageSeries->GetIOObject());
+    int fileNum = ImageIO::ProbeDICOMFolder(folderPath.toStdString(), filenames);
+    imageSeries->Allocate(fileNum);
 
-    ShortSeriesType::RegionType region = tempImages->GetLargestPossibleRegion();
-    ShortSeriesType::IndexType start = region.GetIndex();
-    ShortSeriesType::SizeType size = region.GetSize();
-
-    const unsigned int firstSlice = start[2];
-    const unsigned int lastSlice = start[2] + size[2] - 1;
-
-    imageSeries->Allocate(size[2]);
-    imageSeries->SetDimension(3);
-    imageSeries->SetCurrentWC(imageSeries->GetDefaultWC());
-    imageSeries->SetCurrentWW(imageSeries->GetDefaultWW());
-
-    for(int i=0;i<size[2];i++)
+    for(int i=0;i<fileNum;i++)
     {
-        ImageFilter::ExtractFilter<ShortSeriesType, ShortImageType,
-                ShortSeriesType::Pointer, ShortImageType::Pointer>(tempImages, *imageSeries->GetImage(i), i);
+//        std::cout<<filenames[i]<<std::endl;
+        ImageIO::ReadDICOMImage(filenames[i], *imageSeries->GetImage(i), *imageSeries->GetIOObject(i));
     }
 
     m_vecImages.push_back(imageSeries);
     m_pCurrentImage = imageSeries;
     m_iActiveIndex = m_vecImages.size() - 1;
-    m_iActiveSlice = 0;
+    imageSeries->SetActiveSlice(0);
+    imageSeries->SetMinSliceNum(0);
+    imageSeries->SetMaxSliceNum(fileNum-1);
 
-    DisplayImage(imageSeries->GetDefaultWC(), imageSeries->GetDefaultWW());
+    imageSeries->SetDimension(3);
+    imageSeries->SetCurrentWC(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()));
+    imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
+
+    DisplayImage(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()), imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
 
     return true;
 }
@@ -150,12 +146,12 @@ void ImageHandler::DisplayImage(short wc, short ww)
         m_ucPixArray = NULL;
     }
 
-    m_ucPixArray = new unsigned char[currentImage->GetWidth(m_iActiveSlice)*currentImage->GetHeight(m_iActiveSlice)];
+    m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
 
     ImageFilter::IntensityWindowingFilter
             <ShortImageType, UnsignedCharImageType,
              ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-            (*currentImage->GetImage(m_iActiveSlice), m_ucDisplayImageObj, wc, ww);
+            (*currentImage->GetImage(currentImage->GetActiveSlice()), m_ucDisplayImageObj, wc, ww);
 
     ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
 }
@@ -168,7 +164,8 @@ void ImageHandler::UpdateImage(short wc, short ww)
 
     ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
                                           ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-        (*(m_vecImages[m_iActiveIndex]->GetImage(m_iActiveSlice)), m_ucDisplayImageObj, wc, ww);
+        (*(m_vecImages[m_iActiveIndex]->GetImage(m_vecImages[m_iActiveIndex]->GetActiveSlice())),
+         m_ucDisplayImageObj, wc, ww);
     ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
 }
 
@@ -177,13 +174,15 @@ void ImageHandler::ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, Q
 {
     int i = 0, j = 0;
     ImageIO::PixelToArray(itk_image, &m_ucPixArray);
-    **qt_image = QImage(m_vecImages[m_iActiveIndex]->GetWidth(m_iActiveSlice), m_vecImages[m_iActiveIndex]->GetHeight(m_iActiveSlice), QImage::Format_RGB32);
+    **qt_image = QImage(m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice()),
+                        m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice()),
+                        QImage::Format_RGB32);
 
-    for(i=0;i<m_vecImages[m_iActiveIndex]->GetHeight(m_iActiveSlice);i++)
+    for(i=0;i<m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice());i++)
     {
-        for(j=0;j<m_vecImages[m_iActiveIndex]->GetWidth(m_iActiveSlice);j++)
+        for(j=0;j<m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice());j++)
         {
-            short temp = m_ucPixArray[j+i*m_vecImages[m_iActiveIndex]->GetWidth(m_iActiveSlice)];
+            short temp = m_ucPixArray[j+i*m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice())];
             (*qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
         }
     }
@@ -199,18 +198,6 @@ void ImageHandler::SetActiveIndex(unsigned int index)
 int ImageHandler::GetActiveIndex()
 {
     return m_iActiveIndex;
-}
-
-
-void ImageHandler::SetActiveSlice(int slice)
-{
-    m_iActiveSlice = slice;
-}
-
-
-int ImageHandler::GetActiveSlice()
-{
-    return m_iActiveSlice;
 }
 
 

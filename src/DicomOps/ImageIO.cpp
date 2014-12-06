@@ -253,6 +253,17 @@ bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& i
 }
 
 
+int ImageIO::ProbeDICOMFolder(std::string folderName, std::vector<std::string> &fileNames)
+{
+    DICOMSeriesNameGeneratorType::Pointer nameGenerator = DICOMSeriesNameGeneratorType::New();
+    nameGenerator->AddSeriesRestriction("0020|0012");
+    nameGenerator->SetDirectory(folderName);
+    fileNames = nameGenerator->GetFileNames("");
+
+    return fileNames.size();
+}
+
+
 int ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
 {
     short i = 0;

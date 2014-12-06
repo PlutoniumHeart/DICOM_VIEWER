@@ -25,6 +25,7 @@ signals:
     void MiddleButtonMove(float x, float y);
     void RightButtonMove(float y);
     void MiddleButtonDoubleClick();
+    void WheelMovement(int x, int y);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -32,6 +33,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 protected:
     float m_MouseMiddleStartPos[2];
