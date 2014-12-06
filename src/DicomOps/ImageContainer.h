@@ -11,13 +11,14 @@ public:
     ImageContainer();
     virtual ~ImageContainer();
 
+    void Allocate(int sliceNumber);
     void SetDimension(unsigned int dim);
     unsigned int GetDimension();
-    ShortImageType::Pointer* GetImage();
+    ShortImageType::Pointer* GetImage(int slice);
     DICOMIOType::Pointer* GetIOObject();
-    short GetWidth();
-    short GetHeight();
-    short GetLength();
+    short GetWidth(int slice);
+    short GetHeight(int slice);
+    short GetLength(int slice);
     short GetDefaultWC();
     short GetDefaultWW();
     void SetCurrentWC(short wc);
@@ -29,7 +30,7 @@ public:
 
 private:
     unsigned int m_uiDim;
-    ShortImageType::Pointer m_sImageObj;
+    ShortImageType::Pointer* m_sImageObj;
     DICOMIOType::Pointer m_DicomIO;
     short m_sCurrentWC;
     short m_sCurrentWW;

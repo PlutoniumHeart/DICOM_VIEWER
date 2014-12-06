@@ -276,11 +276,11 @@ int ImageIO::SetDICOMFolder(std::string folderName, std::string** pSeriesName)
 
 
 bool ImageIO::ReadDICOMSeries(std::string folderName, std::string seriesName,
-                              ShortSeriesType::Pointer& imageObj)
+                              ShortSeriesType::Pointer& imageObj, DICOMIOType::Pointer& IO)
 {
     DICOMSeriesNameGeneratorType::Pointer nameGenerator = DICOMSeriesNameGeneratorType::New();
     ShortSeriesReadType::Pointer seriesReader = ShortSeriesReadType::New();
-    seriesReader->SetImageIO(m_pDICOMIO);
+    seriesReader->SetImageIO(IO);
     nameGenerator->AddSeriesRestriction("0020|0012");
     nameGenerator->SetDirectory(folderName);
     std::vector<std::string> fileNameContainer = nameGenerator->GetFileNames(seriesName);

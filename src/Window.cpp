@@ -28,7 +28,8 @@ Window::~Window()
 void Window::CreateMenus()
 {
     m_pMenu = menuBar()->addMenu(tr("&File"));
-    m_pMenu->addAction(tr("&Open Dicom Image."), this, SLOT(OpenDicomImage()));
+    m_pMenu->addAction(tr("&Open Dicom Image"), this, SLOT(OpenDicomImage()));
+    m_pMenu->addAction(tr("&Open Dicom Series"), this, SLOT(OpenDicomSeries()));
     m_pMenu->addAction(tr("&Close"), this, SLOT(CloseDicomImage()));
     m_pMenu->addAction(tr("&Quit"), this, SLOT(close()));
 }
@@ -127,6 +128,25 @@ void Window::OpenDicomImage()
 }
 
 
+void Window::OpenDicomSeries()
+{
+    QString folderPath = QFileDialog::getExistingDirectory(0, tr("Open DICOM folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly);
+
+    if(!m_ImageHandler.AddImageSeries(folderPath))
+        return;
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC());
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW());
+    ZoomOriginalSize();
+    ZoomFitToHeight();
+    m_pImageWindowingDock->SetWidgetsDisabled(false);
+    m_pResizeToolbar->SetWidgetsDisabled(false);
+
+    m_pImageListDock->InsertImageSeries(&m_ImageHandler);
+
+    CreateConnections();
+}
+
+
 void Window::CloseDicomImage()
 {
     if(m_ImageHandler.GetActiveIndex()<0)
@@ -162,7 +182,7 @@ void Window::Pan(float scale)
     std::string currentSize = m_pResizeToolbar->GetComboResize()->currentText().toStdString();
 
     std::ostringstream ss;
-    ss << 100.0*((double)temp.height()/(double)m_ImageHandler.GetImageObj()->GetHeight());
+    ss << 100.0*((double)temp.height()/(double)m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice()));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -173,8 +193,7 @@ void Window::UpdateImage()
 {
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-    m_ImageHandler.UpdateImage(tmp1,
-                               tmp2);
+    m_ImageHandler.UpdateImage(tmp1, tmp2);
 }
 
 
@@ -218,8 +237,10 @@ void Window::ZoomOriginalSize()
 {
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    m_pDisplay->resize(m_ImageHandler.GetImageObj()->GetWidth(),
-                       m_ImageHandler.GetImageObj()->GetHeight());
+    int temp = m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetActiveSlice());
+    int temp1 = m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice());
+    m_pDisplay->resize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetActiveSlice()),
+                       m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice()));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 }
 
@@ -232,7 +253,7 @@ void Window::ZoomFitToHeight()
     double temp = (double)tmp/m_pDisplay->height();
     m_pDisplay->resize(m_pDisplay->size()*temp);
     std::ostringstream ss;
-    ss << 100.0*((double)m_pDisplay->size().height()/(double)m_ImageHandler.GetImageObj()->GetHeight());
+    ss << 100.0*((double)m_pDisplay->size().height()/(double)m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice()));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -251,7 +272,8 @@ void Window::ZoomCustomSize()
     std::string currentText = ss.str() + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
 
-    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(), m_ImageHandler.GetImageObj()->GetHeight());
+    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetActiveSlice()),
+                           m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice()));
     m_pDisplay->resize(original*tmp/100.0);
 }
 
@@ -260,7 +282,8 @@ void Window::ZoomComboResize(int index)
 {
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(), m_ImageHandler.GetImageObj()->GetHeight());
+    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetActiveSlice()),
+                           m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetActiveSlice()));
     switch(index)
     {
     case 0:

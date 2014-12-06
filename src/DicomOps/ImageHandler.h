@@ -25,10 +25,13 @@ public:
     virtual ~ImageHandler();
 
     bool AddImage(QString filename);
+    bool AddImageSeries(QString folderPath);
     bool RemoveImage();
 
     void SetActiveIndex(unsigned int index);
     int GetActiveIndex();
+    void SetActiveSlice(int slice);
+    int GetActiveSlice();
     std::shared_ptr<ImageContainer> GetImageObj();
     int GetNumberOfOpenedImages();
 
@@ -44,6 +47,7 @@ private:
     std::vector<std::shared_ptr<ImageContainer> > m_vecImages;
     std::shared_ptr<ImageContainer> m_pCurrentImage;
     int m_iActiveIndex;
+    int m_iActiveSlice;
     UnsignedCharImageType::Pointer m_ucDisplayImageObj;
     QImage *m_qtDisplayImage;
     unsigned char* m_ucPixArray;

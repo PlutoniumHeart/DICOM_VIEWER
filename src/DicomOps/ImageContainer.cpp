@@ -3,14 +3,34 @@
 
 ImageContainer::ImageContainer()
     : m_uiDim(0)
+    , m_sImageObj(NULL)
 {
-    m_sImageObj = ShortImageType::New();
     m_DicomIO = DICOMIOType::New();
 }
 
 
 ImageContainer::~ImageContainer()
 {
+    if(m_sImageObj != NULL)
+    {
+        delete [] m_sImageObj;
+        m_sImageObj = NULL;
+    }
+}
+
+
+void ImageContainer::Allocate(int sliceNumber)
+{
+    if(m_sImageObj != NULL)
+    {
+        delete [] m_sImageObj;
+        m_sImageObj = NULL;
+    }
+    m_sImageObj = new ShortImageType::Pointer[sliceNumber];
+    for(int i=0;i<sliceNumber;i++)
+    {
+        m_sImageObj[i] = ShortImageType::New();
+    }
 }
 
 
@@ -20,9 +40,9 @@ void ImageContainer::SetDimension(unsigned int dim)
 }
 
 
-ShortImageType::Pointer* ImageContainer::GetImage()
+ShortImageType::Pointer* ImageContainer::GetImage(int slice)
 {
-    return &m_sImageObj;
+    return &(m_sImageObj[slice]);
 }
 
 
@@ -32,20 +52,20 @@ DICOMIOType::Pointer* ImageContainer::GetIOObject()
 }
 
 
-short ImageContainer::GetWidth()
+short ImageContainer::GetWidth(int slice)
 {
-    return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(0);
+    return m_sImageObj[slice]->GetLargestPossibleRegion().GetSize().GetElement(0);
 }
 
-short ImageContainer::GetHeight()
+short ImageContainer::GetHeight(int slice)
 {
-    return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(1);
+    return m_sImageObj[slice]->GetLargestPossibleRegion().GetSize().GetElement(1);
 }
 
 
-short ImageContainer::GetLength()
+short ImageContainer::GetLength(int slice)
 {
-    return m_sImageObj->GetLargestPossibleRegion().GetSize().GetElement(2);
+    return m_sImageObj[slice]->GetLargestPossibleRegion().GetSize().GetElement(2);
 }
 
 

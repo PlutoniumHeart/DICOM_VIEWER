@@ -51,6 +51,7 @@ private:
 
 private slots:
     void OpenDicomImage();
+    void OpenDicomSeries();
     void CloseDicomImage();
     void Pan(float scale);
     void UpdateImage();

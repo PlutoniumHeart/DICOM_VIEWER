@@ -58,6 +58,9 @@ public:
 
     template<class T1, class T2, class T1Pointer, class T2Pointer>
     static bool FlipImageFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, int x, int y);
+
+    template<class T1, class T2, class T1Pointer, class T2Pointer>
+    static bool ExtractFilter(T1Pointer& inputSeries, T2Pointer& outputImage, int sliceNumber);
 };
 
  
@@ -472,6 +475,43 @@ bool ImageFilter::FlipImageFilter(T1Pointer& imageObj_1, T2Pointer& imageObj_2, 
     }
 
     imageObj_2 = filter->GetOutput();
+
+    return true;
+}
+
+
+template<class T1, class T2, class T1Pointer, class T2Pointer>
+bool ImageFilter::ExtractFilter(T1Pointer& inputSeries, T2Pointer& outputImage, int sliceNumber)
+{
+    typedef itk::ExtractImageFilter<T1, T2> ExtractFilterType;
+    typename ExtractFilterType::Pointer extractFilter = ExtractFilterType::New();
+
+    typename T1::RegionType desiredRegion;
+    typename T1::RegionType inputRegion = inputSeries->GetLargestPossibleRegion();
+    typename T1::SizeType size = inputRegion.GetSize();
+    size[2] = 0;
+    typename T1::IndexType start = inputRegion.GetIndex();
+    start[2] = sliceNumber;
+    desiredRegion.SetSize(size);
+    desiredRegion.SetIndex(start);
+
+    extractFilter->SetInput(inputSeries);
+    extractFilter->InPlaceOn();
+    extractFilter->SetDirectionCollapseToSubmatrix();
+    extractFilter->SetExtractionRegion(desiredRegion);
+
+    try
+    {
+        extractFilter->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exeption caught in extracting slice: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return false;
+    }
+
+    outputImage = extractFilter->GetOutput();
 
     return true;
 }

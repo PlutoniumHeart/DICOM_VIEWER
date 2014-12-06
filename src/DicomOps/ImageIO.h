@@ -34,7 +34,7 @@ public:
 
     static int SetDICOMFolder(std::string folderName, std::string** pSeriesName);
     static bool ReadDICOMSeries(std::string folderName, std::string seriesName,
-                                ShortSeriesType::Pointer& imageObj);
+                                ShortSeriesType::Pointer& imageObj, DICOMIOType::Pointer &IO);
     static bool WriteDICOMSeries(std::string folderNmae, ShortSeriesType::Pointer& imageObj,
                                  std::string seriesFormat, int begin, int end);
 
