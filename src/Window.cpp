@@ -109,6 +109,31 @@ void Window::CreateConnections()
 }
 
 
+void Window::SetupAnnotation()
+{
+    std::string UpperLeftText = "Upper left annotation goes here\n"
+            "Line 1\n"
+            "Line 2\n"
+            "Line 3\n";
+    std::string UpperRightText = "Upper Right annotation goes here\n"
+            "Line 1\n"
+            "Line 2\n"
+            "Line 3\n";
+    std::string LowerLeftText = "Lower left annotation goes here\n"
+            "Line 1\n"
+            "Line 2\n"
+            "Line 3\n";
+    std::string LowerRightText = "Lower Right annotation goes here\n"
+            "Line 1\n"
+            "Line 2\n"
+            "Line 3\n";
+    m_pDisplay->SetUpperLeftAnnotation(UpperLeftText);
+    m_pDisplay->SetUpperRightAnnotation(UpperRightText);
+    m_pDisplay->SetLowerLeftAnnotation(LowerLeftText);
+    m_pDisplay->SetLowerRightAnnotation(LowerRightText);
+}
+
+
 // ====== slots ====== //
 void Window::OpenDicomImage()
 {
@@ -126,6 +151,7 @@ void Window::OpenDicomImage()
     m_pImageListDock->InsertImageSeries(&m_ImageHandler);
 
     CreateConnections();
+    SetupAnnotation();
 }
 
 
@@ -145,6 +171,7 @@ void Window::OpenDicomSeries()
     m_pImageListDock->InsertImageSeries(&m_ImageHandler);
 
     CreateConnections();
+    SetupAnnotation();
 }
 
 

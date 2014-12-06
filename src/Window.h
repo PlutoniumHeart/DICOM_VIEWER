@@ -48,6 +48,7 @@ private:
     void CreateCenterWidgets();
     void CreateDocks();
     void CreateConnections();
+    void SetupAnnotation();
 
 private slots:
     void OpenDicomImage();

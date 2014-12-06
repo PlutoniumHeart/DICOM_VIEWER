@@ -36,6 +36,8 @@ set(SOURCES src/main.cpp
 
             src/CenterWidgets/DisplayWidget.h
             src/CenterWidgets/DisplayWidget.cpp
+            src/CenterWidgets/TextOverlayWidget.h
+            src/CenterWidgets/TextOverlayWidget.cpp
 
             src/Docks/ImageWindowingDock.h
             src/Docks/ImageWindowingDock.cpp

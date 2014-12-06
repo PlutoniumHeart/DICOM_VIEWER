@@ -7,6 +7,7 @@
 #include <QScreen>
 #include <QGuiApplication>
 #include "ImageHandler.h"
+#include "TextOverlayWidget.h"
 
 
 //class ImageHandler;
@@ -17,9 +18,20 @@ class DisplayWidget : public QWidget
 
 public:
     DisplayWidget(ImageHandler *handler, QWidget *parent);
+    virtual ~DisplayWidget();
+
+    void SetUpperLeftAnnotation(std::string text);
+    void SetUpperRightAnnotation(std::string text);
+    void SetLowerLeftAnnotation(std::string text);
+    void SetLowerRightAnnotation(std::string text);
 
 public slots:
     void Animate();
+
+private:
+    void InitializeAnnotation();
+    void ShowAnnotation();
+    void UpdateAnnotation();
 
 signals:
     void MiddleButtonMove(float x, float y);
@@ -47,6 +59,11 @@ protected:
 private:
     ImageHandler* m_Handler;
     int m_iElapsed;
+    bool m_bShowAnnotation;
+    TextOverlayWidget* m_pUpperLeft;
+    TextOverlayWidget* m_pUpperRight;
+    TextOverlayWidget* m_pLowerLeft;
+    TextOverlayWidget* m_pLowerRight;
 
 };
 
