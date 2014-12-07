@@ -61,13 +61,13 @@ void DisplayWidget::InitializeAnnotation()
 
     m_pLowerLeft = new TextOverlayWidget(this);
 
-    m_pLowerLeft->setGeometry(0, this->geometry().height(), 100, 100);
+    m_pLowerLeft->setGeometry(0, this->geometry().height(), 200, 150);
     m_pLowerLeft->SetFontSize(8);
     m_pLowerLeft->SetPenColor(QColor(255, 255, 0, 255));
 
     m_pLowerRight = new TextOverlayWidget(this);
 
-    m_pLowerRight->setGeometry(this->geometry().width(), this->geometry().height(), 100, 100);
+    m_pLowerRight->setGeometry(this->geometry().width(), this->geometry().height(), 200, 150);
     m_pLowerRight->SetFontSize(8);
     m_pLowerRight->SetPenColor(QColor(255, 255, 0, 255));
 }
@@ -96,16 +96,16 @@ void DisplayWidget::UpdateAnnotation()
     m_pUpperRight->SetHeight(100);
     m_pUpperRight->SetAlignment(Qt::AlignRight|Qt::AlignTop);
 
-    m_pLowerLeft->setGeometry(0, this->geometry().height()-100, 200, 100);
+    m_pLowerLeft->setGeometry(0, this->geometry().height()-150, 200, 150);
     m_pLowerLeft->SetOrigin(0, 0);
     m_pLowerLeft->SetWidth(200);
-    m_pLowerLeft->SetHeight(100);
+    m_pLowerLeft->SetHeight(150);
     m_pLowerLeft->SetAlignment(Qt::AlignLeft|Qt::AlignBottom);
 
-    m_pLowerRight->setGeometry(this->geometry().width()-200, this->geometry().height()-100, 200, 100);
+    m_pLowerRight->setGeometry(this->geometry().width()-200, this->geometry().height()-150, 200, 150);
     m_pLowerRight->SetOrigin(0, 0);
     m_pLowerRight->SetWidth(200);
-    m_pLowerRight->SetHeight(100);
+    m_pLowerRight->SetHeight(150);
     m_pLowerRight->SetAlignment(Qt::AlignRight|Qt::AlignBottom);
 }
 

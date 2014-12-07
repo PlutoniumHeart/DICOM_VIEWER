@@ -72,6 +72,5 @@ std::string ImageListDock::GetUID(int i)
 
 void ImageListDock::UpdateSelection(QModelIndex index)
 {
-    std::cout<<"Currently selected: "<<index.row()<<std::endl;
     emit(SelectionChanged(m_Model->rowCount()-index.row() - 1));
 }

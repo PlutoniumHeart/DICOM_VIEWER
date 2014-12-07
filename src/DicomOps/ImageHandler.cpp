@@ -49,9 +49,6 @@ bool ImageHandler::AddImage(QString filename)
 
     DisplayImage(image->GetDefaultWC(image->GetActiveSlice()), image->GetDefaultWW(image->GetActiveSlice()));
 
-    std::cout<<"Contain "<<m_vecImages.size()<<" images."<<std::endl;
-    std::cout<<"Active image: "<<m_iActiveIndex<<std::endl;
-
     return true;
 }
 
@@ -70,7 +67,6 @@ bool ImageHandler::AddImageSeries(QString folderPath)
 
     for(int i=0;i<fileNum;i++)
     {
-//        std::cout<<filenames[i]<<std::endl;
         ImageIO::ReadDICOMImage(filenames[i], *imageSeries->GetImage(i), *imageSeries->GetIOObject(i));
     }
 
@@ -123,14 +119,10 @@ bool ImageHandler::RemoveImage()
         {
             for(int j=0;j<1;j++)
             {
-                //short temp = m_ucPixArray[j+i*1];
                 m_qtDisplayImage->setPixel(j, i, qRgb(0, 0, 0));
             }
         }
     }
-
-    std::cout<<"Contain "<<m_vecImages.size()<<" images."<<std::endl;
-    std::cout<<"Active image: "<<m_iActiveIndex<<std::endl;
 
     return true;
 }
@@ -140,13 +132,8 @@ void ImageHandler::DisplayImage(short wc, short ww)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    if(m_ucPixArray != NULL)
-    {
-        delete [] m_ucPixArray;
-        m_ucPixArray = NULL;
-    }
-
-    m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
+    if(m_ucPixArray == NULL)
+        m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
 
     ImageFilter::IntensityWindowingFilter
             <ShortImageType, UnsignedCharImageType,
@@ -173,16 +160,17 @@ void ImageHandler::UpdateImage(short wc, short ww)
 void ImageHandler::ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage **qt_image)
 {
     int i = 0, j = 0;
-    ImageIO::PixelToArray(itk_image, &m_ucPixArray);
-    **qt_image = QImage(m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice()),
-                        m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice()),
-                        QImage::Format_RGB32);
+    int width = m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice());
+    int height = m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice());
 
-    for(i=0;i<m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice());i++)
+    ImageIO::PixelToArray(itk_image, &m_ucPixArray);
+    **qt_image = QImage(width, height, QImage::Format_RGB32);
+
+    for(i=0;i<height;i++)
     {
-        for(j=0;j<m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice());j++)
+        for(j=0;j<width;j++)
         {
-            short temp = m_ucPixArray[j+i*m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice())];
+            int temp = m_ucPixArray[j+i*width];
             (*qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
         }
     }

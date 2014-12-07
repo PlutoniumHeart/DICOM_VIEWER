@@ -49,6 +49,8 @@ private:
     void CreateDocks();
     void CreateConnections();
     void SetupAnnotation();
+    std::string DateFormat(std::string string);
+    std::string TimeFormat(std::string string);
 
 private slots:
     void OpenDicomImage();

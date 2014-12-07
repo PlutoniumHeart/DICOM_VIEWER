@@ -111,26 +111,102 @@ void Window::CreateConnections()
 
 void Window::SetupAnnotation()
 {
-    std::string UpperLeftText = "Upper left annotation goes here\n"
-            "Line 1\n"
-            "Line 2\n"
-            "Line 3\n";
-    std::string UpperRightText = "Upper Right annotation goes here\n"
-            "Line 1\n"
-            "Line 2\n"
-            "Line 3\n";
-    std::string LowerLeftText = "Lower left annotation goes here\n"
-            "Line 1\n"
-            "Line 2\n"
-            "Line 3\n";
-    std::string LowerRightText = "Lower Right annotation goes here\n"
-            "Line 1\n"
-            "Line 2\n"
-            "Line 3\n";
+    int slice = m_ImageHandler.GetImageObj()->GetActiveSlice();
+    DICOMIOType::Pointer io = *m_ImageHandler.GetImageObj()->GetIOObject(slice);
+
+    std::string temp;
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+    io->GetValueFromTag("0010|0010", temp);  //Patient name
+    std::string UpperLeftText = temp + "\n";
+    io->GetValueFromTag("0010|0030", temp);  // Birthday
+    UpperLeftText += DateFormat(temp) + ", ";
+    io->GetValueFromTag("0010|0040", temp);  // Sex
+    UpperLeftText += temp + ", ";
+    io->GetValueFromTag("0010|1010", temp);  // Age
+    UpperLeftText += temp + "\n";
+    io->GetValueFromTag("0008|103e", temp);  // Series Description
+    UpperLeftText += temp +"\n";
+    io->GetValueFromTag("0008|0012", temp);  // Instance Creation Day
+    UpperLeftText += DateFormat(temp) + "\n";
+    io->GetValueFromTag("0008|0013", temp);  // Instance Creation Time
+    UpperLeftText += TimeFormat(temp) + "\n";
+    temp = std::to_string(imageObj->GetActiveSlice()+1);
+    UpperLeftText += temp + "/";
+    temp = std::to_string(imageObj->GetMaxSliceNum()+1);  // Number of Slices
+    UpperLeftText += temp + "\n";
+
+
+    io->GetValueFromTag("0008|0080", temp);  // Institution Name
+    std::string UpperRightText = temp + "\n";
+    io->GetValueFromTag("0008|1090", temp);  // Manufacturer Model Name
+    UpperRightText += temp + "\n";
+    io->GetValueFromTag("0018|1020", temp);  // Software Versions
+    UpperRightText += temp + "\n";
+    io->GetValueFromTag("0018|5100", temp);  // Patient Position
+    UpperRightText += temp + "\n";
+    io->GetValueFromTag("0051|1013", temp);  //
+    UpperRightText += temp + "\n";
+
+
+    io->GetValueFromTag("0018|0080", temp);  // TR
+    std::string LowerLeftText = "TR " + temp + "\n";
+    io->GetValueFromTag("0018|0081", temp);  // TE
+    LowerLeftText += "TE " + temp + "\n";
+    io->GetValueFromTag("0051|100a", temp);  // TA
+    LowerLeftText += temp + "\n";
+    io->GetValueFromTag("0018|0095", temp);  // BW
+    LowerLeftText += "BW " + temp + "\n";
+    io->GetValueFromTag("0051|1016", temp);  //
+    LowerLeftText += temp + "\n\n";
+    io->GetValueFromTag("0051|1019", temp);  //
+    LowerLeftText += temp + "\n";
+    io->GetValueFromTag("0051|100f", temp);  //
+    LowerLeftText += temp + "\n";
+    io->GetValueFromTag("0018|0024", temp);  // Sequence Name
+    LowerLeftText += temp + "\n";
+
+    io->GetValueFromTag("0051|1012", temp);  //
+    std::string LowerRightText = temp + "\n";
+    io->GetValueFromTag("0051|100d", temp);  //
+    LowerRightText += temp + "\n";
+    io->GetValueFromTag("0051|1017", temp);  //
+    LowerRightText += temp + "\n";
+    io->GetValueFromTag("0051|100c", temp);  // FOV
+    LowerRightText += temp + "\n";
+    io->GetValueFromTag("0051|100b", temp);  // Matrix Size
+    LowerRightText += temp + "\n";
+    io->GetValueFromTag("0051|100e", temp);  //
+    LowerRightText += temp + "\n";
+    io->GetValueFromTag("0028|1051", temp);  // WW
+    LowerRightText += "W " + temp + "\n";
+    io->GetValueFromTag("0025|1050", temp);  // WC
+    LowerRightText += "C " + temp + "\n";
+
     m_pDisplay->SetUpperLeftAnnotation(UpperLeftText);
     m_pDisplay->SetUpperRightAnnotation(UpperRightText);
     m_pDisplay->SetLowerLeftAnnotation(LowerLeftText);
     m_pDisplay->SetLowerRightAnnotation(LowerRightText);
+}
+
+
+std::string Window::DateFormat(std::string string)
+{
+    std::string year = string.substr(0, 4);
+    std::string month = string.substr(4, 2);
+    std::string date = string.substr(6, 2);
+
+    return month + "/" + date + "/" + year;
+}
+
+
+std::string Window::TimeFormat(std::string string)
+{
+    std::string hour = string.substr(0, 2);
+    std::string min = string.substr(2, 2);
+    std::string sec = string.substr(4, 2);
+
+    return hour + ":" + min + ":" + sec;
 }
 
 
@@ -141,8 +217,11 @@ void Window::OpenDicomImage()
 
     if(!m_ImageHandler.AddImage(filename))
         return;
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
     ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
@@ -161,8 +240,11 @@ void Window::OpenDicomSeries()
 
     if(!m_ImageHandler.AddImageSeries(folderPath))
         return;
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
     ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
@@ -191,8 +273,10 @@ void Window::CloseDicomImage()
     }
     else
     {
-        short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
-        short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
+        std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+        short tmp1 = imageObj->GetCurrentWC();
+        short tmp2 = imageObj->GetCurrentWW();
         m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
         m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
     }
@@ -202,15 +286,15 @@ void Window::CloseDicomImage()
 
 void Window::Pan(float scale)
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     double presentage = 10.0*scale;
     QSize temp = (1.0+presentage)*m_pDisplay->size();
 
     m_pDisplay->resize(temp);
 
-    std::string currentSize = m_pResizeToolbar->GetComboResize()->currentText().toStdString();
-
     std::ostringstream ss;
-    ss << 100.0*((double)temp.height()/(double)m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -228,49 +312,43 @@ void Window::UpdateImage()
 void Window::UpdateImage(int index)
 {
     m_ImageHandler.SetActiveIndex(index);
-    short tmp1 = m_ImageHandler.GetImageObj()->GetCurrentWC();
-    short tmp2 = m_ImageHandler.GetImageObj()->GetCurrentWW();
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+    short tmp1 = imageObj->GetCurrentWC();
+    short tmp2 = imageObj->GetCurrentWW();
     m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
     m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
     UpdateImage();
+    SetupAnnotation();
 }
 
 
 void Window::UpdateActiveSlice(int deltaX, int deltaY)
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
     int slice = m_ImageHandler.GetImageObj()->GetActiveSlice() - deltaY;
 
-    if(slice>=m_ImageHandler.GetImageObj()->GetMinSliceNum() &&
-       slice<=m_ImageHandler.GetImageObj()->GetMaxSliceNum())
+    if(slice>=imageObj->GetMinSliceNum() &&
+       slice<=imageObj->GetMaxSliceNum())
     {
-        m_ImageHandler.GetImageObj()->SetActiveSlice(slice);
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+        imageObj->SetActiveSlice(slice);
+        m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
+        m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
         UpdateImage();
     }
-    else if(slice<m_ImageHandler.GetImageObj()->GetMinSliceNum())
-    {
-        m_ImageHandler.GetImageObj()->SetActiveSlice(m_ImageHandler.GetImageObj()->GetMinSliceNum());
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-        UpdateImage();
-    }
-    else if(slice>m_ImageHandler.GetImageObj()->GetMaxSliceNum())
-    {
-        m_ImageHandler.GetImageObj()->SetActiveSlice(m_ImageHandler.GetImageObj()->GetMaxSliceNum());
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-        UpdateImage();
-    }
+
+    SetupAnnotation();
 }
 
 
 void Window::ResetWindow()
 {
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
-    m_ImageHandler.UpdateImage(m_ImageHandler.GetImageObj()->GetDefaultWC(m_ImageHandler.GetImageObj()->GetActiveSlice()),
-                               m_ImageHandler.GetImageObj()->GetDefaultWW(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
+    m_ImageHandler.UpdateImage(imageObj->GetDefaultWC(imageObj->GetActiveSlice()),
+                               imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
 }
 
 
@@ -292,25 +370,29 @@ void Window::ZoomOut25Present()
 
 void Window::ZoomOriginalSize()
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    int temp = m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetImageObj()->GetActiveSlice());
-    int temp1 = m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice());
-    m_pDisplay->resize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetImageObj()->GetActiveSlice()),
-                       m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    int temp = imageObj->GetWidth(imageObj->GetActiveSlice());
+    int temp1 = imageObj->GetHeight(imageObj->GetActiveSlice());
+    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
+                       imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 }
 
 
 void Window::ZoomFitToHeight()
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
     short tmp = m_pScrollArea->height();
     double temp = (double)tmp/m_pDisplay->height();
     m_pDisplay->resize(m_pDisplay->size()*temp);
     std::ostringstream ss;
-    ss << 100.0*((double)m_pDisplay->size().height()/(double)m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    ss << 100.0*((double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -319,6 +401,8 @@ void Window::ZoomFitToHeight()
 
 void Window::ZoomCustomSize()
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
     std::string temp = m_pResizeToolbar->GetComboResize()->currentText().toStdString();
@@ -329,18 +413,20 @@ void Window::ZoomCustomSize()
     std::string currentText = ss.str() + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
 
-    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetImageObj()->GetActiveSlice()),
-                           m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
+                           imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pDisplay->resize(original*tmp/100.0);
 }
 
 
 void Window::ZoomComboResize(int index)
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    QSize original = QSize(m_ImageHandler.GetImageObj()->GetWidth(m_ImageHandler.GetImageObj()->GetActiveSlice()),
-                           m_ImageHandler.GetImageObj()->GetHeight(m_ImageHandler.GetImageObj()->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
+                           imageObj->GetHeight(imageObj->GetActiveSlice()));
     switch(index)
     {
     case 0:

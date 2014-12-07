@@ -214,6 +214,7 @@ bool ImageIO::ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& ima
                              DICOMIOType::Pointer& IO)
 {
     ShortImageReadType::Pointer reader = ShortImageReadType::New();
+    IO->SetLoadPrivateTags(true);
     reader->SetImageIO(IO);
     reader->SetFileName(inputFile);
     try
@@ -291,6 +292,7 @@ bool ImageIO::ReadDICOMSeries(std::string folderName, std::string seriesName,
 {
     DICOMSeriesNameGeneratorType::Pointer nameGenerator = DICOMSeriesNameGeneratorType::New();
     ShortSeriesReadType::Pointer seriesReader = ShortSeriesReadType::New();
+    IO->SetLoadPrivateTags(true);
     seriesReader->SetImageIO(IO);
     nameGenerator->AddSeriesRestriction("0020|0012");
     nameGenerator->SetDirectory(folderName);
