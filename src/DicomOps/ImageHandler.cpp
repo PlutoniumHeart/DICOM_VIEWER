@@ -132,8 +132,12 @@ void ImageHandler::DisplayImage(short wc, short ww)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    if(m_ucPixArray == NULL)
-        m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
+    if(m_ucPixArray != NULL)
+    {
+        delete [] m_ucPixArray;
+        m_ucPixArray = NULL;
+    }
+    m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
 
     ImageFilter::IntensityWindowingFilter
             <ShortImageType, UnsignedCharImageType,
@@ -149,11 +153,7 @@ void ImageHandler::UpdateImage(short wc, short ww)
     m_vecImages[m_iActiveIndex]->SetCurrentWC(wc);
     m_vecImages[m_iActiveIndex]->SetCurrentWW(ww);
 
-    ImageFilter::IntensityWindowingFilter<ShortImageType, UnsignedCharImageType,
-                                          ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-        (*(m_vecImages[m_iActiveIndex]->GetImage(m_vecImages[m_iActiveIndex]->GetActiveSlice())),
-         m_ucDisplayImageObj, wc, ww);
-    ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
+    DisplayImage(wc, ww);
 }
 
 

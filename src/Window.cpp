@@ -303,8 +303,15 @@ void Window::Pan(float scale)
 
 void Window::UpdateImage()
 {
+    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
+    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
+                       imageObj->GetHeight(imageObj->GetActiveSlice()));
+    short tmp = m_pScrollArea->height();
+    double temp = (double)tmp/m_pDisplay->height();
+    m_pDisplay->resize(m_pDisplay->size()*temp);
     m_ImageHandler.UpdateImage(tmp1, tmp2);
 }
 
