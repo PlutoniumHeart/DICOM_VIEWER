@@ -180,7 +180,7 @@ void Window::SetupAnnotation()
     LowerRightText += temp + "\n";
     io->GetValueFromTag("0028|1051", temp);  // WW
     LowerRightText += "W " + temp + "\n";
-    io->GetValueFromTag("0025|1050", temp);  // WC
+    io->GetValueFromTag("0028|1050", temp);  // WC
     LowerRightText += "C " + temp + "\n";
 
     m_pDisplay->SetUpperLeftAnnotation(UpperLeftText);
