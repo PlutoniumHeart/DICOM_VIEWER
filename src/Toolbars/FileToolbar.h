@@ -16,9 +16,11 @@ public:
     ~FileToolbar();
 
     QAction* GetOpenDICOMAction();
+    QAction* GetOpenDICOMSeriesAction();
 
 private:
-    QAction *openDICOM;
+    QAction *m_pOpenDICOM;
+    QAction *m_pOpenDICOMSeries;
 
 };
 

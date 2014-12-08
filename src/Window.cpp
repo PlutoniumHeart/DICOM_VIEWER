@@ -41,6 +41,7 @@ void Window::CreateToolbars()
     m_pFileToolbar = new FileToolbar;
     addToolBar(m_pFileToolbar);
     connect(m_pFileToolbar->GetOpenDICOMAction(), SIGNAL(triggered()), this, SLOT(OpenDicomImage()));
+    connect(m_pFileToolbar->GetOpenDICOMSeriesAction(), SIGNAL(triggered()), this, SLOT(OpenDicomSeries()));
 
     m_pResizeToolbar = new ResizeToolbar;
     addToolBar(m_pResizeToolbar);
