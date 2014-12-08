@@ -4,10 +4,10 @@
 Window::Window()
     : m_bConnected(false)
 {
-    CreateMenus();
     CreateToolbars();
     CreateCenterWidgets();
     CreateDocks();
+    CreateMenus();
 
     setWindowTitle(tr("DICOM Viewer"));
     resize(1600, 900);
@@ -28,11 +28,15 @@ Window::~Window()
 
 void Window::CreateMenus()
 {
-    m_pMenu = menuBar()->addMenu(tr("&File"));
-    m_pMenu->addAction(tr("&Open Dicom Image"), this, SLOT(OpenDicomImage()));
-    m_pMenu->addAction(tr("&Open Dicom Series"), this, SLOT(OpenDicomSeries()));
-    m_pMenu->addAction(tr("&Close"), this, SLOT(CloseDicomImage()));
-    m_pMenu->addAction(tr("&Quit"), this, SLOT(close()));
+    m_pFileMenu = menuBar()->addMenu(tr("&File"));
+    m_pFileMenu->addAction(tr("&Open Dicom Image"), this, SLOT(OpenDicomImage()));
+    m_pFileMenu->addAction(tr("&Open Dicom Series"), this, SLOT(OpenDicomSeries()));
+    m_pFileMenu->addAction(tr("&Close"), this, SLOT(CloseDicomImage()));
+    m_pFileMenu->addAction(tr("&Quit"), this, SLOT(close()));
+
+    m_pViewMenu = menuBar()->addMenu(tr("&View"));
+    m_pViewMenu->addAction(m_pImageListDock->toggleViewAction());
+    m_pViewMenu->addAction(m_pImageWindowingDock->toggleViewAction());
 }
 
 

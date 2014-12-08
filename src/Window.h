@@ -31,7 +31,8 @@ public:
     ~Window();
 
 private:
-    QMenu* m_pMenu;
+    QMenu* m_pFileMenu;
+    QMenu* m_pViewMenu;
     FileToolbar* m_pFileToolbar;
     ResizeToolbar* m_pResizeToolbar;
     DisplayWidget* m_pDisplay;
