@@ -119,69 +119,101 @@ void Window::SetupAnnotation()
 
     io->GetValueFromTag("0010|0010", temp);  //Patient name
     std::string UpperLeftText = temp + "\n";
+    temp = "";
     io->GetValueFromTag("0010|0030", temp);  // Birthday
     UpperLeftText += DateFormat(temp) + ", ";
+    temp = "";
     io->GetValueFromTag("0010|0040", temp);  // Sex
     UpperLeftText += temp + ", ";
+    temp = "";
     io->GetValueFromTag("0010|1010", temp);  // Age
     UpperLeftText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0008|103e", temp);  // Series Description
     UpperLeftText += temp +"\n";
+    temp = "";
     io->GetValueFromTag("0008|0012", temp);  // Instance Creation Day
     UpperLeftText += DateFormat(temp) + "\n";
+    temp = "";
     io->GetValueFromTag("0008|0013", temp);  // Instance Creation Time
     UpperLeftText += TimeFormat(temp) + "\n";
+    temp = "";
     temp = std::to_string(imageObj->GetActiveSlice()+1);
     UpperLeftText += temp + "/";
+    temp = "";
     temp = std::to_string(imageObj->GetMaxSliceNum()+1);  // Number of Slices
     UpperLeftText += temp + "\n";
+    temp = "";
 
 
     io->GetValueFromTag("0008|0080", temp);  // Institution Name
     std::string UpperRightText = temp + "\n";
+    temp = "";
     io->GetValueFromTag("0008|1090", temp);  // Manufacturer Model Name
     UpperRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0018|1020", temp);  // Software Versions
     UpperRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0018|5100", temp);  // Patient Position
     UpperRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|1013", temp);  //
     UpperRightText += temp + "\n";
+    temp = "";
 
 
     io->GetValueFromTag("0018|0080", temp);  // TR
     std::string LowerLeftText = "TR " + temp + "\n";
+    temp = "";
     io->GetValueFromTag("0018|0081", temp);  // TE
     LowerLeftText += "TE " + temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100a", temp);  // TA
     LowerLeftText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0018|0095", temp);  // BW
     LowerLeftText += "BW " + temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|1016", temp);  //
     LowerLeftText += temp + "\n\n";
+    temp = "";
     io->GetValueFromTag("0051|1019", temp);  //
     LowerLeftText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100f", temp);  //
     LowerLeftText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0018|0024", temp);  // Sequence Name
     LowerLeftText += temp + "\n";
+    temp = "";
+
 
     io->GetValueFromTag("0051|1012", temp);  //
     std::string LowerRightText = temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100d", temp);  //
     LowerRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|1017", temp);  //
     LowerRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100c", temp);  // FOV
     LowerRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100b", temp);  // Matrix Size
     LowerRightText += temp + "\n";
+    temp = "";
     io->GetValueFromTag("0051|100e", temp);  //
     LowerRightText += temp + "\n";
-    io->GetValueFromTag("0028|1051", temp);  // WW
+    temp = "";
+    temp = std::to_string(imageObj->GetCurrentWW());  // WW
     LowerRightText += "W " + temp + "\n";
-    io->GetValueFromTag("0028|1050", temp);  // WC
+    temp = "";
+    temp = std::to_string(imageObj->GetCurrentWC());  // WC
     LowerRightText += "C " + temp + "\n";
+    temp = "";
+
 
     m_pDisplay->SetUpperLeftAnnotation(UpperLeftText);
     m_pDisplay->SetUpperRightAnnotation(UpperRightText);
@@ -313,6 +345,8 @@ void Window::UpdateImage()
     double temp = (double)tmp/m_pDisplay->height();
     m_pDisplay->resize(m_pDisplay->size()*temp);
     m_ImageHandler.UpdateImage(tmp1, tmp2);
+
+    SetupAnnotation();
 }
 
 
@@ -356,6 +390,7 @@ void Window::ResetWindow()
     m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
     m_ImageHandler.UpdateImage(imageObj->GetDefaultWC(imageObj->GetActiveSlice()),
                                imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
+    SetupAnnotation();
 }
 
 
