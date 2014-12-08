@@ -39,15 +39,13 @@ public:
 
 private:
     void DisplayImage(short wc, short ww);
-    void ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage** qt_image);
+    void ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage** qt_image);
 
 private:
     std::vector<std::shared_ptr<ImageContainer> > m_vecImages;
     std::shared_ptr<ImageContainer> m_pCurrentImage;
     int m_iActiveIndex;
-    UnsignedCharImageType::Pointer m_ucDisplayImageObj;
     QImage *m_qtDisplayImage;
-    unsigned char* m_ucPixArray;
 
 };
 

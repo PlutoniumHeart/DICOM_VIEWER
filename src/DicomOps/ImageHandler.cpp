@@ -3,11 +3,9 @@
 
 ImageHandler::ImageHandler()
     : m_pCurrentImage(NULL)
-    , m_ucPixArray(NULL)
     , m_iActiveIndex(-1)
 {
     m_qtDisplayImage = new QImage();
-    m_ucDisplayImageObj = UnsignedCharImageType::New();
 }
 
 
@@ -17,12 +15,6 @@ ImageHandler::~ImageHandler()
     {
         delete m_qtDisplayImage;
         m_qtDisplayImage = NULL;
-    }
-
-    if(m_ucPixArray != NULL)
-    {
-        delete [] m_ucPixArray;
-        m_ucPixArray = NULL;
     }
 }
 
@@ -132,19 +124,7 @@ void ImageHandler::DisplayImage(short wc, short ww)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    if(m_ucPixArray != NULL)
-    {
-        delete [] m_ucPixArray;
-        m_ucPixArray = NULL;
-    }
-    m_ucPixArray = new unsigned char[currentImage->GetWidth(currentImage->GetActiveSlice())*currentImage->GetHeight(currentImage->GetActiveSlice())];
-
-    ImageFilter::IntensityWindowingFilter
-            <ShortImageType, UnsignedCharImageType,
-             ShortImageType::Pointer, UnsignedCharImageType::Pointer>
-            (*currentImage->GetImage(currentImage->GetActiveSlice()), m_ucDisplayImageObj, wc, ww);
-
-    ITKImageToQImage(m_ucDisplayImageObj, &m_qtDisplayImage);
+    ITKImageToQImage(*currentImage->GetImage(currentImage->GetActiveSlice()), &m_qtDisplayImage);
 }
 
 
@@ -157,21 +137,33 @@ void ImageHandler::UpdateImage(short wc, short ww)
 }
 
 
-void ImageHandler::ITKImageToQImage(UnsignedCharImageType::Pointer& itk_image, QImage **qt_image)
+void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage **qt_image)
 {
     int i = 0, j = 0;
     int width = m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice());
     int height = m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice());
+    ShortImageConstIteratorType itkImage(itk_image, itk_image->GetLargestPossibleRegion());
+    itkImage.GoToBegin();
+    int wc = m_vecImages[m_iActiveIndex]->GetCurrentWC();
+    int ww = m_vecImages[m_iActiveIndex]->GetCurrentWW();
 
-    ImageIO::PixelToArray(itk_image, &m_ucPixArray);
     **qt_image = QImage(width, height, QImage::Format_RGB32);
 
     for(i=0;i<height;i++)
     {
         for(j=0;j<width;j++)
         {
-            int temp = m_ucPixArray[j+i*width];
+            int temp = itkImage.Get();
+
+            if(temp<wc-0.5-(ww-1)/2)
+                temp = 0;
+            else if(temp>wc-0.5+(ww-1)/2)
+                temp = 255;
+            else
+                temp = ((temp-(wc-0.5))/(ww-1)+0.5)*255;
+
             (*qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
+            ++itkImage;
         }
     }
 }
