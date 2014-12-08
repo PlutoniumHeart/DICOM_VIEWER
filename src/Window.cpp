@@ -30,7 +30,7 @@ void Window::CreateMenus()
 {
     m_pFileMenu = menuBar()->addMenu(tr("&File"));
     m_pFileMenu->addAction(tr("&Open Dicom Image"), this, SLOT(OpenDicomImage()));
-    m_pFileMenu->addAction(tr("&Open Dicom Series"), this, SLOT(OpenDicomSeries()));
+    m_pFileMenu->addAction(tr("Open Dicom &Series"), this, SLOT(OpenDicomSeries()));
     m_pFileMenu->addAction(tr("&Close"), this, SLOT(CloseDicomImage()));
     m_pFileMenu->addAction(tr("&Quit"), this, SLOT(close()));
 
