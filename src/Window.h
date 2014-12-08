@@ -42,6 +42,8 @@ private:
 
     ImageHandler m_ImageHandler;
 
+    bool m_bConnected;
+
 private:
     void CreateMenus();
     void CreateToolbars();

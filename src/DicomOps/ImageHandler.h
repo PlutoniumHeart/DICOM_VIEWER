@@ -42,7 +42,7 @@ private:
     void ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage** qt_image);
 
 private:
-    std::vector<std::shared_ptr<ImageContainer> > m_vecImages;
+    std::vector<std::shared_ptr<ImageContainer>> m_vecImages;
     std::shared_ptr<ImageContainer> m_pCurrentImage;
     int m_iActiveIndex;
     QImage *m_qtDisplayImage;

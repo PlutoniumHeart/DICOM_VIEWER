@@ -2,6 +2,7 @@
 
 
 Window::Window()
+    : m_bConnected(false)
 {
     CreateMenus();
     CreateToolbars();
@@ -106,6 +107,8 @@ void Window::CreateConnections()
     connect(m_pResizeToolbar->GetComboResize()->lineEdit(), SIGNAL(editingFinished()), this, SLOT(ZoomCustomSize()));
 
     connect(m_pImageListDock, SIGNAL(SelectionChanged(int)), this, SLOT(UpdateImage(int)));
+
+    m_bConnected = true;
 }
 
 
@@ -261,7 +264,8 @@ void Window::OpenDicomImage()
 
     m_pImageListDock->InsertImageSeries(&m_ImageHandler);
 
-    CreateConnections();
+    if(!m_bConnected)
+        CreateConnections();
     SetupAnnotation();
 }
 
@@ -284,7 +288,8 @@ void Window::OpenDicomSeries()
 
     m_pImageListDock->InsertImageSeries(&m_ImageHandler);
 
-    CreateConnections();
+    if(!m_bConnected)
+        CreateConnections();
     SetupAnnotation();
 }
 

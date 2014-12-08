@@ -88,9 +88,9 @@ bool ImageHandler::RemoveImage()
     }
 
     std::shared_ptr<ImageContainer> temp = m_vecImages[m_iActiveIndex];
-    m_vecImages.erase(m_vecImages.begin()+m_iActiveIndex);
     if(temp != NULL)
         temp.reset();
+    m_vecImages.erase(m_vecImages.begin()+m_iActiveIndex);
 
     if(m_vecImages.size() != 0)
     {
@@ -99,6 +99,7 @@ bool ImageHandler::RemoveImage()
     }
     else
     {
+        m_vecImages.clear();
         m_iActiveIndex = -1;
         if(m_qtDisplayImage != NULL)
         {
@@ -106,14 +107,7 @@ bool ImageHandler::RemoveImage()
             m_qtDisplayImage = NULL;
         }
         m_qtDisplayImage = new QImage(1, 1, QImage::Format_RGB32);
-
-        for(int i=0;i<1;i++)
-        {
-            for(int j=0;j<1;j++)
-            {
-                m_qtDisplayImage->setPixel(j, i, qRgb(0, 0, 0));
-            }
-        }
+        m_qtDisplayImage->setPixel(0, 0, qRgb(0, 0, 0));
     }
 
     return true;
@@ -140,12 +134,13 @@ void ImageHandler::UpdateImage(short wc, short ww)
 void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage **qt_image)
 {
     int i = 0, j = 0;
-    int width = m_vecImages[m_iActiveIndex]->GetWidth(m_vecImages[m_iActiveIndex]->GetActiveSlice());
-    int height = m_vecImages[m_iActiveIndex]->GetHeight(m_vecImages[m_iActiveIndex]->GetActiveSlice());
+    std::shared_ptr<ImageContainer> ActiveImage = m_vecImages[m_iActiveIndex];
+    int width = ActiveImage->GetWidth(ActiveImage->GetActiveSlice());
+    int height = ActiveImage->GetHeight(ActiveImage->GetActiveSlice());
     ShortImageConstIteratorType itkImage(itk_image, itk_image->GetLargestPossibleRegion());
     itkImage.GoToBegin();
-    int wc = m_vecImages[m_iActiveIndex]->GetCurrentWC();
-    int ww = m_vecImages[m_iActiveIndex]->GetCurrentWW();
+    int wc = ActiveImage->GetCurrentWC();
+    int ww = ActiveImage->GetCurrentWW();
 
     **qt_image = QImage(width, height, QImage::Format_RGB32);
 
