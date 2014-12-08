@@ -3,7 +3,7 @@
 
 ImageListDock::ImageListDock()
 {
-    setWindowTitle("Opened Image Series List");
+    setWindowTitle("Document List");
     setStyleSheet(QStringLiteral("QDockWidget::title {background: rgb(181, 195, 255)}"));
 
     m_Model = new QStandardItemModel();
