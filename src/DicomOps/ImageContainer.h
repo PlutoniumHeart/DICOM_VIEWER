@@ -26,6 +26,13 @@ public:
     void SetCurrentWW(short ww);
     short GetCurrentWW();
     std::string GetPatientName(int slice);
+    std::string GetPatientID(int slice);
+    std::string GetAccession(int slice);
+    std::string GetStudyDescription(int slice);
+    std::string GetStudyDate(int slice);
+    std::string GetSeriesDescription(int slice);
+    std::string GetAcqusitionDate(int slice);
+    std::string GetAcqusitionTime(int slice);
     std::string GetStudyInstanceUID(int slice);
     void SetActiveSlice(int slice);
     int GetActiveSlice();

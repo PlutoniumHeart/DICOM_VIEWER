@@ -109,6 +109,62 @@ std::string ImageContainer::GetPatientName(int slice)
 }
 
 
+std::string ImageContainer::GetPatientID(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0010|0020", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetAccession(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|0050", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetStudyDescription(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|1030", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetStudyDate(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|0020", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetSeriesDescription(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|103e", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetAcqusitionDate(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|0022", temp);
+    return temp;
+}
+
+
+std::string ImageContainer::GetAcqusitionTime(int slice)
+{
+    std::string temp;
+    m_DicomIO[slice]->GetValueFromTag("0008|0032", temp);
+    return temp;
+}
+
+
 std::string ImageContainer::GetStudyInstanceUID(int slice)
 {
     std::string temp;
