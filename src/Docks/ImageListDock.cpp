@@ -50,9 +50,10 @@ void ImageListDock::InsertImageSeries(ImageHandler* handler)
 void ImageListDock::RemoveImageSeries(ImageHandler* handler)
 {
     int temp = handler->GetActiveIndex();
+    int TotalOpened = handler->GetNumberOfOpenedImages();
     if(temp>=0)
     {
-        m_Model->removeRows(temp, 1);
+        m_Model->removeRows(TotalOpened - temp - 1, 1);
         m_Table->setCurrentIndex(m_Table->model()->index(0,0));
     }
 }
@@ -72,5 +73,6 @@ std::string ImageListDock::GetUID(int i)
 
 void ImageListDock::UpdateSelection(QModelIndex index)
 {
+    int temp = m_Model->rowCount()-index.row() - 1;
     emit(SelectionChanged(m_Model->rowCount()-index.row() - 1));
 }
