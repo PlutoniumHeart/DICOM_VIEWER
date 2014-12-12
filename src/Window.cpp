@@ -232,21 +232,31 @@ void Window::SetupAnnotation()
 
 std::string Window::DateFormat(std::string string)
 {
-    std::string year = string.substr(0, 4);
-    std::string month = string.substr(4, 2);
-    std::string date = string.substr(6, 2);
+    if(string != "")
+    {
+        std::string year = string.substr(0, 4);
+        std::string month = string.substr(4, 2);
+        std::string date = string.substr(6, 2);
 
-    return month + "/" + date + "/" + year;
+        return month + "/" + date + "/" + year;
+    }
+    else
+        return "";
 }
 
 
 std::string Window::TimeFormat(std::string string)
 {
-    std::string hour = string.substr(0, 2);
-    std::string min = string.substr(2, 2);
-    std::string sec = string.substr(4, 2);
+    if(string != "")
+    {
+        std::string hour = string.substr(0, 2);
+        std::string min = string.substr(2, 2);
+        std::string sec = string.substr(4, 2);
 
-    return hour + ":" + min + ":" + sec;
+        return hour + ":" + min + ":" + sec;
+    }
+    else
+        return "";
 }
 
 
