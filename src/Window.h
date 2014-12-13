@@ -13,6 +13,8 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QUrl>
+#include <QMimeData>
 
 #include "FileToolbar.h"
 #include "ResizeToolbar.h"
@@ -54,6 +56,11 @@ private:
     void SetupAnnotation();
     std::string DateFormat(std::string string);
     std::string TimeFormat(std::string string);
+    void OpenImage(std::string filepath);
+    void OpenSeries(std::string path);
+
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
 
 private slots:
     void OpenDicomImage();

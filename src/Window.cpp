@@ -9,6 +9,7 @@ Window::Window()
     CreateDocks();
     CreateMenus();
 
+    setAcceptDrops(true);
     setWindowTitle(tr("DICOM Viewer"));
     resize(1600, 900);
 }
@@ -230,6 +231,30 @@ void Window::SetupAnnotation()
 }
 
 
+void Window::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->accept();
+}
+
+
+void Window::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+
+    foreach(QUrl url, urls)
+    {
+        QString path = url.toLocalFile();
+        QFileInfo fileInfo(path);
+        if(fileInfo.isFile())
+            OpenImage(path.toStdString());
+        else if(fileInfo.isDir())
+            OpenSeries(path.toStdString());
+        else
+            std::cout<<"Unknown drop"<<std::endl;
+    }
+}
+
+
 std::string Window::DateFormat(std::string string)
 {
     if(string != "")
@@ -260,12 +285,9 @@ std::string Window::TimeFormat(std::string string)
 }
 
 
-// ====== slots ====== //
-void Window::OpenDicomImage()
+void Window::OpenImage(std::string filepath)
 {
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
-
-    if(!m_ImageHandler.AddImage(filename))
+    if(!m_ImageHandler.AddImage(QString(filepath.c_str())))
         return;
 
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
@@ -285,11 +307,9 @@ void Window::OpenDicomImage()
 }
 
 
-void Window::OpenDicomSeries()
+void Window::OpenSeries(std::string path)
 {
-    QString folderPath = QFileDialog::getExistingDirectory(0, tr("Open DICOM folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly);
-
-    if(!m_ImageHandler.AddImageSeries(folderPath))
+    if(!m_ImageHandler.AddImageSeries(QString(path.c_str())))
         return;
 
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
@@ -306,6 +326,21 @@ void Window::OpenDicomSeries()
     if(!m_bConnected)
         CreateConnections();
     SetupAnnotation();
+}
+
+
+// ====== slots ====== //
+void Window::OpenDicomImage()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
+    OpenImage(filename.toStdString());
+}
+
+
+void Window::OpenDicomSeries()
+{
+    QString folderPath = QFileDialog::getExistingDirectory(0, tr("Open DICOM folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly);
+    OpenSeries(folderPath.toStdString());
 }
 
 
