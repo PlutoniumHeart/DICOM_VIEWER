@@ -8,6 +8,7 @@ ImageContainer::ImageContainer()
     , m_iActiveSlice(0)
     , m_iMinSliceNum(0)
     , m_iMaxSliceNum(0)
+    , m_dCurrentSizeFactor(0)
 {
 }
 
@@ -230,4 +231,16 @@ void ImageContainer::SetMaxSliceNum(int max)
 int ImageContainer::GetMaxSliceNum()
 {
     return m_iMaxSliceNum;
+}
+
+
+void ImageContainer::SetCurrentSizeFactor(double factor)
+{
+    m_dCurrentSizeFactor = factor;
+}
+
+
+double ImageContainer::GetCurrentSizeFactor()
+{
+    return m_dCurrentSizeFactor;
 }

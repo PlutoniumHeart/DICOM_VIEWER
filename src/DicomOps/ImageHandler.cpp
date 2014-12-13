@@ -31,6 +31,7 @@ bool ImageHandler::AddImage(QString filename)
     image->SetDimension(2);
     image->SetCurrentWC(image->GetDefaultWC(image->GetActiveSlice()));
     image->SetCurrentWW(image->GetDefaultWW(image->GetActiveSlice()));
+    image->SetCurrentSizeFactor(1);
 
     m_vecImages.push_back(image);
     m_pCurrentImage = image;
@@ -72,6 +73,7 @@ bool ImageHandler::AddImageSeries(QString folderPath)
     imageSeries->SetDimension(3);
     imageSeries->SetCurrentWC(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()));
     imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
+    imageSeries->SetCurrentSizeFactor(1);
 
     DisplayImage(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()), imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
 

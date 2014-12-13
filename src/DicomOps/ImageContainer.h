@@ -40,6 +40,8 @@ public:
     int GetMinSliceNum();
     void SetMaxSliceNum(int max);
     int GetMaxSliceNum();
+    void SetCurrentSizeFactor(double factor);
+    double GetCurrentSizeFactor();
 
 private:
     unsigned int m_uiDim;
@@ -50,6 +52,7 @@ private:
     int m_iActiveSlice;
     int m_iMinSliceNum;
     int m_iMaxSliceNum;
+    double m_dCurrentSizeFactor;
 
 };
 

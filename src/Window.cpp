@@ -294,7 +294,7 @@ void Window::OpenImage(std::string filepath)
 
     m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
     m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
-    ZoomOriginalSize();
+//    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
     m_pResizeToolbar->SetWidgetsDisabled(false);
@@ -316,7 +316,7 @@ void Window::OpenSeries(std::string path)
 
     m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
     m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
-    ZoomOriginalSize();
+//    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
     m_pResizeToolbar->SetWidgetsDisabled(false);
@@ -380,6 +380,9 @@ void Window::Pan(float scale)
 
     m_pDisplay->resize(temp);
 
+    double size = (double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    imageObj->SetCurrentSizeFactor(size);
+
     std::ostringstream ss;
     ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
     std::string currentText(ss.str());
@@ -394,11 +397,8 @@ void Window::UpdateImage()
 
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                       imageObj->GetHeight(imageObj->GetActiveSlice()));
-    short tmp = m_pScrollArea->height();
-    double temp = (double)tmp/m_pDisplay->height();
-    m_pDisplay->resize(m_pDisplay->size()*temp);
+    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor(),
+                       imageObj->GetHeight(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor());
     m_ImageHandler.UpdateImage(tmp1, tmp2);
 
     SetupAnnotation();
@@ -476,6 +476,9 @@ void Window::ZoomOriginalSize()
     m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
                        imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
+
+    double size = (double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    imageObj->SetCurrentSizeFactor(size);
 }
 
 
@@ -485,11 +488,15 @@ void Window::ZoomFitToHeight()
 
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    short tmp = m_pScrollArea->height();
-    double temp = (double)tmp/m_pDisplay->height();
-    m_pDisplay->resize(m_pDisplay->size()*temp);
+
+    double size = (double)m_pScrollArea->height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice())*size,
+                       imageObj->GetHeight(imageObj->GetActiveSlice())*size);
+
+
+    imageObj->SetCurrentSizeFactor(size);
     std::ostringstream ss;
-    ss << 100.0*((double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
+    ss << 100.0*size;
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -513,6 +520,9 @@ void Window::ZoomCustomSize()
     QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
                            imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pDisplay->resize(original*tmp/100.0);
+
+    double size = tmp/100.0;
+    imageObj->SetCurrentSizeFactor(size);
 }
 
 
@@ -528,30 +538,39 @@ void Window::ZoomComboResize(int index)
     {
     case 0:
         m_pDisplay->resize(original*8.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 1:
         m_pDisplay->resize(original*7.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 2:
         m_pDisplay->resize(original*6.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 3:
         m_pDisplay->resize(original*5.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 4:
         m_pDisplay->resize(original*4.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 5:
         m_pDisplay->resize(original*3.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 6:
         m_pDisplay->resize(original*2.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 7:
         m_pDisplay->resize(original*1.0);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 8:
         m_pDisplay->resize(original*0.5);
+        imageObj->SetCurrentSizeFactor(8.0);
         break;
     default:
         std::cout<<"Combo resize: no such index found."<<std::endl;
