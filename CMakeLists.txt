@@ -64,6 +64,10 @@ qt5_add_resources(Resources ${RESOURCES})
 
 add_executable(DICOM_Tool ${SOURCES} ${Resources})
 
+install(TARGETS DICOM_Tool DESTINATION bin)
+install(FILES src/Resources/Desktop/DICOM_Tool.desktop DESTINATION "share/applications")
+install(FILES src/Resources/icons/DICOM_Tool.png DESTINATION "/usr/share/icons/hicolor/256x256/apps")
+
 qt5_use_modules(DICOM_Tool Widgets Core PrintSupport OpenGL)
 
 target_link_libraries(DICOM_Tool ${ALL_LIBS})

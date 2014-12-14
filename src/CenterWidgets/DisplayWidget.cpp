@@ -96,10 +96,10 @@ void DisplayWidget::UpdateAnnotation()
     m_pUpperRight->SetHeight(100);
     m_pUpperRight->SetAlignment(Qt::AlignRight|Qt::AlignTop);
 
-    m_pLowerLeft->setGeometry(0, this->geometry().height()-150, 200, 150);
+    m_pLowerLeft->setGeometry(0, this->geometry().height()-180, 200, 180);
     m_pLowerLeft->SetOrigin(0, 0);
     m_pLowerLeft->SetWidth(200);
-    m_pLowerLeft->SetHeight(150);
+    m_pLowerLeft->SetHeight(180);
     m_pLowerLeft->SetAlignment(Qt::AlignLeft|Qt::AlignBottom);
 
     m_pLowerRight->setGeometry(this->geometry().width()-200, this->geometry().height()-150, 200, 150);

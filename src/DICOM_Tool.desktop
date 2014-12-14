@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.1
+Type=Application
+Terminal=false
+Exec=DICOM_Tool %U
+Name=DICOM_Tool
+GenericName=Medical Image Processing
+Comment=Simple DICOM image viewer
+Keywords=DICOM;Image;Viewer;
+Icon=DICOM_Tool.png
+Categories=Application;Graphics;
+Name[en_US]=DICOM_Tool
