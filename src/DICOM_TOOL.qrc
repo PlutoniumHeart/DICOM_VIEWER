@@ -6,5 +6,6 @@
         <file>Resources/icons/Zoom_Out.png</file>
         <file>Resources/icons/Image.png</file>
         <file>Resources/icons/ImageSeries.png</file>
+        <file>Resources/icons/DICOM_Tool.png</file>
     </qresource>
 </RCC>

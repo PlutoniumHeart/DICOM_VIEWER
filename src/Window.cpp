@@ -4,6 +4,10 @@
 Window::Window()
     : m_bConnected(false)
 {
+    QIcon appIcon;
+    appIcon.addFile(":Resources/icons/DICOM_Tool.png");
+    this->setWindowIcon(appIcon);
+
     CreateToolbars();
     CreateCenterWidgets();
     CreateDocks();
