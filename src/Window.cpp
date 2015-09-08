@@ -380,13 +380,13 @@ void Window::Pan(float scale)
 
     double presentage = 10.0*scale;
 //    QSize temp = (1.0+presentage)*m_pDisplay->size();
-    QSize temp = (1.0+presentage)*m_pCanvas->size();
+    QSize temp = (1.0+presentage)*m_pCanvas->GetDisplayWidget(0)->size();
 
 //    m_pDisplay->resize(temp);
     m_pCanvas->Resize(temp);
 
 //    double size = (double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
-    double size = (double)m_pCanvas->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     imageObj->SetCurrentSizeFactor(size);
 
     std::ostringstream ss;

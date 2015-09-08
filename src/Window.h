@@ -38,7 +38,6 @@ private:
     QMenu* m_pViewMenu;
     FileToolbar* m_pFileToolbar;
     ResizeToolbar* m_pResizeToolbar;
-    DisplayWidget* m_pDisplay;
     CanvasWidget* m_pCanvas;
 
     QScrollArea* m_pScrollArea;

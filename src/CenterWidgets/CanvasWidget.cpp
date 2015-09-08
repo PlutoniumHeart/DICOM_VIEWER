@@ -23,12 +23,7 @@ CanvasWidget::~CanvasWidget()
 
 void CanvasWidget::Resize(QSize size)
 {
-    resize(size);
-
-    for (int i=0;i<m_vpDisplay.size();i++)
-    {
-        m_vpDisplay[i]->resize(size);
-    }
+    Resize(size.width(), size.height());
 }
 
 
