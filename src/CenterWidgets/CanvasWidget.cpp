@@ -21,6 +21,17 @@ CanvasWidget::~CanvasWidget()
 }
 
 
+void CanvasWidget::Resize(QSize size)
+{
+    resize(size);
+
+    for (int i=0;i<m_vpDisplay.size();i++)
+    {
+        m_vpDisplay[i]->resize(size);
+    }
+}
+
+
 void CanvasWidget::Resize(int width, int height)
 {
     resize(width*m_vpDisplay.size(), height);
@@ -29,6 +40,12 @@ void CanvasWidget::Resize(int width, int height)
     {
         m_vpDisplay[i]->resize(width, height);
     }
+}
+
+
+DisplayWidget* CanvasWidget::GetDisplayWidget(int i)
+{
+    return m_vpDisplay[i];
 }
 
 

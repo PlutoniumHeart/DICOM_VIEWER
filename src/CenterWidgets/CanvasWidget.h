@@ -17,7 +17,9 @@ public:
     CanvasWidget(ImageHandler* handler, QWidget* parent);
     virtual ~CanvasWidget();
 
+    void Resize(QSize size);
     void Resize(int width, int height);
+    DisplayWidget* GetDisplayWidget(int i);
     void SetupAnnotations(std::string UpperLeft, std::string UpperRight,
                           std::string LowerLeft, std::string LowerRight);
 
