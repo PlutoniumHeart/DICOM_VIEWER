@@ -22,6 +22,7 @@
 #include "DisplayWidget.h"
 #include "ImageWindowingDock.h"
 #include "ImageListDock.h"
+#include "CanvasWidget.h"
 
 
 class Window : public QMainWindow
@@ -38,6 +39,8 @@ private:
     FileToolbar* m_pFileToolbar;
     ResizeToolbar* m_pResizeToolbar;
     DisplayWidget* m_pDisplay;
+    CanvasWidget* m_pCanvas;
+
     QScrollArea* m_pScrollArea;
     QTimer* m_pTimer;
     ImageWindowDock* m_pImageWindowingDock;

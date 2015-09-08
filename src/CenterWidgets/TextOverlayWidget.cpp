@@ -69,7 +69,5 @@ void TextOverlayWidget::paintEvent(QPaintEvent *)
     p.setPen(m_penColor);
     p.drawText(m_iOriginX, m_iOriginY, m_iWidth, m_iHeight,
                m_align, QString(m_sText.c_str()));
-//    p.drawText(0, 10, 200, 100,
-//               Qt::AlignLeft|Qt::AlignTop, QString(m_sText.c_str()));
     p.restore();
 }

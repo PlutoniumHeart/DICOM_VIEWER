@@ -34,6 +34,8 @@ set(SOURCES src/main.cpp
             src/Toolbars/ResizeToolbar.h
             src/Toolbars/ResizeToolbar.cpp
 
+            src/CenterWidgets/CanvasWidget.h
+            src/CenterWidgets/CanvasWidget.cpp
             src/CenterWidgets/DisplayWidget.h
             src/CenterWidgets/DisplayWidget.cpp
             src/CenterWidgets/TextOverlayWidget.h
