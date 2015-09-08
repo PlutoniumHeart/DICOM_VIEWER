@@ -356,7 +356,6 @@ void Window::CloseDicomImage()
 
     if(m_ImageHandler.GetNumberOfOpenedImages()<=0)
     {
-//        m_pDisplay->resize(0, 0);
         m_pCanvas->Resize(0, 0);
         m_pImageWindowingDock->SetWidgetsDisabled(true);
         m_pResizeToolbar->SetWidgetsDisabled(true);
@@ -379,13 +378,10 @@ void Window::Pan(float scale)
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
 
     double presentage = 10.0*scale;
-//    QSize temp = (1.0+presentage)*m_pDisplay->size();
     QSize temp = (1.0+presentage)*m_pCanvas->GetDisplayWidget(0)->size();
 
-//    m_pDisplay->resize(temp);
     m_pCanvas->Resize(temp);
 
-//    double size = (double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     imageObj->SetCurrentSizeFactor(size);
 
@@ -403,8 +399,6 @@ void Window::UpdateImage()
 
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-//    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor(),
-//                       imageObj->GetHeight(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor());
     m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor(),
                       imageObj->GetHeight(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor());
     m_ImageHandler.UpdateImage(tmp1, tmp2);
@@ -481,13 +475,11 @@ void Window::ZoomOriginalSize()
         return;
     int temp = imageObj->GetWidth(imageObj->GetActiveSlice());
     int temp1 = imageObj->GetHeight(imageObj->GetActiveSlice());
-//    m_pDisplay->resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-//                       imageObj->GetHeight(imageObj->GetActiveSlice()));
+
     m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
                       imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 
-//    double size = (double)m_pDisplay->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     double size = (double)m_pCanvas->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     imageObj->SetCurrentSizeFactor(size);
 }
@@ -530,7 +522,6 @@ void Window::ZoomCustomSize()
 
     QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
                            imageObj->GetHeight(imageObj->GetActiveSlice()));
-//    m_pDisplay->resize(original*tmp/100.0);
     m_pCanvas->Resize(original*tmp/100.0);
 
     double size = tmp/100.0;
@@ -549,48 +540,39 @@ void Window::ZoomComboResize(int index)
     switch(index)
     {
     case 0:
-//        m_pDisplay->resize(original*8.0);
-        m_pCanvas->resize(original*8.0);
+        m_pCanvas->Resize(original*8.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 1:
-//        m_pDisplay->resize(original*7.0);
-        m_pCanvas->resize(original*7.0);
+        m_pCanvas->Resize(original*7.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 2:
-//        m_pDisplay->resize(original*6.0);
-        m_pCanvas->resize(original*6.0);
+        m_pCanvas->Resize(original*6.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 3:
-//        m_pDisplay->resize(original*5.0);
-        m_pCanvas->resize(original*5.0);
+        m_pCanvas->Resize(original*5.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 4:
-//        m_pDisplay->resize(original*4.0);
-        m_pCanvas->resize(original*4.0);
+        m_pCanvas->Resize(original*4.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 5:
-//        m_pDisplay->resize(original*3.0);
-        m_pCanvas->resize(original*3.0);
+        m_pCanvas->Resize(original*3.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 6:
-//        m_pDisplay->resize(original*2.0);
-        m_pCanvas->resize(original*2.0);
+        m_pCanvas->Resize(original*2.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 7:
-//        m_pDisplay->resize(original*1.0);
-        m_pCanvas->resize(original*1.0);
+        m_pCanvas->Resize(original*1.0);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     case 8:
-//        m_pDisplay->resize(original*0.5);
-        m_pCanvas->resize(original*0.5);
+        m_pCanvas->Resize(original*0.5);
         imageObj->SetCurrentSizeFactor(8.0);
         break;
     default:
