@@ -33,19 +33,19 @@ public:
     std::shared_ptr<ImageContainer> GetImageObj();
     int GetNumberOfOpenedImages();
 
-    void UpdateImage(short wc, short ww);
+    void DisplayImage(short wc, short ww, std::vector<QImage*> image);
+    void UpdateImage(short wc, short ww, std::vector<QImage*> image);
 
-    void Paint(QPainter* painter, QPaintEvent* event, int elapsed, const QRect& rect);
+    void Paint(QPainter* painter, QPaintEvent* event, int elapsed, QImage* image, const QRect& rect);
 
 private:
-    void DisplayImage(short wc, short ww);
-    void ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage** qt_image);
+    void ITKImageToQImage(ShortImageType::Pointer& itk_image, int slice, QImage** qt_image);
 
 private:
     std::vector<std::shared_ptr<ImageContainer>> m_vecImages;
     std::shared_ptr<ImageContainer> m_pCurrentImage;
     int m_iActiveIndex;
-    QImage *m_qtDisplayImage;
+//    QImage *m_qtDisplayImage;
 
 };
 

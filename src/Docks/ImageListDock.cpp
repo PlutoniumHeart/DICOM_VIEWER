@@ -43,7 +43,7 @@ ImageListDock::~ImageListDock()
 void ImageListDock::InsertImageSeries(ImageHandler* handler)
 {
     std::shared_ptr<ImageContainer> imageObj = handler->GetImageObj();
-    int slice = handler->GetImageObj()->GetActiveSlice();
+    int slice = 0;
 
     std::string imagesInSeries = std::to_string(imageObj->GetMaxSliceNum()+1);
     std::string patientName = imageObj->GetPatientName(slice);

@@ -135,9 +135,8 @@ void Window::CreateConnections()
 }
 
 
-void Window::SetupAnnotation()
+void Window::SetupAnnotation(int slice)
 {
-    int slice = m_ImageHandler.GetImageObj()->GetActiveSlice();
     DICOMIOType::Pointer io = *m_ImageHandler.GetImageObj()->GetIOObject(slice);
 
     std::string temp;
@@ -164,7 +163,7 @@ void Window::SetupAnnotation()
     io->GetValueFromTag("0008|0013", temp);  // Instance Creation Time
     UpperLeftText += TimeFormat(temp) + "\n";
     temp = "";
-    temp = std::to_string(imageObj->GetActiveSlice()+1);
+    temp = std::to_string(slice+1);
     UpperLeftText += temp + "/";
     temp = "";
     temp = std::to_string(imageObj->GetMaxSliceNum()+1);  // Number of Slices
@@ -304,10 +303,22 @@ void Window::OpenImage(std::string filepath)
     if(!m_ImageHandler.AddImage(QString(filepath.c_str())))
         return;
 
+    auto image = m_ImageHandler.GetImageObj();
+
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        m_pCanvas->GetDisplayWidget(i)->SetSliceNum(image->GetLength());
+        m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(i);
+        m_ImageHandler.DisplayImage(image->GetDefaultWC(i),
+                                    image->GetDefaultWW(i),
+                                    m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        SetupAnnotation(i);
+    }
+
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
 
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(0));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(0));
 //    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
@@ -317,7 +328,6 @@ void Window::OpenImage(std::string filepath)
 
     if(!m_bConnected)
         CreateConnections();
-    SetupAnnotation();
 }
 
 
@@ -326,10 +336,22 @@ void Window::OpenSeries(std::string path)
     if(!m_ImageHandler.AddImageSeries(QString(path.c_str())))
         return;
 
+    auto image = m_ImageHandler.GetImageObj();
+
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        m_pCanvas->GetDisplayWidget(i)->SetSliceNum(image->GetLength());
+        m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(i);
+        m_ImageHandler.DisplayImage(image->GetDefaultWC(i),
+                                    image->GetDefaultWW(i),
+                                    m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        SetupAnnotation(i);
+    }
+
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
 
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(0));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(0));
 //    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
@@ -339,7 +361,6 @@ void Window::OpenSeries(std::string path)
 
     if(!m_bConnected)
         CreateConnections();
-    SetupAnnotation();
 }
 
 
@@ -396,11 +417,11 @@ void Window::Pan(float scale)
 
     m_pCanvas->Resize(temp);
 
-    double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(0);
     imageObj->SetCurrentSizeFactor(size);
 
     std::ostringstream ss;
-    ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
+    ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(0));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -413,11 +434,14 @@ void Window::UpdateImage()
 
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor(),
-                      imageObj->GetHeight(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor());
-    m_ImageHandler.UpdateImage(tmp1, tmp2);
-
-    SetupAnnotation();
+    m_pCanvas->Resize(imageObj->GetWidth(0)*imageObj->GetCurrentSizeFactor(),
+                      imageObj->GetHeight(0)*imageObj->GetCurrentSizeFactor());
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        m_ImageHandler.UpdateImage(tmp1, tmp2,
+                                   m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        SetupAnnotation(i);
+    }
 }
 
 
@@ -431,25 +455,33 @@ void Window::UpdateImage(int index)
     m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
     m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
     UpdateImage();
-    SetupAnnotation();
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        SetupAnnotation(i);
+    }
 }
 
 
 void Window::UpdateActiveSlice(int deltaX, int deltaY)
 {
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-    int slice = m_ImageHandler.GetImageObj()->GetActiveSlice() - deltaY;
 
-    if(slice>=imageObj->GetMinSliceNum() &&
-       slice<=imageObj->GetMaxSliceNum())
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        imageObj->SetActiveSlice(slice);
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
-        UpdateImage();
+        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice() - deltaY;
+
+        if(slice>=imageObj->GetMinSliceNum()+i &&
+           slice<=imageObj->GetMaxSliceNum()-m_pCanvas->GetNumDisplays()+i)
+        {
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(slice);
+//            m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(slice));
+//            m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(slice));
+//            UpdateImage();
+        }
+
+        SetupAnnotation(i);
     }
 
-    SetupAnnotation();
 }
 
 
@@ -457,11 +489,16 @@ void Window::ResetWindow()
 {
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
 
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(imageObj->GetActiveSlice()));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
-    m_ImageHandler.UpdateImage(imageObj->GetDefaultWC(imageObj->GetActiveSlice()),
-                               imageObj->GetDefaultWW(imageObj->GetActiveSlice()));
-    SetupAnnotation();
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(0));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(0));
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
+        m_ImageHandler.UpdateImage(imageObj->GetDefaultWC(slice),
+                                   imageObj->GetDefaultWW(slice),
+                                   m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        SetupAnnotation(i);
+    }
 }
 
 
@@ -487,14 +524,14 @@ void Window::ZoomOriginalSize()
 
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    int temp = imageObj->GetWidth(imageObj->GetActiveSlice());
-    int temp1 = imageObj->GetHeight(imageObj->GetActiveSlice());
+    int temp = imageObj->GetWidth(0);
+    int temp1 = imageObj->GetHeight(0);
 
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                      imageObj->GetHeight(imageObj->GetActiveSlice()));
+    m_pCanvas->Resize(imageObj->GetWidth(0),
+                      imageObj->GetHeight(0));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 
-    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(0);
     imageObj->SetCurrentSizeFactor(size);
 }
 
@@ -506,9 +543,9 @@ void Window::ZoomFitToHeight()
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
 
-    double size = (double)m_pScrollArea->height()/((double)imageObj->GetHeight(imageObj->GetActiveSlice()+10)*m_pCanvas->GetVerticalNum());
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*size,
-                      imageObj->GetHeight(imageObj->GetActiveSlice())*size);
+    double size = (double)m_pScrollArea->height()/((double)imageObj->GetHeight(0+10)*m_pCanvas->GetVerticalNum());
+    m_pCanvas->Resize(imageObj->GetWidth(0)*size,
+                      imageObj->GetHeight(0)*size);
 
 
     imageObj->SetCurrentSizeFactor(size);
@@ -534,8 +571,8 @@ void Window::ZoomCustomSize()
     std::string currentText = ss.str() + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
 
-    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                           imageObj->GetHeight(imageObj->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(0),
+                           imageObj->GetHeight(0));
     m_pCanvas->Resize(original*tmp/100.0);
 
     double size = tmp/100.0;
@@ -549,8 +586,8 @@ void Window::ZoomComboResize(int index)
 
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                           imageObj->GetHeight(imageObj->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(0),
+                           imageObj->GetHeight(0));
     switch(index)
     {
     case 0:
@@ -599,12 +636,19 @@ void Window::ZoomComboResize(int index)
 void Window::UpdateDisplayLayout()
 {
     ZoomFitToHeight();
+    auto image = m_ImageHandler.GetImageObj();
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonMove(float, float)), m_pImageWindowingDock, SLOT(UpdateWindowLevel(float, float)));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonDoubleClick()), this, SLOT(ResetWindow()));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(WheelMovement(int,int)), this, SLOT(UpdateActiveSlice(int,int)));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(RightButtonMove(float)), this, SLOT(Pan(float)));
+
+        m_pCanvas->GetDisplayWidget(i)->SetSliceNum(image->GetLength());
+        m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(i);
+        m_ImageHandler.DisplayImage(image->GetDefaultWC(i),
+                                    image->GetDefaultWW(i),
+                                    m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
     }
-    SetupAnnotation();
+    UpdateImage();
 }
