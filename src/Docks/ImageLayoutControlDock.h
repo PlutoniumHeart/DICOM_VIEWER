@@ -25,11 +25,17 @@ public:
 public slots:
     void SetVertical(int x);
     void SetHorizontal(int y);
+    void EmitNewLayout();
+
+signals:
+    void NewLayout(int x, int y);
 
 private:
     QWidget* m_pDockContents;
     QWidget* m_pLayoutWidget;
 
+    QLabel* m_pLabelVertical;
+    QLabel* m_pLabelHorizontal;
     QGridLayout* m_pLayout;
     QSpinBox* m_pSpinBoxVertical;
     QSpinBox* m_pSpinBoxHorizontal;

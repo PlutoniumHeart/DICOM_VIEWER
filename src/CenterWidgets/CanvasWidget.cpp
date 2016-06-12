@@ -3,22 +3,43 @@
 
 CanvasWidget::CanvasWidget(ImageHandler* handler, QWidget* parent)
     : QWidget(parent)
+    , m_pHandler(handler)
     , m_iElapsed(0)
+    , m_iX(1)
+    , m_iY(1)
 {
-    QGridLayout* layout = new QGridLayout;
-    for (int i=0;i<1;i++)
-    {
-        DisplayWidget* display = new DisplayWidget(handler, this);
-        m_vpDisplay.push_back(display);
-        layout->addWidget(m_vpDisplay[i], 0, i);
-        layout->setSpacing(30);
-    }
-    setLayout(layout);
+    m_pLayout = new QGridLayout;
+
+    DisplayWidget* display = new DisplayWidget(m_pHandler, this);
+    m_vpDisplay.push_back(display);
+    m_pLayout->addWidget(m_vpDisplay[0], 0, 1);
+    m_pLayout->setSpacing(30);
+
+    setLayout(m_pLayout);
 }
 
 
 CanvasWidget::~CanvasWidget()
 {
+    delete m_pLayout;
+}
+
+
+int CanvasWidget::GetNumDisplays()
+{
+    return m_vpDisplay.size();
+}
+
+
+int CanvasWidget::GetVerticalNum()
+{
+    return m_iY;
+}
+
+
+int CanvasWidget::GetHorizontalNum()
+{
+    return m_iX;
 }
 
 
@@ -30,7 +51,7 @@ void CanvasWidget::Resize(QSize size)
 
 void CanvasWidget::Resize(int width, int height)
 {
-    resize((width+30)*m_vpDisplay.size(), height);
+    resize((width+10)*m_iX, (height+10)*m_iY);
 
     for (int i=0;i<m_vpDisplay.size();i++)
     {
@@ -65,5 +86,29 @@ void CanvasWidget::Animate()
     for (int i=0;i<m_vpDisplay.size();i++)
     {
         m_vpDisplay[i]->repaint();
+    }
+}
+
+
+void CanvasWidget::Rearrange(int x, int y)
+{
+    m_iX = x;
+    m_iY = y;
+
+    for (int i=0;i<m_vpDisplay.size();i++)
+    {
+        delete m_vpDisplay[i];
+    }
+    m_vpDisplay.clear();
+
+    for (int i=0;i<y;i++)
+    {
+        for (int j=0;j<x;j++)
+        {
+            DisplayWidget* display = new DisplayWidget(m_pHandler, this);
+            m_vpDisplay.push_back(display);
+            m_pLayout->addWidget(m_vpDisplay[j+i*x], i, j);
+            m_pLayout->setSpacing(10);
+        }
     }
 }

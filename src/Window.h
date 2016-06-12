@@ -81,6 +81,7 @@ private slots:
     void ZoomFitToHeight();
     void ZoomComboResize(int index);
     void ZoomCustomSize();
+    void UpdateDisplayLayout();
 
 };
 

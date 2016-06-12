@@ -80,7 +80,6 @@ void Window::CreateDocks()
     m_pImageListDock = new ImageListDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_pImageListDock);
 
-
     m_pImageWindowingDock = new ImageWindowDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_pImageWindowingDock);
 
@@ -108,16 +107,20 @@ void Window::CreateConnections()
 {
     connect(m_pTimer, SIGNAL(timeout()), m_pCanvas, SLOT(Animate()));
 
-    for (int i=0;i<2;i++)
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonMove(float, float)), m_pImageWindowingDock, SLOT(UpdateWindowLevel(float, float)));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonDoubleClick()), this, SLOT(ResetWindow()));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(WheelMovement(int,int)), this, SLOT(UpdateActiveSlice(int,int)));
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(RightButtonMove(float)), this, SLOT(Pan(float)));
     }
+
     connect(m_pImageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
     connect(m_pImageWindowingDock->GetSliderWW(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
     connect(m_pImageWindowingDock->GetResetButton(), SIGNAL(clicked()), this, SLOT(ResetWindow()));
+
+    connect(m_pImageLayoutDock, SIGNAL(NewLayout(int, int)), m_pCanvas, SLOT(Rearrange(int, int)));
+    connect(m_pImageLayoutDock, SIGNAL(NewLayout(int, int)), this, SLOT(UpdateDisplayLayout()));
 
     connect(m_pResizeToolbar->GetActionZoomIn(), SIGNAL(triggered()), this, SLOT(ZoomIn25Present()));
     connect(m_pResizeToolbar->GetActionZoomOut(), SIGNAL(triggered()), this, SLOT(ZoomOut25Present()));
@@ -388,6 +391,8 @@ void Window::Pan(float scale)
 
     double presentage = 10.0*scale;
     QSize temp = (1.0+presentage)*m_pCanvas->GetDisplayWidget(0)->size();
+    temp.setHeight(temp.height());
+    temp.setWidth(temp.width());
 
     m_pCanvas->Resize(temp);
 
@@ -489,7 +494,7 @@ void Window::ZoomOriginalSize()
                       imageObj->GetHeight(imageObj->GetActiveSlice()));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 
-    double size = (double)m_pCanvas->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
     imageObj->SetCurrentSizeFactor(size);
 }
 
@@ -501,7 +506,7 @@ void Window::ZoomFitToHeight()
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
 
-    double size = (double)m_pScrollArea->height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)m_pScrollArea->height()/((double)imageObj->GetHeight(imageObj->GetActiveSlice()+10)*m_pCanvas->GetVerticalNum());
     m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*size,
                       imageObj->GetHeight(imageObj->GetActiveSlice())*size);
 
@@ -588,4 +593,18 @@ void Window::ZoomComboResize(int index)
         std::cout<<"Combo resize: no such index found."<<std::endl;
         break;
     }
+}
+
+
+void Window::UpdateDisplayLayout()
+{
+    ZoomFitToHeight();
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonMove(float, float)), m_pImageWindowingDock, SLOT(UpdateWindowLevel(float, float)));
+        connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(MiddleButtonDoubleClick()), this, SLOT(ResetWindow()));
+        connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(WheelMovement(int,int)), this, SLOT(UpdateActiveSlice(int,int)));
+        connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(RightButtonMove(float)), this, SLOT(Pan(float)));
+    }
+    SetupAnnotation();
 }
