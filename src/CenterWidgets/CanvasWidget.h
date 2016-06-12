@@ -4,6 +4,8 @@
 
 #include <QWidget>
 #include <QGridLayout>
+#include <QGraphicsLinearLayout>
+#include <QGraphicsGridLayout>
 
 #include "DisplayWidget.h"
 #include "ImageHandler.h"

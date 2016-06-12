@@ -22,6 +22,7 @@
 #include "DisplayWidget.h"
 #include "ImageWindowingDock.h"
 #include "ImageListDock.h"
+#include "ImageLayoutControlDock.h"
 #include "CanvasWidget.h"
 
 
@@ -44,6 +45,7 @@ private:
     QTimer* m_pTimer;
     ImageWindowDock* m_pImageWindowingDock;
     ImageListDock* m_pImageListDock;
+    ImageLayoutControlDock* m_pImageLayoutDock;
 
     ImageHandler m_ImageHandler;
 

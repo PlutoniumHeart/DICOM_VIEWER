@@ -45,6 +45,8 @@ set(SOURCES src/main.cpp
             src/Docks/ImageWindowingDock.cpp
             src/Docks/ImageListDock.h
             src/Docks/ImageListDock.cpp
+            src/Docks/ImageLayoutControlDock.h
+            src/Docks/ImageLayoutControlDock.cpp
 
             src/DicomOps/ImageCommon.h
             src/DicomOps/ImageIO.h

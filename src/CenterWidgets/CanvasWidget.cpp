@@ -6,11 +6,12 @@ CanvasWidget::CanvasWidget(ImageHandler* handler, QWidget* parent)
     , m_iElapsed(0)
 {
     QGridLayout* layout = new QGridLayout;
-    for (int i=0;i<2;i++)
+    for (int i=0;i<1;i++)
     {
         DisplayWidget* display = new DisplayWidget(handler, this);
         m_vpDisplay.push_back(display);
         layout->addWidget(m_vpDisplay[i], 0, i);
+        layout->setSpacing(30);
     }
     setLayout(layout);
 }
@@ -29,7 +30,7 @@ void CanvasWidget::Resize(QSize size)
 
 void CanvasWidget::Resize(int width, int height)
 {
-    resize(width*m_vpDisplay.size(), height);
+    resize((width+30)*m_vpDisplay.size(), height);
 
     for (int i=0;i<m_vpDisplay.size();i++)
     {

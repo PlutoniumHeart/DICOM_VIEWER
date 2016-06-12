@@ -25,22 +25,22 @@ DisplayWidget::~DisplayWidget()
     if(m_pUpperLeft != NULL)
     {
         delete m_pUpperLeft;
-        m_pUpperLeft == NULL;
+        m_pUpperLeft = NULL;
     }
     if(m_pUpperRight != NULL)
     {
         delete m_pUpperRight;
-        m_pUpperRight == NULL;
+        m_pUpperRight = NULL;
     }
     if(m_pLowerLeft != NULL)
     {
         delete m_pLowerLeft;
-        m_pLowerLeft == NULL;
+        m_pLowerLeft = NULL;
     }
     if(m_pLowerRight!= NULL)
     {
         delete m_pLowerRight;
-        m_pLowerRight == NULL;
+        m_pLowerRight = NULL;
     }
 }
 

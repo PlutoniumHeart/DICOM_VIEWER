@@ -27,6 +27,7 @@ Window::~Window()
     delete m_pTimer;
     delete m_pImageListDock;
     delete m_pImageWindowingDock;
+    delete m_pImageLayoutDock;
 }
 
 
@@ -83,6 +84,9 @@ void Window::CreateDocks()
     m_pImageWindowingDock = new ImageWindowDock;
     addDockWidget(Qt::BottomDockWidgetArea, m_pImageWindowingDock);
 
+    m_pImageLayoutDock = new ImageLayoutControlDock;
+    addDockWidget(Qt::RightDockWidgetArea, m_pImageLayoutDock);
+
     m_pImageWindowingDock->GetSpinBoxWC()->setMinimum(0);
     m_pImageWindowingDock->GetSpinBoxWC()->setMaximum(4096);
     m_pImageWindowingDock->GetSliderWC()->setMinimum(0);
@@ -92,6 +96,11 @@ void Window::CreateDocks()
     m_pImageWindowingDock->GetSpinBoxWW()->setMaximum(4096);
     m_pImageWindowingDock->GetSliderWW()->setMinimum(0);
     m_pImageWindowingDock->GetSliderWW()->setMaximum(4096);
+
+    m_pImageLayoutDock->GetSpinBoxVertical()->setMinimum(1);
+    m_pImageLayoutDock->GetSpinBoxVertical()->setMaximum(8);
+    m_pImageLayoutDock->GetSpinBoxHorizontal()->setMinimum(1);
+    m_pImageLayoutDock->GetSpinBoxHorizontal()->setMaximum(8);
 }
 
 
