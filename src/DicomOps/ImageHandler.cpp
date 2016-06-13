@@ -34,8 +34,6 @@ bool ImageHandler::AddImage(QString filename)
     image->SetMinSliceNum(0);
     image->SetMaxSliceNum(0);
 
-//    DisplayImage(image->GetDefaultWC(image->GetActiveSlice()), image->GetDefaultWW(image->GetActiveSlice()));
-
     return true;
 }
 
@@ -69,9 +67,6 @@ bool ImageHandler::AddImageSeries(QString folderPath)
     imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
     imageSeries->SetCurrentSizeFactor(1);
 
-//    DisplayImage(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()),
-//                 imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
-
     return true;
 }
 
@@ -90,10 +85,7 @@ bool ImageHandler::RemoveImage()
     m_vecImages.erase(m_vecImages.begin()+m_iActiveIndex);
 
     if(m_vecImages.size() != 0)
-    {
         m_iActiveIndex = m_vecImages.size()-1;
-//        UpdateImage(m_vecImages[m_iActiveIndex]->GetCurrentWC(), m_vecImages[m_iActiveIndex]->GetCurrentWW());
-    }
     else
     {
         m_vecImages.clear();
@@ -104,7 +96,7 @@ bool ImageHandler::RemoveImage()
 }
 
 
-void ImageHandler::DisplayImage(short wc, short ww, int slice, QImage* image)
+void ImageHandler::DisplayImage(int slice, QImage* image)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
@@ -117,7 +109,7 @@ void ImageHandler::UpdateImage(short wc, short ww, int slice, QImage* image)
     m_vecImages[m_iActiveIndex]->SetCurrentWC(wc);
     m_vecImages[m_iActiveIndex]->SetCurrentWW(ww);
 
-    DisplayImage(wc, ww, slice, image);
+    DisplayImage(slice, image);
 }
 
 

@@ -33,7 +33,7 @@ public:
     std::shared_ptr<ImageContainer> GetImageObj();
     int GetNumberOfOpenedImages();
 
-    void DisplayImage(short wc, short ww, int slice, QImage* image);
+    void DisplayImage(int slice, QImage* image);
     void UpdateImage(short wc, short ww, int slice, QImage* image);
 
     void Paint(QPainter* painter, QPaintEvent* event, int elapsed, QImage* image, const QRect& rect);

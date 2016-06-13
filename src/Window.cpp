@@ -308,9 +308,7 @@ void Window::OpenImage(std::string filepath)
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        m_ImageHandler.DisplayImage(imageObj->GetDefaultWC(0),
-                                    imageObj->GetDefaultWW(0),
-                                    0,
+        m_ImageHandler.DisplayImage(0,
                                     m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
     }
 
@@ -338,9 +336,7 @@ void Window::OpenSeries(std::string path)
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        m_ImageHandler.DisplayImage(imageObj->GetDefaultWC(0),
-                                    imageObj->GetDefaultWW(0),
-                                    0,
+        m_ImageHandler.DisplayImage(0,
                                     m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
     }
 
