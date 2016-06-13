@@ -3,16 +3,18 @@
 
 DisplayWidget::DisplayWidget(ImageHandler *handler, QWidget *parent)
     : QWidget(parent)
-    , m_Handler(handler)
-    , m_MiddleButtonDown(false)
-    , m_RightButtonDown(false)
+    , m_bMiddleButtonDown(false)
+    , m_bRightButtonDown(false)
+    , m_pHandler(handler)
+    , m_iElapsed(0)
+    , m_iActiveSlice(0)
+    , m_bShowAnnotation(true)
+    , m_qtDisplayImage(new QImage())
     , m_pUpperLeft(NULL)
     , m_pUpperRight(NULL)
     , m_pLowerLeft(NULL)
     , m_pLowerRight(NULL)
-    , m_bShowAnnotation(true)
 {
-    m_iElapsed = 0;
     resize(512, 512);
     setAutoFillBackground(false);
 
@@ -41,6 +43,11 @@ DisplayWidget::~DisplayWidget()
     {
         delete m_pLowerRight;
         m_pLowerRight = NULL;
+    }
+    if(m_qtDisplayImage != NULL)
+    {
+        delete m_qtDisplayImage;
+        m_qtDisplayImage = NULL;
     }
 }
 
@@ -141,12 +148,30 @@ void DisplayWidget::Animate()
 }
 
 
+void DisplayWidget::SetActiveSlice(int i)
+{
+    m_iActiveSlice = i;
+}
+
+
+int DisplayWidget::GetActiveSlice()
+{
+    return m_iActiveSlice;
+}
+
+
+QImage* DisplayWidget::GetDisplayImage()
+{
+    return m_qtDisplayImage;
+}
+
+
 void DisplayWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    m_Handler->Paint(&painter, event, m_iElapsed, geometry());
+    m_pHandler->Paint(&painter, event, m_iElapsed, m_qtDisplayImage, geometry());
     painter.end();
 
     if(m_bShowAnnotation)
@@ -161,13 +186,13 @@ void DisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
     {
-        m_MiddleButtonDown = true;
+        m_bMiddleButtonDown = true;
         m_MouseMiddleStartPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
         m_MouseMiddleStartPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
     }
     else if(event->button()==Qt::RightButton)
     {
-        m_RightButtonDown = true;
+        m_bRightButtonDown = true;
         m_MouseRightStartPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
         m_MouseRightStartPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
     }
@@ -176,7 +201,7 @@ void DisplayWidget::mousePressEvent(QMouseEvent *event)
 
 void DisplayWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if(m_MiddleButtonDown)
+    if(m_bMiddleButtonDown)
     {
         m_MouseMiddleCurrentPos[0] = (float)QCursor::pos().x()/(QGuiApplication::primaryScreen()->availableSize().width());
         m_MouseMiddleCurrentPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
@@ -189,7 +214,7 @@ void DisplayWidget::mouseMoveEvent(QMouseEvent *event)
 
         emit MiddleButtonMove(tmpX, tmpY);
     }
-    else if(m_RightButtonDown)
+    else if(m_bRightButtonDown)
     {
         m_MouseRightCurrentPos[1] = (float)QCursor::pos().y()/(QGuiApplication::primaryScreen()->availableSize().height());
         float tmpY = m_MouseRightCurrentPos[1] - m_MouseRightStartPos[1];
@@ -203,7 +228,7 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::MiddleButton)
     {
-        m_MiddleButtonDown = false;
+        m_bMiddleButtonDown = false;
         m_MouseMiddleCurrentPos[0] = 0.0;
         m_MouseMiddleCurrentPos[1] = 0.0;
         m_MouseMiddleStartPos[0] = 0.0;
@@ -211,7 +236,7 @@ void DisplayWidget::mouseReleaseEvent(QMouseEvent *event)
     }
     else if(event->button()==Qt::RightButton)
     {
-        m_RightButtonDown = false;
+        m_bRightButtonDown = false;
         m_MouseRightCurrentPos[0] = 0.0;
         m_MouseRightCurrentPos[1] = 0.0;
         m_MouseRightStartPos[0] = 0.0;

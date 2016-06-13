@@ -5,17 +5,11 @@ ImageHandler::ImageHandler()
     : m_pCurrentImage(NULL)
     , m_iActiveIndex(-1)
 {
-    m_qtDisplayImage = new QImage();
 }
 
 
 ImageHandler::~ImageHandler()
 {
-    if(m_qtDisplayImage != NULL)
-    {
-        delete m_qtDisplayImage;
-        m_qtDisplayImage = NULL;
-    }
 }
 
 
@@ -40,7 +34,7 @@ bool ImageHandler::AddImage(QString filename)
     image->SetMinSliceNum(0);
     image->SetMaxSliceNum(0);
 
-    DisplayImage(image->GetDefaultWC(image->GetActiveSlice()), image->GetDefaultWW(image->GetActiveSlice()));
+//    DisplayImage(image->GetDefaultWC(image->GetActiveSlice()), image->GetDefaultWW(image->GetActiveSlice()));
 
     return true;
 }
@@ -75,7 +69,8 @@ bool ImageHandler::AddImageSeries(QString folderPath)
     imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
     imageSeries->SetCurrentSizeFactor(1);
 
-    DisplayImage(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()), imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
+//    DisplayImage(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()),
+//                 imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
 
     return true;
 }
@@ -97,43 +92,36 @@ bool ImageHandler::RemoveImage()
     if(m_vecImages.size() != 0)
     {
         m_iActiveIndex = m_vecImages.size()-1;
-        UpdateImage(m_vecImages[m_iActiveIndex]->GetCurrentWC(), m_vecImages[m_iActiveIndex]->GetCurrentWW());
+//        UpdateImage(m_vecImages[m_iActiveIndex]->GetCurrentWC(), m_vecImages[m_iActiveIndex]->GetCurrentWW());
     }
     else
     {
         m_vecImages.clear();
         m_iActiveIndex = -1;
-        if(m_qtDisplayImage != NULL)
-        {
-            delete m_qtDisplayImage;
-            m_qtDisplayImage = NULL;
-        }
-        m_qtDisplayImage = new QImage(1, 1, QImage::Format_RGB32);
-        m_qtDisplayImage->setPixel(0, 0, qRgb(0, 0, 0));
     }
 
     return true;
 }
 
 
-void ImageHandler::DisplayImage(short wc, short ww)
+void ImageHandler::DisplayImage(short wc, short ww, int slice, QImage* image)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    ITKImageToQImage(*currentImage->GetImage(currentImage->GetActiveSlice()), m_qtDisplayImage);
+    ITKImageToQImage(*currentImage->GetImage(slice), image);
 }
 
 
-void ImageHandler::UpdateImage(short wc, short ww)
+void ImageHandler::UpdateImage(short wc, short ww, int slice, QImage* image)
 {
     m_vecImages[m_iActiveIndex]->SetCurrentWC(wc);
     m_vecImages[m_iActiveIndex]->SetCurrentWW(ww);
 
-    DisplayImage(wc, ww);
+    DisplayImage(wc, ww, slice, image);
 }
 
 
-void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage *qt_image)
+void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage* qt_image)
 {
     int i = 0, j = 0;
     std::shared_ptr<ImageContainer> ActiveImage = m_vecImages[m_iActiveIndex];
@@ -159,7 +147,7 @@ void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage *
             else
                 temp = ((temp-(wc-0.5))/(ww-1)+0.5)*255;
 
-            (qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
+            qt_image->setPixel(j, i, qRgb(temp, temp, temp));
             ++itkImage;
         }
     }
@@ -190,8 +178,8 @@ int ImageHandler::GetNumberOfOpenedImages()
 }
 
 
-void ImageHandler::Paint(QPainter *painter, QPaintEvent *event, int elapsed, const QRect& rect)
+void ImageHandler::Paint(QPainter *painter, QPaintEvent *event, int elapsed, QImage* image, const QRect& rect)
 {
     QRect rect1 = QRect(0, 0, rect.width(), rect.height());
-    painter->drawImage(rect1, *m_qtDisplayImage);
+    painter->drawImage(rect1, *image);
 }

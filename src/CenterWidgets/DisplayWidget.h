@@ -25,6 +25,10 @@ public:
     void SetLowerLeftAnnotation(std::string text);
     void SetLowerRightAnnotation(std::string text);
 
+    void SetActiveSlice(int i);
+    int GetActiveSlice();
+    QImage* GetDisplayImage();
+
 public slots:
     void Animate();
 
@@ -53,13 +57,15 @@ protected:
     float m_MouseRightStartPos[2];
     float m_MouseRightCurrentPos[2];
     
-    bool m_MiddleButtonDown;
-    bool m_RightButtonDown;
+    bool m_bMiddleButtonDown;
+    bool m_bRightButtonDown;
     
 private:
-    ImageHandler* m_Handler;
+    ImageHandler* m_pHandler;
     int m_iElapsed;
+    int m_iActiveSlice;
     bool m_bShowAnnotation;
+    QImage* m_qtDisplayImage;
     TextOverlayWidget* m_pUpperLeft;
     TextOverlayWidget* m_pUpperRight;
     TextOverlayWidget* m_pLowerLeft;
