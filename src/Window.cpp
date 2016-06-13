@@ -506,7 +506,7 @@ void Window::ZoomFitToHeight()
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
 
-    double size = (double)m_pScrollArea->height()/((double)imageObj->GetHeight(imageObj->GetActiveSlice()+10)*m_pCanvas->GetVerticalNum());
+    double size = (double)m_pScrollArea->height()/(((double)imageObj->GetHeight(imageObj->GetActiveSlice())+10)*m_pCanvas->GetVerticalNum());
     m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*size,
                       imageObj->GetHeight(imageObj->GetActiveSlice())*size);
 
