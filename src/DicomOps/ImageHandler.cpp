@@ -120,7 +120,7 @@ void ImageHandler::DisplayImage(short wc, short ww)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    ITKImageToQImage(*currentImage->GetImage(currentImage->GetActiveSlice()), &m_qtDisplayImage);
+    ITKImageToQImage(*currentImage->GetImage(currentImage->GetActiveSlice()), m_qtDisplayImage);
 }
 
 
@@ -133,7 +133,7 @@ void ImageHandler::UpdateImage(short wc, short ww)
 }
 
 
-void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage **qt_image)
+void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage *qt_image)
 {
     int i = 0, j = 0;
     std::shared_ptr<ImageContainer> ActiveImage = m_vecImages[m_iActiveIndex];
@@ -144,7 +144,7 @@ void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage *
     int wc = ActiveImage->GetCurrentWC();
     int ww = ActiveImage->GetCurrentWW();
 
-    **qt_image = QImage(width, height, QImage::Format_RGB32);
+    *qt_image = QImage(width, height, QImage::Format_RGB32);
 
     for(i=0;i<height;i++)
     {
@@ -159,7 +159,7 @@ void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage *
             else
                 temp = ((temp-(wc-0.5))/(ww-1)+0.5)*255;
 
-            (*qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
+            (qt_image)->setPixel(j, i, qRgb(temp, temp, temp));
             ++itkImage;
         }
     }
