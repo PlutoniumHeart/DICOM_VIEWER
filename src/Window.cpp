@@ -137,7 +137,7 @@ void Window::CreateConnections()
 
 void Window::SetupAnnotation()
 {
-    int slice = m_ImageHandler.GetImageObj()->GetActiveSlice();
+    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSlice();
     DICOMIOType::Pointer io = *m_ImageHandler.GetImageObj()->GetIOObject(slice);
 
     std::string temp;
@@ -164,7 +164,7 @@ void Window::SetupAnnotation()
     io->GetValueFromTag("0008|0013", temp);  // Instance Creation Time
     UpperLeftText += TimeFormat(temp) + "\n";
     temp = "";
-    temp = std::to_string(imageObj->GetActiveSlice()+1);
+    temp = std::to_string(slice+1);
     UpperLeftText += temp + "/";
     temp = "";
     temp = std::to_string(imageObj->GetMaxSliceNum()+1);  // Number of Slices
@@ -408,11 +408,11 @@ void Window::Pan(float scale)
 
     m_pCanvas->Resize(temp);
 
-    double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(0);
     imageObj->SetCurrentSizeFactor(size);
 
     std::ostringstream ss;
-    ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(imageObj->GetActiveSlice()));
+    ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(0));
     std::string currentText(ss.str());
     currentText = currentText + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
@@ -425,8 +425,8 @@ void Window::UpdateImage()
 
     short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
     short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor(),
-                      imageObj->GetHeight(imageObj->GetActiveSlice())*imageObj->GetCurrentSizeFactor());
+    m_pCanvas->Resize(imageObj->GetWidth(0)*imageObj->GetCurrentSizeFactor(),
+                      imageObj->GetHeight(0)*imageObj->GetCurrentSizeFactor());
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
         int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
@@ -514,14 +514,14 @@ void Window::ZoomOriginalSize()
 
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    int temp = imageObj->GetWidth(imageObj->GetActiveSlice());
-    int temp1 = imageObj->GetHeight(imageObj->GetActiveSlice());
+    int temp = imageObj->GetWidth(0);
+    int temp1 = imageObj->GetHeight(0);
 
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                      imageObj->GetHeight(imageObj->GetActiveSlice()));
+    m_pCanvas->Resize(imageObj->GetWidth(0),
+                      imageObj->GetHeight(0));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 
-    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(imageObj->GetActiveSlice());
+    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(0);
     imageObj->SetCurrentSizeFactor(size);
 }
 
@@ -533,9 +533,8 @@ void Window::ZoomFitToHeight()
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
 
-    double size = (double)m_pScrollArea->height()/(((double)imageObj->GetHeight(imageObj->GetActiveSlice())+10)*m_pCanvas->GetVerticalNum());
-    m_pCanvas->Resize(imageObj->GetWidth(imageObj->GetActiveSlice())*size,
-                      imageObj->GetHeight(imageObj->GetActiveSlice())*size);
+    double size = (double)m_pScrollArea->height()/(((double)imageObj->GetHeight(0)+10)*m_pCanvas->GetVerticalNum());
+    m_pCanvas->Resize(imageObj->GetWidth(0)*size, imageObj->GetHeight(0)*size);
 
 
     imageObj->SetCurrentSizeFactor(size);
@@ -561,8 +560,7 @@ void Window::ZoomCustomSize()
     std::string currentText = ss.str() + "%";
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString(currentText.c_str()));
 
-    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                           imageObj->GetHeight(imageObj->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(0), imageObj->GetHeight(0));
     m_pCanvas->Resize(original*tmp/100.0);
 
     double size = tmp/100.0;
@@ -576,8 +574,7 @@ void Window::ZoomComboResize(int index)
 
     if(m_ImageHandler.GetActiveIndex()<0)
         return;
-    QSize original = QSize(imageObj->GetWidth(imageObj->GetActiveSlice()),
-                           imageObj->GetHeight(imageObj->GetActiveSlice()));
+    QSize original = QSize(imageObj->GetWidth(0), imageObj->GetHeight(0));
     switch(index)
     {
     case 0:

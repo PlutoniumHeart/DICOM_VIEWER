@@ -39,7 +39,7 @@ public:
     void Paint(QPainter* painter, QPaintEvent* event, int elapsed, QImage* image, const QRect& rect);
 
 private:
-    void ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage* qt_image);
+    void ITKImageToQImage(ShortImageType::Pointer& itk_image, int slice, QImage* qt_image);
 
 private:
     std::vector<std::shared_ptr<ImageContainer>> m_vecImages;

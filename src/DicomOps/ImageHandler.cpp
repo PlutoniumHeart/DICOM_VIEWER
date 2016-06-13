@@ -23,14 +23,13 @@ bool ImageHandler::AddImage(QString filename)
 
     ImageIO::ReadDICOMImage(filename.toStdString(), *image->GetImage(0), *image->GetIOObject(0));
     image->SetDimension(2);
-    image->SetCurrentWC(image->GetDefaultWC(image->GetActiveSlice()));
-    image->SetCurrentWW(image->GetDefaultWW(image->GetActiveSlice()));
+    image->SetCurrentWC(image->GetDefaultWC(0));
+    image->SetCurrentWW(image->GetDefaultWW(0));
     image->SetCurrentSizeFactor(1);
 
     m_vecImages.push_back(image);
     m_pCurrentImage = image;
     m_iActiveIndex = m_vecImages.size()-1;
-    image->SetActiveSlice(0);
     image->SetMinSliceNum(0);
     image->SetMaxSliceNum(0);
 
@@ -58,13 +57,12 @@ bool ImageHandler::AddImageSeries(QString folderPath)
     m_vecImages.push_back(imageSeries);
     m_pCurrentImage = imageSeries;
     m_iActiveIndex = m_vecImages.size() - 1;
-    imageSeries->SetActiveSlice(0);
     imageSeries->SetMinSliceNum(0);
     imageSeries->SetMaxSliceNum(fileNum-1);
 
     imageSeries->SetDimension(3);
-    imageSeries->SetCurrentWC(imageSeries->GetDefaultWC(imageSeries->GetActiveSlice()));
-    imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(imageSeries->GetActiveSlice()));
+    imageSeries->SetCurrentWC(imageSeries->GetDefaultWC(0));
+    imageSeries->SetCurrentWW(imageSeries->GetDefaultWW(0));
     imageSeries->SetCurrentSizeFactor(1);
 
     return true;
@@ -100,7 +98,7 @@ void ImageHandler::DisplayImage(int slice, QImage* image)
 {
     std::shared_ptr<ImageContainer> currentImage = m_vecImages[m_iActiveIndex];
 
-    ITKImageToQImage(*currentImage->GetImage(slice), image);
+    ITKImageToQImage(*currentImage->GetImage(slice), slice, image);
 }
 
 
@@ -113,12 +111,12 @@ void ImageHandler::UpdateImage(short wc, short ww, int slice, QImage* image)
 }
 
 
-void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, QImage* qt_image)
+void ImageHandler::ITKImageToQImage(ShortImageType::Pointer& itk_image, int slice, QImage* qt_image)
 {
     int i = 0, j = 0;
     std::shared_ptr<ImageContainer> ActiveImage = m_vecImages[m_iActiveIndex];
-    int width = ActiveImage->GetWidth(ActiveImage->GetActiveSlice());
-    int height = ActiveImage->GetHeight(ActiveImage->GetActiveSlice());
+    int width = ActiveImage->GetWidth(slice);
+    int height = ActiveImage->GetHeight(slice);
     ShortImageConstIteratorType itkImage(itk_image, itk_image->GetLargestPossibleRegion());
     itkImage.GoToBegin();
     int wc = ActiveImage->GetCurrentWC();

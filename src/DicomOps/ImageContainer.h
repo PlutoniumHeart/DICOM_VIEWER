@@ -34,8 +34,6 @@ public:
     std::string GetAcqusitionDate(int slice);
     std::string GetAcqusitionTime(int slice);
     std::string GetStudyInstanceUID(int slice);
-    void SetActiveSlice(int slice);
-    int GetActiveSlice();
     void SetMinSliceNum(int min);
     int GetMinSliceNum();
     void SetMaxSliceNum(int max);
@@ -49,7 +47,6 @@ private:
     DICOMIOType::Pointer* m_DicomIO;
     short m_sCurrentWC;
     short m_sCurrentWW;
-    int m_iActiveSlice;
     int m_iMinSliceNum;
     int m_iMaxSliceNum;
     double m_dCurrentSizeFactor;
