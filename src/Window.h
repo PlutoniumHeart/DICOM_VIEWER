@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include <thread>
 
 #include <QMainWindow>
 #include <QTimer>

@@ -432,8 +432,6 @@ void Window::UpdateImage()
         int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
         m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
     }
-
-    SetupAnnotation();
 }
 
 
@@ -454,6 +452,12 @@ void Window::UpdateImage(int index)
 void Window::UpdateActiveSlice(int deltaX, int deltaY)
 {
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    int w = imageObj->GetWidth(0);
+    int h = imageObj->GetHeight(0);
+    double factor = imageObj->GetCurrentSizeFactor();
+    m_pCanvas->Resize(w*factor, h*factor);
+    short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
+    short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
@@ -463,11 +467,13 @@ void Window::UpdateActiveSlice(int deltaX, int deltaY)
            slice<=imageObj->GetMaxSliceNum()-m_pCanvas->GetNumDisplays()+i)
         {
             m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(slice);
-            m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(slice));
-            m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(slice));
-            UpdateImage();
+            m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
         }
     }
+
+    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSlice();
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(slice));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(slice));
 
     SetupAnnotation();
 }
@@ -632,6 +638,10 @@ void Window::UpdateDisplayLayout()
     }
 
     std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    int w = imageObj->GetWidth(0);
+    int h = imageObj->GetHeight(0);
+    double factor = imageObj->GetCurrentSizeFactor();
+
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
         if(i>=imageObj->GetMinSliceNum()+i &&
@@ -640,7 +650,13 @@ void Window::UpdateDisplayLayout()
             m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(i);
             m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(i));
             m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(i));
-            UpdateImage();
+
+            short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
+            short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
+            m_pCanvas->Resize(w*factor, h*factor);
+
+            int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
+            m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
         }
     }
     SetupAnnotation();
