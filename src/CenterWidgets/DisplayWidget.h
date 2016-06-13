@@ -25,11 +25,6 @@ public:
     void SetLowerLeftAnnotation(std::string text);
     void SetLowerRightAnnotation(std::string text);
 
-    std::vector<QImage*> GetDisplayImage();
-    void SetActiveSlice(int i);
-    int GetActiveSlice();
-    void SetSliceNum(int num);
-
 public slots:
     void Animate();
 
@@ -69,8 +64,6 @@ private:
     TextOverlayWidget* m_pUpperRight;
     TextOverlayWidget* m_pLowerLeft;
     TextOverlayWidget* m_pLowerRight;
-    std::vector<QImage*> m_qtDisplayImage;
-    int m_iActiveSlice;
 
 };
 

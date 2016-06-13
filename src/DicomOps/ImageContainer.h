@@ -18,7 +18,7 @@ public:
     DICOMIOType::Pointer* GetIOObject(int slice);
     short GetWidth(int slice);
     short GetHeight(int slice);
-    short GetLength();
+    short GetLength(int slice);
     short GetDefaultWC(int slice);
     short GetDefaultWW(int slice);
     void SetCurrentWC(short wc);
@@ -34,6 +34,8 @@ public:
     std::string GetAcqusitionDate(int slice);
     std::string GetAcqusitionTime(int slice);
     std::string GetStudyInstanceUID(int slice);
+    void SetActiveSlice(int slice);
+    int GetActiveSlice();
     void SetMinSliceNum(int min);
     int GetMinSliceNum();
     void SetMaxSliceNum(int max);
@@ -47,10 +49,10 @@ private:
     DICOMIOType::Pointer* m_DicomIO;
     short m_sCurrentWC;
     short m_sCurrentWW;
+    int m_iActiveSlice;
     int m_iMinSliceNum;
     int m_iMaxSliceNum;
     double m_dCurrentSizeFactor;
-    int m_iSlices;
 
 };
 

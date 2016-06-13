@@ -11,7 +11,6 @@ DisplayWidget::DisplayWidget(ImageHandler *handler, QWidget *parent)
     , m_pLowerLeft(NULL)
     , m_pLowerRight(NULL)
     , m_bShowAnnotation(true)
-    , m_iActiveSlice(0)
 {
     m_iElapsed = 0;
     resize(512, 512);
@@ -43,12 +42,6 @@ DisplayWidget::~DisplayWidget()
         delete m_pLowerRight;
         m_pLowerRight = NULL;
     }
-    for (int i=0;i<m_qtDisplayImage.size();i++)
-    {
-        delete m_qtDisplayImage[i];
-        m_qtDisplayImage[i] = NULL;
-    }
-    m_qtDisplayImage.clear();
 }
 
 
@@ -153,7 +146,7 @@ void DisplayWidget::paintEvent(QPaintEvent *event)
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    m_Handler->Paint(&painter, event, m_iElapsed, m_qtDisplayImage[m_iActiveSlice], geometry());
+    m_Handler->Paint(&painter, event, m_iElapsed, geometry());
     painter.end();
 
     if(m_bShowAnnotation)
@@ -239,31 +232,4 @@ void DisplayWidget::wheelEvent(QWheelEvent *event)
     QPoint numDegrees = event->angleDelta()/(8*15);
 
     emit WheelMovement(numDegrees.rx(), numDegrees.ry());
-}
-
-
-std::vector<QImage*> DisplayWidget::GetDisplayImage()
-{
-    return m_qtDisplayImage;
-}
-
-
-void DisplayWidget::SetActiveSlice(int i)
-{
-    m_iActiveSlice = i;
-}
-
-
-int DisplayWidget::GetActiveSlice()
-{
-    return m_iActiveSlice;
-}
-
-
-void DisplayWidget::SetSliceNum(int num)
-{
-    for (int i=0;i<num;i++)
-    {
-        m_qtDisplayImage.push_back(new QImage());
-    }
 }

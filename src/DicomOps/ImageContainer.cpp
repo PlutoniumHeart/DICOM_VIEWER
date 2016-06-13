@@ -5,6 +5,7 @@ ImageContainer::ImageContainer()
     : m_uiDim(0)
     , m_sImageObj(NULL)
     , m_DicomIO(NULL)
+    , m_iActiveSlice(0)
     , m_iMinSliceNum(0)
     , m_iMaxSliceNum(0)
     , m_dCurrentSizeFactor(0)
@@ -47,7 +48,6 @@ void ImageContainer::Allocate(int sliceNumber)
         m_sImageObj[i] = ShortImageType::New();
         m_DicomIO[i] = DICOMIOType::New();
     }
-    m_iSlices = sliceNumber;
 }
 
 
@@ -80,9 +80,9 @@ short ImageContainer::GetHeight(int slice)
 }
 
 
-short ImageContainer::GetLength()
+short ImageContainer::GetLength(int slice)
 {
-    return m_iSlices;
+    return m_sImageObj[slice]->GetLargestPossibleRegion().GetSize().GetElement(2);
 }
 
 
@@ -195,6 +195,18 @@ void ImageContainer::SetCurrentWW(short ww)
 short ImageContainer::GetCurrentWW()
 {
     return m_sCurrentWW;
+}
+
+
+void ImageContainer::SetActiveSlice(int slice)
+{
+    m_iActiveSlice = slice;
+}
+
+
+int ImageContainer::GetActiveSlice()
+{
+    return m_iActiveSlice;
 }
 
 
