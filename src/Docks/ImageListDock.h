@@ -9,7 +9,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 
-#include "ImageHandler.h"
+#include "ImageData.h"
 
 
 class ImageListDock : public QDockWidget
@@ -20,14 +20,22 @@ public:
     ImageListDock();
     virtual ~ImageListDock();
 
-    void InsertImageSeries(ImageHandler* handler);
-    void RemoveImageSeries(ImageHandler* handler);
+    void InsertImageData(std::shared_ptr<ImageData> imageData);
+    void EraseImageData(int i);
+    std::shared_ptr<ImageData> GetSeries(int idx);
+    std::shared_ptr<ImageData> GetActiveSeries();
     QTableView* GetTable();
     std::string GetUID(int i);
+    void SetActiveSeriesIndex(int idx);
+    int GetActiveSeriesIndex();
+    int GetNumOpenedSeries();
 
 private:
-    QTableView* m_Table;
-    QStandardItemModel* m_Model;
+    QTableView* m_pTable;
+    QStandardItemModel* m_pModel;
+
+    int m_iActiveSeries;
+    std::vector<std::shared_ptr<ImageData>> m_vImages;
 
 private slots:
     void UpdateSelection(QModelIndex index);

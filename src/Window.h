@@ -17,9 +17,10 @@
 #include <QUrl>
 #include <QMimeData>
 
+#include "ImageOps.h"
+
 #include "FileToolbar.h"
 #include "ResizeToolbar.h"
-#include "ImageHandler.h"
 #include "DisplayWidget.h"
 #include "ImageWindowingDock.h"
 #include "ImageListDock.h"
@@ -48,24 +49,25 @@ private:
     ImageListDock* m_pImageListDock;
     ImageLayoutControlDock* m_pImageLayoutDock;
 
-    ImageHandler m_ImageHandler;
-
     bool m_bConnected;
 
 private:
+    void OpenSlice(QString filename);
+    void OpenSeries(QString path);
     void CreateMenus();
     void CreateToolbars();
     void CreateCenterWidgets();
     void CreateDocks();
     void CreateConnections();
-    void SetupAnnotation();
+    void SetupAnnotation(int index);
+    void SetupDisplays();
+    void SetupImageWindow(int wc, int ww);
     std::string DateFormat(std::string string);
     std::string TimeFormat(std::string string);
-    void OpenImage(std::string filepath);
-    void OpenSeries(std::string path);
 
     void dragEnterEvent(QDragEnterEvent* event);
     void dropEvent(QDropEvent* event);
+
 
 private slots:
     void OpenDicomImage();

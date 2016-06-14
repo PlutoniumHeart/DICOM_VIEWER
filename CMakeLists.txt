@@ -27,7 +27,13 @@ include_directories(src/Docks/)
 include_directories(src/)
 
 set(SOURCES src/main.cpp 
-            src/Window.h src/Window.cpp
+            src/Window.h
+            src/Window.cpp
+
+            src/DicomOps/ImageOps.h
+            src/DicomOps/ImageOps.cpp
+            src/DicomOps/ImageData.h
+            src/DicomOps/ImageData.cpp
 
             src/Toolbars/FileToolbar.h
             src/Toolbars/FileToolbar.cpp
@@ -53,10 +59,6 @@ set(SOURCES src/main.cpp
             src/DicomOps/ImageIO.cpp
             src/DicomOps/ImageFilter.h
             src/DicomOps/ImageFilter.cpp
-            src/DicomOps/ImageContainer.h
-            src/DicomOps/ImageContainer.cpp
-            src/DicomOps/ImageHandler.h
-            src/DicomOps/ImageHandler.cpp
 )
 set(RESOURCES src/DICOM_TOOL.qrc)
 

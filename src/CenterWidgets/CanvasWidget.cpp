@@ -1,19 +1,19 @@
 #include "CanvasWidget.h"
 
 
-CanvasWidget::CanvasWidget(ImageHandler* handler, QWidget* parent)
+CanvasWidget::CanvasWidget(QWidget* parent)
     : QWidget(parent)
-    , m_pHandler(handler)
     , m_iElapsed(0)
     , m_iX(1)
     , m_iY(1)
+    , m_dSizeFactor(1)
 {
     m_pLayout = new QGridLayout;
 
-    DisplayWidget* display = new DisplayWidget(m_pHandler, this);
+    DisplayWidget* display = new DisplayWidget(this);
     m_vpDisplay.push_back(display);
     m_pLayout->addWidget(m_vpDisplay[0], 0, 1);
-    m_pLayout->setSpacing(30);
+    m_pLayout->setSpacing(5);
 
     setLayout(m_pLayout);
 }
@@ -28,6 +28,18 @@ CanvasWidget::~CanvasWidget()
 int CanvasWidget::GetNumDisplays()
 {
     return m_vpDisplay.size();
+}
+
+
+double CanvasWidget::GetSizeFactor()
+{
+    return m_dSizeFactor;
+}
+
+
+void CanvasWidget::SetSizeFactor(double factor)
+{
+    m_dSizeFactor = factor;
 }
 
 
@@ -105,10 +117,10 @@ void CanvasWidget::Rearrange(int x, int y)
     {
         for (int j=0;j<x;j++)
         {
-            DisplayWidget* display = new DisplayWidget(m_pHandler, this);
+            DisplayWidget* display = new DisplayWidget(this);
             m_vpDisplay.push_back(display);
             m_pLayout->addWidget(m_vpDisplay[j+i*x], i, j);
-            m_pLayout->setSpacing(10);
+            m_pLayout->setSpacing(5);
         }
     }
 }

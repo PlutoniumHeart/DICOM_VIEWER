@@ -6,18 +6,18 @@
 #include <QTimer>
 #include <QScreen>
 #include <QGuiApplication>
-#include "ImageHandler.h"
+#include <QMouseEvent>
+
 #include "TextOverlayWidget.h"
+#include "ImageData.h"
 
-
-//class ImageHandler;
 
 class DisplayWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    DisplayWidget(ImageHandler *handler, QWidget *parent);
+    DisplayWidget(QWidget *parent);
     virtual ~DisplayWidget();
 
     void SetUpperLeftAnnotation(std::string text);
@@ -25,9 +25,11 @@ public:
     void SetLowerLeftAnnotation(std::string text);
     void SetLowerRightAnnotation(std::string text);
 
-    void SetActiveSlice(int i);
-    int GetActiveSlice();
-    QImage* GetDisplayImage();
+    int GetActiveSliceIndex();
+    void SetActiveSliceIndex(int index);
+
+    void SetImageData(std::shared_ptr<ImageData> imageData);
+    std::shared_ptr<ImageData> GetImageData();
 
 public slots:
     void Animate();
@@ -36,6 +38,7 @@ private:
     void InitializeAnnotation();
     void ShowAnnotation();
     void UpdateAnnotation();
+    void Paint(QPainter *painter, const QRect& rect);
 
 signals:
     void MiddleButtonMove(float x, float y);
@@ -61,15 +64,14 @@ protected:
     bool m_bRightButtonDown;
     
 private:
-    ImageHandler* m_pHandler;
     int m_iElapsed;
     int m_iActiveSlice;
     bool m_bShowAnnotation;
-    QImage* m_qtDisplayImage;
     TextOverlayWidget* m_pUpperLeft;
     TextOverlayWidget* m_pUpperRight;
     TextOverlayWidget* m_pLowerLeft;
     TextOverlayWidget* m_pLowerRight;
+    std::shared_ptr<ImageData> m_pImageData;
 
 };
 

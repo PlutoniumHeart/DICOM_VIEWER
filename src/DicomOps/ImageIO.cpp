@@ -232,6 +232,27 @@ bool ImageIO::ReadDICOMImage(std::string inputFile, ShortImageType::Pointer& ima
 }
 
 
+ShortImageType::Pointer ImageIO::ReadDICOMSlice(std::string inputFile, DICOMIOType::Pointer IO)
+{
+    ShortImageReadType::Pointer reader = ShortImageReadType::New();
+    IO->SetLoadPrivateTags(true);
+    reader->SetImageIO(IO);
+    reader->SetFileName(inputFile);
+    try
+    {
+        reader->Update();
+    }
+    catch(itk::ExceptionObject &e)
+    {
+        std::cerr<<"Exception in reading DICOM file: "<<std::endl;
+        std::cerr<<e<<std::endl;
+        return NULL;
+    }
+    ShortImageType::Pointer imageObj = reader->GetOutput();
+    return imageObj;
+}
+
+
 bool ImageIO::WriteDICOMImage(std::string outputFile, ShortImageType::Pointer& imageObj,
                               DICOMIOType::Pointer& IO)
 {

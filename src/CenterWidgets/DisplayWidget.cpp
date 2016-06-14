@@ -1,15 +1,13 @@
 #include "DisplayWidget.h"
 
 
-DisplayWidget::DisplayWidget(ImageHandler *handler, QWidget *parent)
+DisplayWidget::DisplayWidget(QWidget *parent)
     : QWidget(parent)
     , m_bMiddleButtonDown(false)
     , m_bRightButtonDown(false)
-    , m_pHandler(handler)
     , m_iElapsed(0)
     , m_iActiveSlice(0)
     , m_bShowAnnotation(true)
-    , m_qtDisplayImage(new QImage())
     , m_pUpperLeft(NULL)
     , m_pUpperRight(NULL)
     , m_pLowerLeft(NULL)
@@ -43,11 +41,6 @@ DisplayWidget::~DisplayWidget()
     {
         delete m_pLowerRight;
         m_pLowerRight = NULL;
-    }
-    if(m_qtDisplayImage != NULL)
-    {
-        delete m_qtDisplayImage;
-        m_qtDisplayImage = NULL;
     }
 }
 
@@ -117,6 +110,16 @@ void DisplayWidget::UpdateAnnotation()
 }
 
 
+void DisplayWidget::Paint(QPainter *painter, const QRect& rect)
+{
+    QRect rect1 = QRect(0, 0, rect.width(), rect.height());
+    if (m_iActiveSlice == -1)
+        painter->drawImage(rect1, *m_pImageData->GetDummyImage());
+    else
+        painter->drawImage(rect1, (*m_pImageData->GetDisplayImage())[m_iActiveSlice]);
+}
+
+
 void DisplayWidget::SetUpperLeftAnnotation(std::string text)
 {
     m_pUpperLeft->SetText(text);
@@ -141,6 +144,18 @@ void DisplayWidget::SetLowerRightAnnotation(std::string text)
 }
 
 
+int DisplayWidget::GetActiveSliceIndex()
+{
+    return m_iActiveSlice;
+}
+
+
+void DisplayWidget::SetActiveSliceIndex(int index)
+{
+    m_iActiveSlice = index;
+}
+
+
 void DisplayWidget::Animate()
 {
     m_iElapsed = (m_iElapsed + qobject_cast<QTimer*>(sender())->interval()) % 1000;
@@ -148,21 +163,15 @@ void DisplayWidget::Animate()
 }
 
 
-void DisplayWidget::SetActiveSlice(int i)
+void DisplayWidget::SetImageData(std::shared_ptr<ImageData> imageData)
 {
-    m_iActiveSlice = i;
+    m_pImageData = imageData;
 }
 
 
-int DisplayWidget::GetActiveSlice()
+std::shared_ptr<ImageData> DisplayWidget::GetImageData()
 {
-    return m_iActiveSlice;
-}
-
-
-QImage* DisplayWidget::GetDisplayImage()
-{
-    return m_qtDisplayImage;
+    return m_pImageData;
 }
 
 
@@ -171,7 +180,7 @@ void DisplayWidget::paintEvent(QPaintEvent *event)
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    m_pHandler->Paint(&painter, event, m_iElapsed, m_qtDisplayImage, geometry());
+    Paint(&painter, geometry());
     painter.end();
 
     if(m_bShowAnnotation)

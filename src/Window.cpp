@@ -59,7 +59,7 @@ void Window::CreateToolbars()
 
 void Window::CreateCenterWidgets()
 {
-    m_pCanvas = new CanvasWidget(&m_ImageHandler, this);
+    m_pCanvas = new CanvasWidget(this);
     m_pScrollArea = new QScrollArea;
     m_pTimer = new QTimer(this);
 
@@ -135,13 +135,14 @@ void Window::CreateConnections()
 }
 
 
-void Window::SetupAnnotation()
+void Window::SetupAnnotation(int index)
 {
-    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSlice();
-    DICOMIOType::Pointer io = *m_ImageHandler.GetImageObj()->GetIOObject(slice);
+    int series = m_pImageListDock->GetActiveSeriesIndex();
+    int slice = m_pCanvas->GetDisplayWidget(index)->GetActiveSliceIndex();
+    DICOMIOType::Pointer io = (*m_pImageListDock->GetSeries(series)->GetIO())[slice];
 
     std::string temp;
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetSeries(m_pImageListDock->GetActiveSeriesIndex());
 
     io->GetValueFromTag("0010|0010", temp);  //Patient name
     std::string UpperLeftText = temp + "\n";
@@ -164,10 +165,10 @@ void Window::SetupAnnotation()
     io->GetValueFromTag("0008|0013", temp);  // Instance Creation Time
     UpperLeftText += TimeFormat(temp) + "\n";
     temp = "";
-    temp = std::to_string(slice+1);
+    temp = std::to_string(slice+index+1);
     UpperLeftText += temp + "/";
     temp = "";
-    temp = std::to_string(imageObj->GetMaxSliceNum()+1);  // Number of Slices
+    temp = std::to_string(imageObj->GetDepth());  // Number of Slices
     UpperLeftText += temp + "\n";
     temp = "";
 
@@ -233,15 +234,33 @@ void Window::SetupAnnotation()
     io->GetValueFromTag("0051|100e", temp);  //
     LowerRightText += temp + "\n";
     temp = "";
-    temp = std::to_string(imageObj->GetCurrentWW());  // WW
+    temp = std::to_string(imageObj->GetCurrentWW(0));  // WW  TODO
     LowerRightText += "W " + temp + "\n";
     temp = "";
-    temp = std::to_string(imageObj->GetCurrentWC());  // WC
+    temp = std::to_string(imageObj->GetCurrentWC(0));  // WC
     LowerRightText += "C " + temp + "\n";
     temp = "";
 
     m_pCanvas->SetupAnnotations(UpperLeftText, UpperRightText,
                                 LowerLeftText, LowerRightText);
+}
+
+
+void Window::SetupDisplays()
+{
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        m_pCanvas->GetDisplayWidget(i)->SetImageData(m_pImageListDock->GetSeries(m_pImageListDock->GetActiveSeriesIndex()));
+    }
+}
+
+
+void Window::SetupImageWindow(int wc, int ww)
+{
+    disconnect(m_pImageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(wc);
+    connect(m_pImageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(ww);
 }
 
 
@@ -260,9 +279,9 @@ void Window::dropEvent(QDropEvent *event)
         QString path = url.toLocalFile();
         QFileInfo fileInfo(path);
         if(fileInfo.isFile())
-            OpenImage(path.toStdString());
+            OpenSlice(path);
         else if(fileInfo.isDir())
-            OpenSeries(path.toStdString());
+            OpenSeries(path);
         else
             std::cout<<"Unknown drop"<<std::endl;
     }
@@ -299,59 +318,37 @@ std::string Window::TimeFormat(std::string string)
 }
 
 
-void Window::OpenImage(std::string filepath)
+void Window::OpenSlice(QString filename)
 {
-    if(!m_ImageHandler.AddImage(QString(filepath.c_str())))
-        return;
+    std::shared_ptr<ImageData> image = ImageOps::OpenSlice(filename);
+    m_pImageListDock->InsertImageData(image);
 
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-
-    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
-    {
-        m_ImageHandler.DisplayImage(0,
-                                    m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
-    }
-
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(0));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(0));
-//    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
     m_pResizeToolbar->SetWidgetsDisabled(false);
-
-    m_pImageListDock->InsertImageSeries(&m_ImageHandler);
+    SetupDisplays();
+    SetupAnnotation(0);
+    SetupImageWindow(image->GetDefaultWC(0), image->GetDefaultWW(0));
 
     if(!m_bConnected)
         CreateConnections();
-    SetupAnnotation();
 }
 
 
-void Window::OpenSeries(std::string path)
+void Window::OpenSeries(QString path)
 {
-    if(!m_ImageHandler.AddImageSeries(QString(path.c_str())))
-        return;
+    std::shared_ptr<ImageData> image = ImageOps::OpenSeries(path);
+    m_pImageListDock->InsertImageData(image);
 
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-
-    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
-    {
-        m_ImageHandler.DisplayImage(0,
-                                    m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
-    }
-
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(0));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(0));
-//    ZoomOriginalSize();
     ZoomFitToHeight();
     m_pImageWindowingDock->SetWidgetsDisabled(false);
     m_pResizeToolbar->SetWidgetsDisabled(false);
-
-    m_pImageListDock->InsertImageSeries(&m_ImageHandler);
+    SetupDisplays();
+    SetupAnnotation(0);
+    SetupImageWindow(image->GetDefaultWC(0), image->GetDefaultWW(0));
 
     if(!m_bConnected)
         CreateConnections();
-    SetupAnnotation();
 }
 
 
@@ -359,26 +356,25 @@ void Window::OpenSeries(std::string path)
 void Window::OpenDicomImage()
 {
     QString filename = QFileDialog::getOpenFileName(this, tr("Open DICOM file"), QDir::currentPath());
-    OpenImage(filename.toStdString());
+    OpenSlice(filename);
 }
 
 
 void Window::OpenDicomSeries()
 {
     QString folderPath = QFileDialog::getExistingDirectory(0, tr("Open DICOM folder"), QDir::currentPath(), QFileDialog::ShowDirsOnly);
-    OpenSeries(folderPath.toStdString());
+    OpenSeries(folderPath);
 }
 
 
 void Window::CloseDicomImage()
 {
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if (m_pImageListDock->GetNumOpenedSeries() == 0)
         return;
 
-    m_pImageListDock->RemoveImageSeries(&m_ImageHandler);
-    m_ImageHandler.RemoveImage();
+    m_pImageListDock->EraseImageData(m_pImageListDock->GetActiveSeriesIndex());
 
-    if(m_ImageHandler.GetNumberOfOpenedImages()<=0)
+    if (m_pImageListDock->GetNumOpenedSeries()<=0)
     {
         m_pCanvas->Resize(0, 0);
         m_pImageWindowingDock->SetWidgetsDisabled(true);
@@ -386,12 +382,10 @@ void Window::CloseDicomImage()
     }
     else
     {
-        std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-
-        short tmp1 = imageObj->GetCurrentWC();
-        short tmp2 = imageObj->GetCurrentWW();
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
+        int idxSeries = m_pImageListDock->GetActiveSeriesIndex();
+        short wc = m_pImageListDock->GetSeries(idxSeries)->GetCurrentWC(0); // TODO
+        short ww = m_pImageListDock->GetSeries(idxSeries)->GetCurrentWW(0);
+        SetupImageWindow(wc, ww);
     }
     m_pScrollArea->viewport()->update();
 }
@@ -399,7 +393,7 @@ void Window::CloseDicomImage()
 
 void Window::Pan(float scale)
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetSeries(m_pImageListDock->GetActiveSeriesIndex());
 
     double presentage = 10.0*scale;
     QSize temp = (1.0+presentage)*m_pCanvas->GetDisplayWidget(0)->size();
@@ -409,7 +403,6 @@ void Window::Pan(float scale)
     m_pCanvas->Resize(temp);
 
     double size = (double)m_pCanvas->GetDisplayWidget(0)->size().height()/(double)imageObj->GetHeight(0);
-    imageObj->SetCurrentSizeFactor(size);
 
     std::ostringstream ss;
     ss << 100.0*((double)temp.height()/(double)imageObj->GetHeight(0));
@@ -421,86 +414,86 @@ void Window::Pan(float scale)
 
 void Window::UpdateImage()
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
+    int wc = m_pImageWindowingDock->GetSliderWC()->value();
+    int ww = m_pImageWindowingDock->GetSliderWW()->value();
+    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSliceIndex();
 
-    short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
-    short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-    m_pCanvas->Resize(imageObj->GetWidth(0)*imageObj->GetCurrentSizeFactor(),
-                      imageObj->GetHeight(0)*imageObj->GetCurrentSizeFactor());
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
-        m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        if (i<imageObj->GetDepth())
+        {
+            m_pCanvas->GetDisplayWidget(i)->SetImageData(imageObj);
+            m_pImageListDock->GetActiveSeries()->UpdateImageWindow(slice+i, wc, ww);
+            m_pImageListDock->GetActiveSeries()->SetCurrentWC(slice+i, wc);
+            m_pImageListDock->GetActiveSeries()->SetCurrentWW(slice+i, ww);
+        }
     }
 }
 
 
 void Window::UpdateImage(int index)
 {
-    m_ImageHandler.SetActiveIndex(index);
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    m_pImageListDock->SetActiveSeriesIndex(index);
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
-    short tmp1 = imageObj->GetCurrentWC();
-    short tmp2 = imageObj->GetCurrentWW();
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(tmp1);
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(tmp2);
+    short tmp1 = imageObj->GetCurrentWC(0);
+    short tmp2 = imageObj->GetCurrentWW(0);
+    SetupImageWindow(tmp1, tmp2);
     UpdateImage();
-    SetupAnnotation();
+    SetupAnnotation(index);
 }
 
 
 void Window::UpdateActiveSlice(int deltaX, int deltaY)
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-    int w = imageObj->GetWidth(0);
-    int h = imageObj->GetHeight(0);
-    double factor = imageObj->GetCurrentSizeFactor();
-    m_pCanvas->Resize(w*factor, h*factor);
-    short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
-    short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice() - deltaY;
+        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSliceIndex() - deltaY;
 
-        if(slice>=imageObj->GetMinSliceNum()+i &&
-           slice<=imageObj->GetMaxSliceNum()-m_pCanvas->GetNumDisplays()+i)
+        if(slice>=0+i &&
+           slice<=imageObj->GetDepth()-m_pCanvas->GetNumDisplays()+i)
         {
-            m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(slice);
-            m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSliceIndex(slice);
+            SetupAnnotation(i);
         }
     }
 
-    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSlice();
-    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(slice));
-    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(slice));
-
-    SetupAnnotation();
+    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSliceIndex();
+    disconnect(m_pImageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
+    disconnect(m_pImageWindowingDock->GetSliderWW(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
+    m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetCurrentWC(slice));
+    m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetCurrentWW(slice));
+    connect(m_pImageWindowingDock->GetSliderWC(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
+    connect(m_pImageWindowingDock->GetSliderWW(), SIGNAL(valueChanged(int)), this, SLOT(UpdateImage()));
 }
 
 
 void Window::ResetWindow()
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
-        m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(slice));
-        m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(slice));
-        m_ImageHandler.UpdateImage(imageObj->GetDefaultWC(slice),
-                                   imageObj->GetDefaultWW(slice),
-                                   slice,
-                                   m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+        if (i<imageObj->GetDepth())
+        {
+            int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSliceIndex();
+            SetupAnnotation(i);
+        }
     }
-
-    SetupAnnotation();
+    int slice = m_pCanvas->GetDisplayWidget(0)->GetActiveSliceIndex();
+    m_pImageListDock->GetActiveSeries()->UpdateImageWindow(slice,
+                                                           imageObj->GetDefaultWC(slice),
+                                                           imageObj->GetDefaultWW(slice));
+    SetupImageWindow(imageObj->GetDefaultWC(slice), imageObj->GetDefaultWW(slice));
 }
 
 
 void Window::ZoomIn25Present()
 {
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
     Pan(0.025);
 }
@@ -508,7 +501,7 @@ void Window::ZoomIn25Present()
 
 void Window::ZoomOut25Present()
 {
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
     Pan(-0.025);
 }
@@ -516,9 +509,9 @@ void Window::ZoomOut25Present()
 
 void Window::ZoomOriginalSize()
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
     int temp = imageObj->GetWidth(0);
     int temp1 = imageObj->GetHeight(0);
@@ -527,23 +520,22 @@ void Window::ZoomOriginalSize()
                       imageObj->GetHeight(0));
     m_pResizeToolbar->GetComboResize()->setCurrentText(QString("100%"));
 
-    double size = (double)((m_pCanvas->size().height()+10)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(0);
-    imageObj->SetCurrentSizeFactor(size);
+    double size = (double)((m_pCanvas->size().height()+5)/m_pCanvas->GetVerticalNum())/(double)imageObj->GetHeight(0);
+    m_pCanvas->SetSizeFactor(size);
 }
 
 
 void Window::ZoomFitToHeight()
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
 
-    double size = (double)m_pScrollArea->height()/(((double)imageObj->GetHeight(0)+10)*m_pCanvas->GetVerticalNum());
+    double size = (double)m_pScrollArea->height()/(((double)imageObj->GetHeight(0)+5)*m_pCanvas->GetVerticalNum());
     m_pCanvas->Resize(imageObj->GetWidth(0)*size, imageObj->GetHeight(0)*size);
+    m_pCanvas->SetSizeFactor(size);
 
-
-    imageObj->SetCurrentSizeFactor(size);
     std::ostringstream ss;
     ss << 100.0*size;
     std::string currentText(ss.str());
@@ -554,9 +546,9 @@ void Window::ZoomFitToHeight()
 
 void Window::ZoomCustomSize()
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
     std::string temp = m_pResizeToolbar->GetComboResize()->currentText().toStdString();
 
@@ -570,54 +562,54 @@ void Window::ZoomCustomSize()
     m_pCanvas->Resize(original*tmp/100.0);
 
     double size = tmp/100.0;
-    imageObj->SetCurrentSizeFactor(size);
+    m_pCanvas->SetSizeFactor(size);
 }
 
 
 void Window::ZoomComboResize(int index)
 {
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetActiveSeries();
 
-    if(m_ImageHandler.GetActiveIndex()<0)
+    if(m_pImageListDock->GetActiveSeriesIndex()<0)
         return;
     QSize original = QSize(imageObj->GetWidth(0), imageObj->GetHeight(0));
     switch(index)
     {
     case 0:
         m_pCanvas->Resize(original*8.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(8.0);
         break;
     case 1:
         m_pCanvas->Resize(original*7.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(7.0);
         break;
     case 2:
         m_pCanvas->Resize(original*6.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(6.0);
         break;
     case 3:
         m_pCanvas->Resize(original*5.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(5.0);
         break;
     case 4:
         m_pCanvas->Resize(original*4.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(4.0);
         break;
     case 5:
         m_pCanvas->Resize(original*3.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(3.0);
         break;
     case 6:
         m_pCanvas->Resize(original*2.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(2.0);
         break;
     case 7:
         m_pCanvas->Resize(original*1.0);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(1.0);
         break;
     case 8:
         m_pCanvas->Resize(original*0.5);
-        imageObj->SetCurrentSizeFactor(8.0);
+        m_pCanvas->SetSizeFactor(0.5);
         break;
     default:
         std::cout<<"Combo resize: no such index found."<<std::endl;
@@ -637,27 +629,22 @@ void Window::UpdateDisplayLayout()
         connect(m_pCanvas->GetDisplayWidget(i), SIGNAL(RightButtonMove(float)), this, SLOT(Pan(float)));
     }
 
-    std::shared_ptr<ImageContainer> imageObj = m_ImageHandler.GetImageObj();
-    int w = imageObj->GetWidth(0);
-    int h = imageObj->GetHeight(0);
-    double factor = imageObj->GetCurrentSizeFactor();
+    std::shared_ptr<ImageData> imageObj = m_pImageListDock->GetSeries(m_pImageListDock->GetActiveSeriesIndex());
+    SetupImageWindow(imageObj->GetDefaultWC(0), imageObj->GetDefaultWW(0));
 
     for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
     {
-        if(i>=imageObj->GetMinSliceNum()+i &&
-           i<=imageObj->GetMaxSliceNum()-m_pCanvas->GetNumDisplays()+i)
+        m_pCanvas->GetDisplayWidget(i)->SetImageData(m_pImageListDock->GetActiveSeries());
+
+        if(i<imageObj->GetDepth() &&
+           i<m_pCanvas->GetNumDisplays())
         {
-            m_pCanvas->GetDisplayWidget(i)->SetActiveSlice(i);
-            m_pImageWindowingDock->GetSpinBoxWC()->setValue(imageObj->GetDefaultWC(i));
-            m_pImageWindowingDock->GetSpinBoxWW()->setValue(imageObj->GetDefaultWW(i));
-
-            short tmp1 = m_pImageWindowingDock->GetSpinBoxWC()->value();
-            short tmp2 = m_pImageWindowingDock->GetSpinBoxWW()->value();
-            m_pCanvas->Resize(w*factor, h*factor);
-
-            int slice = m_pCanvas->GetDisplayWidget(i)->GetActiveSlice();
-            m_ImageHandler.UpdateImage(tmp1, tmp2, slice, m_pCanvas->GetDisplayWidget(i)->GetDisplayImage());
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSliceIndex(i);
+            SetupAnnotation(i);
+        }
+        else
+        {
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSliceIndex(-1);
         }
     }
-    SetupAnnotation();
 }

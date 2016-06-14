@@ -11,6 +11,9 @@ public:
     ImageIO();
     ~ImageIO();
 
+    static ShortImageType::Pointer ReadDICOMSlice(std::string inputFile, DICOMIOType::Pointer IO);
+
+
     static bool ReadPNGImage(std::string inputFile, UnsignedCharImageType::Pointer& imageObj);
     static bool WritePNGImage(std::string outputFile, UnsignedCharImageType::Pointer& imageObj);
 
