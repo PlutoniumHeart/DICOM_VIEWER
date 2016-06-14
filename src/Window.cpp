@@ -439,9 +439,23 @@ void Window::UpdateImage(int index)
 
     short tmp1 = imageObj->GetCurrentWC(0);
     short tmp2 = imageObj->GetCurrentWW(0);
+    for (int i=0;i<m_pCanvas->GetNumDisplays();i++)
+    {
+        if(i<imageObj->GetDepth() &&
+           i<m_pCanvas->GetNumDisplays())
+        {
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSliceIndex(i);
+            SetupAnnotation(i);
+        }
+        else
+        {
+            m_pCanvas->GetDisplayWidget(i)->SetActiveSliceIndex(-1);
+        }
+        SetupAnnotation(i);
+    }
     SetupImageWindow(tmp1, tmp2);
     UpdateImage();
-    SetupAnnotation(index);
+    ZoomFitToHeight();
 }
 
 
